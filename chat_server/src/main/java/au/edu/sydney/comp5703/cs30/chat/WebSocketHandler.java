@@ -1,12 +1,11 @@
 package au.edu.sydney.comp5703.cs30.chat;
 
 
+import au.edu.sydney.comp5703.cs30.chat.models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import static au.edu.sydney.comp5703.cs30.chat.ClientSession.sessionMap;
@@ -29,6 +28,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 var sendMessageRequest = om.treeToValue(treeNode, SendMessageRequest.class);
                 handleSendMessageRequest(session, sendMessageRequest);
                 break;
+            case "createChannel":
+                var createChannelRequest = om.treeToValue(treeNode, CreateChannelRequest.class);
             default:
                 System.err.println("Unknown cmd: " + cmd);
                 break;
