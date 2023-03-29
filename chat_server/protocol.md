@@ -15,6 +15,7 @@ The server and client communicates in json using websocket text mode. There are 
 ```json
 {
   "type": "res",
+  "request": "request type-string",
   "success": true,
   "message": "error message description",
   "result": {...}
@@ -35,6 +36,7 @@ The server and client communicates in json using websocket text mode. There are 
 ```json
 {
   "type": "res",
+  "request": "auth",
   "success": true,
   "result": {
     "userId": "user-id",
@@ -49,23 +51,27 @@ The server and client communicates in json using websocket text mode. There are 
   "type": "sendMessage",
   "args": {
     "content": "message content",
-    "channel": "channel-id"
+    "channel": "numeric channel-id"
   }
 }
 ```
 ```json
 {
   "type": "res",
-  "success": true
+  "request": "sendMessage",
+  "success": true,
+  "result": {
+    "messageId": 114514
+}
 }
 ```
 
 #### Get historical Messages
 ```json
 {
-  "type": "getMessage",
+  "type": "getMessages",
   "args": {
-    "channel": "channel-id",
+    "channel": "numeric channel-id",
     "id": "(optional) message-id",
     "afterId": "(optional) return messages after this id",
     "afterTime": "(optional) return messages after "
@@ -75,9 +81,10 @@ The server and client communicates in json using websocket text mode. There are 
 ```json
 {
   "type": "res",
+  "request": "getMessages",
   "success": true,
   "result": {
-    
+    "messages": [1, 2, 4, 8, 16]
   }
 }
 ```
@@ -90,16 +97,17 @@ The server and client communicates in json using websocket text mode. There are 
   "type": "createChannel",
   "args": {
     "name": "channel name",
-    "workspace": "workspace-id"
+    "workspace": "numeric workspace-id"
   }
 }
 ```
 ```json
 {
   "type": "res",
+  "request": "createChannel",
   "success": true,
   "result": {
-    "channelId": "channel-id"
+    "channelId": "numeric channel-id"
   }
 }
 ```
@@ -118,9 +126,10 @@ The server and client communicates in json using websocket text mode. There are 
 ```json
 {
   "type": "res",
+  "request": "joinChannel",
   "success": true,
   "result": {
-    "channelId": "channel-id"
+    "channelId": "numeric channel-id"
   }
 }
 ```
@@ -137,6 +146,7 @@ The server and client communicates in json using websocket text mode. There are 
 ```json
 {
   "type": "res",
+  "request": "getChannels",
   "success": true,
   "result": {
     "channels": []
@@ -154,6 +164,7 @@ The server and client communicates in json using websocket text mode. There are 
 ```json
 {
   "type": "res",
+  "request": "getUserInfo",
   "success": true,
   "result": {
     "id": 23333,
@@ -162,15 +173,19 @@ The server and client communicates in json using websocket text mode. There are 
 }
 ```
 #### Get Channel info
+
 ```json
 {
   "type": "getChannelInfo",
-  "id": "channel-id"
+  "args": {
+    "channelId": "numeric channel-id"
+  },
 }
 ```
 ```json
 {
   "type": "res",
+  "request": "getChannelInfo",
   "success": true,
   "result": {
     "id": 23333,
@@ -192,7 +207,9 @@ The server and client communicates in json using websocket text mode. There are 
 {
   "type": "newMessage",
   "data": {
-    "messageId": "message-id"
+    "messageId": "message-id",
+    "preview": "preview text",
+    "senderId": "numeric sender id"
   }
 }
 ```
