@@ -1,22 +1,14 @@
 package au.edu.sydney.comp5703.cs30.chat.model;
 
 public class CreateChannelRequest {
-    public String name;
-    public long users[];
+    private String name;
+    private long workspace = 0;  // this is currently a stub
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public long[] getUsers() {
-        return users;
-    }
-
-    public void setUsers(long[] users) {
-        this.users = users;
+    public long getWorkspace() {
+        return workspace;
     }
 }

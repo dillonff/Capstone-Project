@@ -118,7 +118,6 @@ The server and client communicates in json using websocket text mode. There are 
   "type": "joinChannel",
   "args": {
     "channel": "channel-id",
-    "workspace": "workspace-id",
     "user": "user-id"
   }
 }
@@ -127,10 +126,7 @@ The server and client communicates in json using websocket text mode. There are 
 {
   "type": "res",
   "request": "joinChannel",
-  "success": true,
-  "result": {
-    "channelId": "numeric channel-id"
-  }
+  "success": true
 }
 ```
 
@@ -149,7 +145,7 @@ The server and client communicates in json using websocket text mode. There are 
   "request": "getChannels",
   "success": true,
   "result": {
-    "channels": []
+    "channelIds": []
   }
 }
 ```

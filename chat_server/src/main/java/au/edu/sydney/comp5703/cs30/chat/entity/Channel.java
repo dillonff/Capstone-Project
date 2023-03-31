@@ -2,10 +2,7 @@ package au.edu.sydney.comp5703.cs30.chat.entity;
 
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Channel {
@@ -35,6 +32,14 @@ public class Channel {
     private String name;
     private long timeCreated;
     private List<User> participants;
+
+    public List<Long> getParticipantIds() {
+        var ids = new LinkedList<Long>();
+        for (var user : participants) {
+            ids.add(user.getId());
+        }
+        return ids;
+    }
 
     public long getId() {
         return id;
