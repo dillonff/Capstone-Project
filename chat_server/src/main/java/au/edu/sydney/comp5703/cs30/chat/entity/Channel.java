@@ -1,6 +1,8 @@
 package au.edu.sydney.comp5703.cs30.chat.entity;
 
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,8 +33,10 @@ public class Channel {
     private long id;
     private String name;
     private long timeCreated;
+    @JsonIgnore
     private List<User> participants;
 
+    @JsonProperty("participantIds")
     public List<Long> getParticipantIds() {
         var ids = new LinkedList<Long>();
         for (var user : participants) {
