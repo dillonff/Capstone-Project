@@ -8,17 +8,28 @@ const nullChannel = {
   participantIds: []
 }
 
+const API_ENDPOINT = 'http://127.0.0.1:11451/api/v1';
+function callApi(path, method, auth, body) {
+  return fetch(API_ENDPOINT + path, {
+    method: method,
+    mode: 'cors',
+    body: body,
+    headers: {
+      'authorization': auth,
+      'content-type': 'application/json'
+    }
+  });
+}
+
 function App() {
-
-
   let [status, setStatus] = React.useState('disconnected');
   let [ws, setWs] = useState(null);
   let [msgList, setMsgList] = useState([]);
+  let auth = useRef();
   const msgListRef = React.useRef(msgList);
   let [msgToSend, setMsgToSend] = useState('');
   let [userName, setUserName] = useState('user-' + new Date().getTime());
   let [channels, setChannels] = useState([]);
-  const channelsRef = useRef(channels);
   let [currentChannel, setCurrentChannel] = useState(nullChannel);
   const addUserIdRef = useRef(null);
   let msgElems = [];
@@ -37,6 +48,7 @@ function App() {
     console.log(channel);
     const clickCb = () => {
       setMsgList([]);
+      msgListRef.current = [];
       setCurrentChannel(channel);
     }
     let elem = <div key={i} style={{padding: '5px', margin: '5px', border: '1px solid black', cursor: 'pointer'}} onClick={clickCb}>
@@ -45,113 +57,101 @@ function App() {
     </div>
     channelElems.push(elem);
   }
+  if (channelElems.length === 0) {
+    channelElems.push(<div key='-1'>No channel</div>);
+  }
 
-  const getAllChannels = (ws) => {
-    const req = {
-      type: 'getChannels',
-      args: {}
+  const getAllChannels = async () => {
+    let res = await callApi('/channels', 'GET', auth.current);
+    if (!res.ok)
+      throw new Error('api failed');
+    res = await res.json();
+    let newChannels = [];
+    for (let channelId of res.channelIds) {
+      res = await callApi('/channel?channelId=' + channelId, 'GET', auth.current);
+      if (!res.ok)
+        throw new Error('api failed');
+      res = await res.json();
+      newChannels.push(res);
+      if (res.id === currentChannel.id) {
+        setCurrentChannel(res);
+      }
+      if (currentChannel.id === -1 && res.name === 'general') {
+        setCurrentChannel(res);
+      }
     }
-    window.ws.send(JSON.stringify(req));
+    setChannels(newChannels);
   }
 
   const addUserToChannel = (ws, cid, uid) => {
-    const req = {
-      type: 'joinChannel',
-      args: {
-        user: parseInt(uid),
-        channel: parseInt(cid)
-      }
+    let req = {
+      user: parseInt(uid),
+      channel: parseInt(cid)
     }
-    ws.send(JSON.stringify(req));
+    req = JSON.stringify(req);
+    return callApi('/channel/join', 'POST', auth.current, req);
   }
 
-  const doConnect = () => {
-    let newWs = new WebSocket('ws://127.0.0.1:11451/chat-ws');
-    newWs.onmessage = (event) => {
+  if (ws) {
+    ws.onmessage = (event) => {
       let res = JSON.parse(event.data);
       // console.log(event);
       console.log(res)
       switch (res.type) {
         case 'res':
-          switch (res.request) {
-            case 'auth':
-              if (res.success) {
-                setStatus(`logged in as (${res.result.userId})`);
-                getAllChannels(window.ws);
-              }
-              break;
-            case 'sendMessage':
-              break;
-            case 'getChannels':
-              for (let channelId of res.result.channelIds) {
-                let req = {
-                  type: 'getChannelInfo',
-                  args: {
-                    channelId: channelId
-                  }
-                };
-                window.ws.send(JSON.stringify(req));
-              }
-              break;
-            case 'getChannelInfo':
-              let newChannels = [];
-              let hasId = false;
-              for (let channel of channelsRef.current) {
-                
-                console.error(channel);
-                if (channel.id != res.result.id) {
-                  newChannels.push(channel);
-                } else {
-                  hasId = true;
-                  newChannels.push(res.result);
-                }
-              }
-              if (!hasId) {
-                newChannels.push(res.result);
-              }
-              console.log(newChannels)
-              setChannels(newChannels);
-              channelsRef.current = newChannels;
-              if (currentChannel.id === -1 && res.result.name === 'general') {
-                setCurrentChannel(res.result);
-              }
-              break;
-            case 'createChannel':
-              getAllChannels();
-              break;
-          }
+          setStatus(`logged in as (${res.result.userId})`);
           break;
         case 'newMessage':
           let msg = {
             message: res.data.preview,
             sender: res.data.senderId   // TODO: obtain the user info and then set this sender properly
           }
-          let newMsgList = [...msgListRef.current, msg];
-          setMsgList(newMsgList);
-          msgListRef.current = newMsgList;
+          console.error(res.data);
+          if (res.data.channelId === currentChannel.id) {
+            let newMsgList = [...msgListRef.current, msg];
+            setMsgList(newMsgList);
+            msgListRef.current = newMsgList;
+          }
+          break;
+        case 'infoChanged':
+          getAllChannels();
           break;
         default:
           break;
       }
     }
-    newWs.onerror = (e) => {
+    ws.onerror = (e) => {
       setStatus('error');
       console.error(e);
     }
-    newWs.onopen = (e) => {
-      newWs.send(JSON.stringify({
+    ws.onopen = (e) => {
+      ws.send(JSON.stringify({
         'type': 'auth',
         'args': {
           userName: userName
         }
       }));
-      setWs(newWs);
-      window.ws = newWs;
       setStatus('connected');
     }
-    newWs.onclose = (e) => {
+    ws.onclose = (e) => {
       setStatus('closed');
     }
+  }
+
+  const doConnect = async () => {
+    let res = await callApi('/auth', 'POST', '-1', JSON.stringify({
+      userName: userName
+    }));
+    if (!res.ok) {
+      console.error(res);
+      return false;
+    }
+    res = await res.json();
+    auth.current = res.userId;
+    getAllChannels();
+    
+    let newWs = new WebSocket('ws://127.0.0.1:11451/chat-ws');
+    setWs(newWs);
   }
 
   return (
@@ -162,13 +162,11 @@ function App() {
           <input type='button' value='create channel' onClick={_ => {
             let name = prompt('channel name: ');
             if (name) {
-              const req = {
-                'type': 'createChannel',
-                args: {
-                  name: name
-                }
+              let req = {
+                name: name
               }
-              window.ws.send(JSON.stringify(req));
+              req = JSON.stringify(req);
+              callApi('/channel', 'POST', auth.current, req);
             }
           }}></input>
           <input type='button' value='refresh channel' onClick={_ => {
@@ -189,9 +187,13 @@ function App() {
         <div>Channel ({currentChannel.id}): {currentChannel.name}</div>
         <div style={{display: 'flex'}}>
           <input type='button' value='Add user (id)' style={{marginRight: '5px'}} onClick={_ => {
-            addUserToChannel(window.ws, currentChannel.id, addUserIdRef.current.value);
+            addUserToChannel(window.ws, currentChannel.id, addUserIdRef.current.value).then(res => {
+              if (!res.ok) {
+                console.error(res);
+                alert('cannot add user');
+              }
+            });
             addUserIdRef.current.value = '';
-            getAllChannels();
           }}></input>
           <input type='text' ref={addUserIdRef}></input>
         </div>
@@ -201,15 +203,18 @@ function App() {
         <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '15px'}}>
           <input type="text" value={msgToSend} onInput={e => setMsgToSend(e.target.value)}></input>
           <input type="button" value="Send" onClick={() => {
-            let msg = {
-              type: 'sendMessage',
-              args: {
-                content: msgToSend,
-                channel: currentChannel.id   // hardcoded 'general channel'
-              }
+            let body = {
+              content: msgToSend,
+              channel: currentChannel.id
             }
-            ws.send(JSON.stringify(msg));
-            setMsgToSend("");
+            body = JSON.stringify(body);
+            callApi('/sendMessage', 'POST', auth.current, body).then(res => {
+              if (res.ok) {
+                setMsgToSend("");
+              } else {
+                console.error(res);
+              }
+            })
           }}></input>
         </div>
       </div>

@@ -39,6 +39,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 var authRequest = om.treeToValue(argsNode, AuthRequest.class);
                 handleAuthRequest(wssession, authRequest);
                 break;
+                /*  // deprecated, do not implement
             case "sendMessage":
                 var sendMessageRequest = om.treeToValue(argsNode, SendMessageRequest.class);
                 handleSendMessageRequest(wssession, sendMessageRequest);
@@ -64,7 +65,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 var gcir = om.treeToValue(argsNode, GetChannelInfoRequest.class);
                 handleGetChannelInfo(wssession, gcir);
                 break;
-
+            */
             default:
                 System.err.println("Unknown type: " + type);
                 break;
@@ -139,10 +140,19 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     private void handleAuthRequest(WebSocketSession wssession, AuthRequest ar) throws Exception {
         // construct a new user
-        var user = new User(ar.getUserName());
-        User.userMap.put(user.getId(), user);
+        User user = null;
+        // workaround for the temporary authentication
+        for (var tmp : User.userMap.values()) {
+            if (tmp.getName().equals(ar.getUserName())) {
+                user = tmp;
+            }
+        }
+        if (user == null) {
+            wssession.close();
+            throw new RuntimeException("user not authenticated");
+        }
         // add the user to general channel
-        Channel.general.getParticipants().add(user);
+        // Channel.general.getParticipants().add(user);
         // create a client session for newly connected client
         var clientSession = new ClientSession(wssession, user);
         ClientSession.put(wssession.getId(), clientSession);
@@ -169,7 +179,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         sendOneMessage(wssession, respPayload);
 
         // send a new message push to all members in the channel
-        var msg = new NewMessagePush(message.getId(), message.getContent(), message.getSender().getId());
+        var msg = new NewMessagePush(message.getId(), message.getContent(), message.getSender().getId(), message.getChannel().getId());
         var bcastPayload = makeServerPush("newMessage", msg);
         broadcastMessagesToChannel(bcastPayload, channel);
     }

@@ -4,11 +4,13 @@ public class NewMessagePush {
     private long messageId;
     private String preview;
     private long senderId;
+    private long channelId;
 
-    public NewMessagePush(long messageId, String preview, long senderId) {
+    public NewMessagePush(long messageId, String preview, long senderId, long channelId) {
         this.messageId = messageId;
         this.preview = preview;
         this.senderId = senderId;
+        this.channelId = channelId;
     }
 
     public long getMessageId() {
@@ -21,5 +23,9 @@ public class NewMessagePush {
 
     public long getSenderId() {
         return senderId;
+    }
+
+    public long getChannelId() {
+        return channelId;
     }
 }

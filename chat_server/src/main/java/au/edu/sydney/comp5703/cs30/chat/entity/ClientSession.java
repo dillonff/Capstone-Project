@@ -2,10 +2,7 @@ package au.edu.sydney.comp5703.cs30.chat.entity;
 
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientSession {
@@ -29,6 +26,10 @@ public class ClientSession {
 
     public static List<ClientSession> getByUserId(Long id) {
         return userMap.get(id);
+    }
+
+    public static Collection<ClientSession> getAll() {
+        return sessionMap.values();
     }
 
     public static void remove(String wsid) {
