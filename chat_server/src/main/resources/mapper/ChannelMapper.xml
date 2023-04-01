@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper">
+    <resultMap id="ChannelMap" type="au.edu.sydney.comp5703.cs30.chat.entity.Channel">
+        <id column="groupid" property="id"/>
+        <result column="groupname" property="Name"/>
+        <result column="createtime" property="timeCreated"/>
+        <result column="members" property="participants"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="groupid">
+        insert into chatlog(
+            groupid,groupname,createtime,members
+        ) values (
+                     #{id},#{Name},#{time},#{particpants}
+                 )
+    </insert>
+
+    <select id="findChannel" resultMap="ChannelMap">
+        select * from usergroup where groupid=#{id}
+    </select>
+</mapper>

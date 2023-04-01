@@ -10,15 +10,7 @@ public class User {
     private String name;
     private long timeCreated;
 
-    private String userName;
 
-    private String email;
-
-    private String phone;
-
-    private int age;
-
-    private String gender;
 
 
     public static Map<Long, User> userMap = new ConcurrentHashMap<>();
@@ -59,43 +51,5 @@ public class User {
         this.timeCreated = timeCreated;
     }
 
-    public String getUserName() {
-        return userName;
-    }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
 }

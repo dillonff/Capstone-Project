@@ -1,5 +1,7 @@
 package au.edu.sydney.comp5703.cs30.chat.db;
 
+import au.edu.sydney.comp5703.cs30.chat.entity.User;
+
 import java.util.List;
 
 public class Workspace {

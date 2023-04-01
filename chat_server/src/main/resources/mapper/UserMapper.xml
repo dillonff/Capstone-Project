@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="au.edu.sydney.comp5703.cs30.chat.mapper.UserMapper">
+    <resultMap id="UserEntityMap" type="au.edu.sydney.comp5703.cs30.chat.entity.User">
+
+        <id column="userid" property="id"></id>
+        <result column="username" property="name"></result>
+        <result column="createtime" property="timeCreated"></result>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userid">
+        insert into user(
+            userid,username,createtime
+        ) values (
+                     #{id},#{name},#{timeCreated}
+                 )
+    </insert>
+
+    <select id="findByUid" resultMap="UserEntityMap">
+        select * from user where account_id=#{id}
+    </select>
+
+
+
+</mapper>

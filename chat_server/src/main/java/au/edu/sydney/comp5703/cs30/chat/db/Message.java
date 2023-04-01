@@ -6,6 +6,6 @@ public class Message {
     private long id;
     private String content;
     private long time;
-    private Channel channel;
-    private User sender;
+    private long channelId;
+    private long senderId;
 }

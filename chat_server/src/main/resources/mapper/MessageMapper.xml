@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="au.edu.sydney.comp5703.cs30.chat.mapper.MessageMapper">
+    <resultMap id="MessageMap" type="au.edu.sydney.comp5703.cs30.chat.entity.Message">
+        <id column="messageid" property="id"/>
+        <result column="senderid" property="senderId"/>
+        <result column="timelog" property="time"/>
+        <result column="content" property="content"/>
+        <result column="groupid" property="channelId"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="messageid">
+        insert into chatlog(
+            messageid,senderid,groupid,timelog,content
+        ) values (
+                     #{id},#{senderId},#{channelId},#{time},#{content}
+                 )
+    </insert>
+
+    <select id="findByChannel" resultMap="MessageMap">
+        select * from chatlog where groupid=#{channelId}
+    </select>
+</mapper>
