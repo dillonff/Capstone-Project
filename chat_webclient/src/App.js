@@ -208,7 +208,7 @@ function App() {
               channel: currentChannel.id
             }
             body = JSON.stringify(body);
-            callApi('/sendMessage', 'POST', auth.current, body).then(res => {
+            callApi('/message/send', 'POST', auth.current, body).then(res => {
               if (res.ok) {
                 setMsgToSend("");
               } else {

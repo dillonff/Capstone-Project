@@ -17,7 +17,7 @@ public class MessageController {
 
     private static final ObjectMapper om = new ObjectMapper();
     @RequestMapping(
-            value = "/api/v1/sendMessage", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
+            value = "/api/v1/message/send", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
     public SendMessageResponse handleSendMessage(@RequestBody SendMessageRequest req, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
         // for existing client, first figure out the clientSession that was created in auth
