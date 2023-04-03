@@ -3,7 +3,6 @@ package au.edu.sydney.comp5703.cs30.chat;
 
 import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
 import au.edu.sydney.comp5703.cs30.chat.entity.ClientSession;
-import au.edu.sydney.comp5703.cs30.chat.entity.Message;
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import au.edu.sydney.comp5703.cs30.chat.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,9 +13,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 
 
 public class WebSocketHandler extends TextWebSocketHandler {
@@ -39,33 +35,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 var authRequest = om.treeToValue(argsNode, AuthRequest.class);
                 handleAuthRequest(wssession, authRequest);
                 break;
-                /*  // deprecated, do not implement
-            case "sendMessage":
-                var sendMessageRequest = om.treeToValue(argsNode, SendMessageRequest.class);
-                handleSendMessageRequest(wssession, sendMessageRequest);
-                break;
-            case "getMessages":
-                // TODO
-                break;
-            case "createChannel":
-                var ccr = om.treeToValue(argsNode, CreateChannelRequest.class);
-                handleCreateChannel(wssession, ccr);
-                break;
-            case "joinChannel":
-                var jcr = om.treeToValue(argsNode, JoinChannelRequest.class);
-                handleJoinChannel(wssession, jcr);
-                break;
-            case "getChannels":
-                handleGetChannels(wssession);
-                break;
-            case "getUserInfo":
-                // TODO
-                break;
-            case "getChannelInfo":
-                var gcir = om.treeToValue(argsNode, GetChannelInfoRequest.class);
-                handleGetChannelInfo(wssession, gcir);
-                break;
-            */
             default:
                 System.err.println("Unknown type: " + type);
                 break;
@@ -163,67 +132,4 @@ public class WebSocketHandler extends TextWebSocketHandler {
         sendOneMessage(wssession, resp);
     }
 
-    private void handleSendMessageRequest(WebSocketSession wssession, SendMessageRequest smr) throws Exception {
-        // for existing client, first figure out the clientSession that was created in auth
-        var clientSession = ClientSession.getByWsId(wssession.getId());
-        // then figure out the channel by id
-        var channelId = smr.getChannel();
-        var channel = Channel.channelMap.get(channelId);
-        // save the message to the memory
-        var message = new Message(smr.getContent(), channel, clientSession.getUser());
-        Message.messageMap.put(message.getId(), message);
-
-        // build and send the response
-        var result = new SendMessageResponse(message.getId());
-        var respPayload = makeSuccessfulServerResponse("sendMessage", result);
-        sendOneMessage(wssession, respPayload);
-
-        // send a new message push to all members in the channel
-        var msg = new NewMessagePush(message.getId(), message.getContent(), message.getSender().getId(), message.getChannel().getId());
-        var bcastPayload = makeServerPush("newMessage", msg);
-        broadcastMessagesToChannel(bcastPayload, channel);
-    }
-
-    private void handleCreateChannel(WebSocketSession wssession, CreateChannelRequest ccr) throws Exception {
-        // for existing client, first figure out the clientSession that was created in auth
-        var clientSession = ClientSession.getByWsId(wssession.getId());
-        // create an in-memory channel
-        var channel = new Channel(ccr.getName());
-        Channel.channelMap.put(channel.getId(), channel);
-        channel.getParticipants().add(clientSession.getUser());
-        var result = new CreateChannelResponse(channel.getId());
-        var resp = makeSuccessfulServerResponse("createChannel", result);
-        sendOneMessage(wssession, resp);
-    }
-
-    private void handleJoinChannel(WebSocketSession wssession, JoinChannelRequest ccr) throws Exception {
-        var clientSession = ClientSession.getByWsId(wssession.getId());
-        var channel = Channel.channelMap.get(ccr.getChannel());
-        var user = User.userMap.get(ccr.getUser());
-        channel.getParticipants().add(user);
-        // make a response without a result
-        var resp = makeSuccessfulServerResponse("joinChannel", null);
-        sendOneMessage(wssession, resp);
-    }
-
-    private void handleGetChannels(WebSocketSession wssession) throws Exception {
-        var clientSession = ClientSession.getByWsId(wssession.getId());
-        var channelIds = new LinkedList<Long>();
-        for (var channel : Channel.channelMap.values()) {
-            channelIds.add(channel.getId());
-        }
-        var result = new GetChannelsResponse(channelIds);
-        var resp = makeSuccessfulServerResponse("getChannels", result);
-        sendOneMessage(wssession, resp);
-    }
-
-    private void handleGetChannelInfo(WebSocketSession wssession, GetChannelInfoRequest r) throws Exception {
-        var clientSession = ClientSession.getByWsId(wssession.getId());
-        var channel = Channel.channelMap.get(r.getChannelId());
-        var resultTree = (ObjectNode) om.valueToTree(channel);
-        var idsTree = om.valueToTree(channel.getParticipantIds());
-        resultTree.set("participantIds", idsTree);
-        var resp = makeSuccessfulServerResponse("getChannelInfo", resultTree);
-        sendOneMessage(wssession, resp);
-    }
 }
