@@ -3,6 +3,7 @@ package au.edu.sydney.comp5703.cs30.chat.controller;
 import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
+import au.edu.sydney.comp5703.cs30.chat.entity.Workspace;
 import au.edu.sydney.comp5703.cs30.chat.model.AuthRequest;
 import au.edu.sydney.comp5703.cs30.chat.model.AuthResponse;
 import au.edu.sydney.comp5703.cs30.chat.model.InfoChangedPush;
@@ -38,8 +39,9 @@ public class AuthController {
         if (user == null) {
             user = new User(req.getUserName());
             Repo.userMap.put(user.getId(), user);
-            // add the user to general channel
-            Repo.addMemberToChannel(Channel.general.getId(), user.getId());
+            // add the user to default workspace and general channel
+            Repo.addMemberToWorkspace(Workspace.def.getId(), user.getId());
+
 
             var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
             broadcastMessages(p);

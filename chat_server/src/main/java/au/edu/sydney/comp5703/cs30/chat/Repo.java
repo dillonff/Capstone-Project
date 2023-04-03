@@ -18,9 +18,23 @@ public class Repo {
     public static Map<Long, WorkspaceMember> workspaceMemberMap = new ConcurrentHashMap<>();
     public static Map<Long, ChannelMember> channelMemberMap = new ConcurrentHashMap<>();
 
+    public static Map<Long, WorkspaceChannel> workspaceChannelMap = new ConcurrentHashMap<>();
+
     public static void addMemberToChannel(long channelId, long userId) {
         var m = new ChannelMember(channelId, userId);
         channelMemberMap.put(m.getId(), m);
+    }
+
+    public static void addMemberToWorkspace(long workspaceId, long userId) {
+        var m = new WorkspaceMember(workspaceId, userId);
+        workspaceMemberMap.put(m.getId(), m);
+        var general = Util.getChannelForName(workspaceId, "general");
+        addMemberToChannel(general.getId(), userId);
+    }
+
+    public static void addChannelToWorkspace(long workspaceId, long channelId) {
+        var c = new WorkspaceChannel(workspaceId, channelId);
+        workspaceChannelMap.put(c.getId(), c);
     }
 
 }
