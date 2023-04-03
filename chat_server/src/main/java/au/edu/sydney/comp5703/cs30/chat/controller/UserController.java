@@ -22,7 +22,7 @@ public class UserController {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.");
         }
-        return new GetUserResponse(user.getId(), user.getUserName(), user.getName());
+        return new GetUserResponse(user.getId(), user.getName(), user.getName());
     }
 
 }
