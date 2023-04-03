@@ -68,7 +68,7 @@ function App() {
     res = await res.json();
     let newChannels = [];
     for (let channelId of res.channelIds) {
-      res = await callApi('/channel?channelId=' + channelId, 'GET', auth.current);
+      res = await callApi('/channel/' + channelId, 'GET', auth.current);
       if (!res.ok)
         throw new Error('api failed');
       res = await res.json();

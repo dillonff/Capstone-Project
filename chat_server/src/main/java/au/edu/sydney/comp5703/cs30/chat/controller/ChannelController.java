@@ -81,9 +81,9 @@ public class ChannelController {
     }
 
     @RequestMapping(
-            value = "/api/v1/channel", produces = "application/json", method = RequestMethod.GET
+            value = "/api/v1/channel/{channelId}", produces = "application/json", method = RequestMethod.GET
     )
-    public Channel handleGetChannelInfo(@RequestParam long channelId, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
+    public Channel handleGetChannelInfo(@PathVariable long channelId, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
         var user = User.userMap.get(auth);
         System.out.println(user.getName());
         var channel = Channel.channelMap.get(channelId);
