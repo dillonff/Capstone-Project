@@ -1,11 +1,5 @@
 package au.edu.sydney.comp5703.cs30.chat.entity;
 
-import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
-import au.edu.sydney.comp5703.cs30.chat.entity.User;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 public class Message {
     private long id;
     private String content;
@@ -13,7 +7,6 @@ public class Message {
     private Channel channel;
     private User sender;
 
-    public static Map<Long, Message> messageMap = new ConcurrentHashMap<>();
     private static SeqIdGen idGen = new SeqIdGen();
     public long getNextId() {
         return idGen.getNextId();

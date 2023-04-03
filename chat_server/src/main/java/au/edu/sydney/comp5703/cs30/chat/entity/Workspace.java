@@ -1,24 +1,27 @@
 package au.edu.sydney.comp5703.cs30.chat.entity;
 
-public class User {
-    // Note: temporarily use this before integrating the database
-    private long id;
-    private String name;
-    private long timeCreated;
+import static au.edu.sydney.comp5703.cs30.chat.Repo.workspaceMap;
 
+public class Workspace {
+    public long id;
+    public String name;
 
     private static SeqIdGen idGen = new SeqIdGen();
     public long getNextId() {
         return idGen.getNextId();
     }
 
-    public User(String name) {
-        this.id = getNextId();
-        this.name = name;
-        timeCreated = System.currentTimeMillis();
+    // default workspace where everyone will be joined automatically
+    public static Workspace def;
+    static {
+        def = new Workspace("default workspace");
+        workspaceMap.put(def.getId(), def);
     }
 
-
+    public Workspace(String name) {
+        this.id = getNextId();
+        this.name = name;
+    }
 
     public long getId() {
         return id;
@@ -35,14 +38,4 @@ public class User {
     public void setName(String name) {
         this.name = name;
     }
-
-    public long getTimeCreated() {
-        return timeCreated;
-    }
-
-    public void setTimeCreated(long timeCreated) {
-        this.timeCreated = timeCreated;
-    }
-
-
 }

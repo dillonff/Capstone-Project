@@ -1,12 +1,11 @@
 package au.edu.sydney.comp5703.cs30.chat.controller;
 
+import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
-import au.edu.sydney.comp5703.cs30.chat.entity.ClientSession;
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import au.edu.sydney.comp5703.cs30.chat.model.AuthRequest;
 import au.edu.sydney.comp5703.cs30.chat.model.AuthResponse;
 import au.edu.sydney.comp5703.cs30.chat.model.InfoChangedPush;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,16 +30,16 @@ public class AuthController {
         // construct a new user
         User user = null;
         // workaround for the temporary authentication
-        for (var tmp : User.userMap.values()) {
+        for (var tmp : Repo.userMap.values()) {
             if (tmp.getName().equals(req.getUserName())) {
                 user = tmp;
             }
         }
         if (user == null) {
             user = new User(req.getUserName());
-            User.userMap.put(user.getId(), user);
+            Repo.userMap.put(user.getId(), user);
             // add the user to general channel
-            Channel.general.getParticipants().add(user);
+            Repo.addMemberToChannel(Channel.general.getId(), user.getId());
 
             var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
             broadcastMessages(p);
