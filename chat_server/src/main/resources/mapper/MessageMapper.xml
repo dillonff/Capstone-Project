@@ -4,22 +4,22 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="au.edu.sydney.comp5703.cs30.chat.mapper.MessageMapper">
     <resultMap id="MessageMap" type="au.edu.sydney.comp5703.cs30.chat.entity.Message">
-        <id column="messageid" property="id"/>
-        <result column="senderid" property="senderId"/>
-        <result column="timelog" property="time"/>
+        <id column="message_id" property="id"/>
+        <result column="sender_id" property="senderId"/>
+        <result column="gmt_create" property="time"/>
         <result column="content" property="content"/>
-        <result column="groupid" property="channelId"/>
+        <result column="group_id" property="channelId"/>
     </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="messageid">
         insert into chatlog(
-            messageid,senderid,groupid,timelog,content
+            message_id,sender_id,group_id,gmt_create,content
         ) values (
                      #{id},#{senderId},#{channelId},#{time},#{content}
                  )
     </insert>
 
     <select id="findByChannel" resultMap="MessageMap">
-        select * from chatlog where groupid=#{channelId}
+        select * from chatlog where group_id=#{channelId}
     </select>
 </mapper>

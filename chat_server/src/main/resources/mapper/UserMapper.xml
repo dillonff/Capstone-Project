@@ -6,20 +6,20 @@
 <mapper namespace="au.edu.sydney.comp5703.cs30.chat.mapper.UserMapper">
     <resultMap id="UserEntityMap" type="au.edu.sydney.comp5703.cs30.chat.entity.User">
 
-        <id column="userid" property="id"></id>
-        <result column="username" property="name"></result>
-        <result column="createtime" property="timeCreated"></result>
+        <id column="user_id" property="id"></id>
+        <result column="user_name" property="name"></result>
+        <result column="gmt_create" property="timeCreated"></result>
     </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="userid">
         insert into user(
-            userid,username,createtime
+            user_id,user_name,gmt_create
         ) values (
                      #{id},#{name},#{timeCreated}
                  )
     </insert>
 
     <select id="findByUid" resultMap="UserEntityMap">
-        select * from user where account_id=#{id}
+        select * from user where user_id=#{id}
     </select>
 </mapper>
