@@ -22,7 +22,4 @@
     <select id="findByUid" resultMap="UserEntityMap">
         select * from user where account_id=#{id}
     </select>
-
-
-
 </mapper>
