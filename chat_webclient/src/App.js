@@ -68,7 +68,7 @@ function App() {
     res = await res.json();
     let newChannels = [];
     for (let channelId of res.channelIds) {
-      res = await callApi('/channel/' + channelId, 'GET', auth.current);
+      res = await callApi('/channels/' + channelId, 'GET', auth.current);
       if (!res.ok)
         throw new Error('api failed');
       res = await res.json();
@@ -85,11 +85,11 @@ function App() {
 
   const addUserToChannel = (ws, cid, uid) => {
     let req = {
-      user: parseInt(uid),
-      channel: parseInt(cid)
+      userId: parseInt(uid),
+      channelId: parseInt(cid)
     }
     req = JSON.stringify(req);
-    return callApi('/channel/join', 'POST', auth.current, req);
+    return callApi('/channels/join', 'POST', auth.current, req);
   }
 
   if (ws) {
@@ -166,7 +166,7 @@ function App() {
                 name: name
               }
               req = JSON.stringify(req);
-              callApi('/channel', 'POST', auth.current, req);
+              callApi('/channels', 'POST', auth.current, req);
             }
           }}></input>
           <input type='button' value='refresh channel' onClick={_ => {
@@ -205,10 +205,10 @@ function App() {
           <input type="button" value="Send" onClick={() => {
             let body = {
               content: msgToSend,
-              channel: currentChannel.id
+              channelId: currentChannel.id
             }
             body = JSON.stringify(body);
-            callApi('/message/send', 'POST', auth.current, body).then(res => {
+            callApi('/messages/send', 'POST', auth.current, body).then(res => {
               if (res.ok) {
                 setMsgToSend("");
               } else {

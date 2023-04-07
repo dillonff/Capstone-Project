@@ -20,7 +20,7 @@ import static au.edu.sydney.comp5703.cs30.chat.WsUtil.makeServerPush;
 @RestController
 public class ChannelController {
     @RequestMapping(
-            value = "/api/v1/channel", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
+            value = "/api/v1/channels", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
     public CreateChannelResponse handleCreateChannel(@RequestBody CreateChannelRequest req, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
         // this is a simple workaround to know the calling user
@@ -39,14 +39,14 @@ public class ChannelController {
     }
 
     @RequestMapping(
-            value = "/api/v1/channel/join", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
+            value = "/api/v1/channels/join", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
     public String handleJoinChannel(@RequestBody JoinChannelRequest req, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
         // for existing client, first figure out the clientSession that was created in auth
-        var user = Repo.userMap.get(req.getUser());
-        var channel = Repo.channelMap.get(req.getChannel());
+        var user = Repo.userMap.get(req.getUserId());
+        var channel = Repo.channelMap.get(req.getChannelId());
         for (var m : channelMemberMap.values()) {
-            if (m.getUserId() == req.getUser() && m.getChannelId() == channel.getId()) {
+            if (m.getUserId() == req.getUserId() && m.getChannelId() == channel.getId()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "already joined");
             }
         }
@@ -83,7 +83,7 @@ public class ChannelController {
     }
 
     @RequestMapping(
-            value = "/api/v1/channel/{channelId}", produces = "application/json", method = RequestMethod.GET
+            value = "/api/v1/channels/{channelId}", produces = "application/json", method = RequestMethod.GET
     )
     public Channel handleGetChannelInfo(@PathVariable long channelId, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
         var user = Repo.userMap.get(auth);

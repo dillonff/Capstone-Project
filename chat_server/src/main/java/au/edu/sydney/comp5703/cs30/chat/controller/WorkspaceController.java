@@ -17,7 +17,7 @@ import static au.edu.sydney.comp5703.cs30.chat.Repo.workspaceMemberMap;
 @RestController
 public class WorkspaceController {
     @RequestMapping(
-            value = "/api/v1/workspace", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
+            value = "/api/v1/workspaces", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
     public Workspace createWorkspace(@RequestBody CreateWorkspaceRequest req) {
         if (req.getName() == null) {
@@ -29,7 +29,7 @@ public class WorkspaceController {
 
     // TODO: member check
     @RequestMapping(
-            value = "/api/v1/workspace/{workspaceId}", produces = "application/json", method = RequestMethod.GET
+            value = "/api/v1/workspaces/{workspaceId}", produces = "application/json", method = RequestMethod.GET
     )
     public Workspace getWorkspace(@PathVariable long workspaceId) {
         var workspace = Repo.workspaceMap.get(workspaceId);

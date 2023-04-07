@@ -16,7 +16,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = "/api/v1/user/{userId}", produces = "application/json", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1/users/{userId}", produces = "application/json", method = RequestMethod.GET)
     public GetUserResponse handleGetUser(@PathVariable long userId) {
         User user = userService.getUser(userId);
         if (user == null) {
