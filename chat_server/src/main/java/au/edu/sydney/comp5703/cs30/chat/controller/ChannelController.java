@@ -3,6 +3,7 @@ package au.edu.sydney.comp5703.cs30.chat.controller;
 import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
 import au.edu.sydney.comp5703.cs30.chat.model.*;
+import au.edu.sydney.comp5703.cs30.chat.service.ChannelService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
@@ -19,6 +20,9 @@ import static au.edu.sydney.comp5703.cs30.chat.WsUtil.makeServerPush;
 
 @RestController
 public class ChannelController {
+
+    private ChannelService channelService;
+
     @RequestMapping(
             value = "/api/v1/channel", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
@@ -83,16 +87,23 @@ public class ChannelController {
     }
 
     @RequestMapping(
-            value = "/api/v1/channel/{channelId}", produces = "application/json", method = RequestMethod.GET
+            value = "/api/v1/channel/{channelId}",
+            produces = "application/json",
+            method = RequestMethod.GET
     )
-    public Channel handleGetChannelInfo(@PathVariable long channelId, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
+        public Channel handleGetChannelInfo(@PathVariable long channelId,
+                                        @CurrentSecurityContext SecurityContext sc,
+                                        @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
+        Channel channel = channelService.getChannel(channelId);
         var user = Repo.userMap.get(auth);
-        System.out.println(user.getName());
-        var channel = Repo.channelMap.get(channelId);
+//        System.out.println(user.getName());
+//        var channel = Repo.channelMap.get(channelId);
         if (channel == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "");
         }
-        return channel;
+        return  channel;
     }
 
 }
+
+

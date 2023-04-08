@@ -1,25 +1,12 @@
 package au.edu.sydney.comp5703.cs30.chat.dao;
 
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
-import org.springframework.stereotype.Repository;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
-@Repository
-public class UserDao {
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    public User getUserById(long userId) {
-        try {
-            return entityManager.createQuery("SELECT u FROM User u WHERE u.id=:userId", User.class)
-                    .setParameter("userId", userId)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
+@Mapper
+public interface UserDao {
+    @Select("SELECT * FROM User WHERE id = #{userId}")
+    User getUserById(@Param("userId") long userId);
 }
