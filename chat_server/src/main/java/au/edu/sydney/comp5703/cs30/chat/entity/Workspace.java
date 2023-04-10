@@ -1,6 +1,7 @@
 package au.edu.sydney.comp5703.cs30.chat.entity;
 
 import au.edu.sydney.comp5703.cs30.chat.Repo;
+import au.edu.sydney.comp5703.cs30.chat.Util;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.LinkedList;
@@ -20,8 +21,7 @@ public class Workspace {
     // default workspace where everyone will be joined automatically
     public static Workspace def;
     static {
-        def = new Workspace("default workspace");
-        workspaceMap.put(def.getId(), def);
+        def = Util.createWorkspace("default");
     }
 
     public Workspace(String name) {
