@@ -27,7 +27,15 @@ public class ChannelController {
         var user = Repo.userMap.get(auth);
         // create an in-memory channel
         var channel = new Channel(req.getName());
+        if (channel == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found");
+        }
+        var workspace = Repo.workspaceMap.get(req.getWorkspace());
+        if (workspace == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "workspace not found");
+        }
         Repo.channelMap.put(channel.getId(), channel);
+        Repo.addChannelToWorkspace(workspace.getId(), channel.getId());
         addMemberToChannel(channel.getId(), user.getId());
 
         // tell all the clients that the channel info has changed
