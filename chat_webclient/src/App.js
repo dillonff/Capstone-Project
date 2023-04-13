@@ -1,6 +1,25 @@
 import logo from './logo.svg';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
+
+const userCache = {};
+async function getUser(id, auth, refresh=false) {
+  let user = userCache[id];
+  if (!user || refresh) {
+    let res = await callApi('/users/' + id, 'GET', auth);
+    if (res.ok) {
+      res = await res.json();
+      userCache[res.id] = res;
+      user = res;
+    } else {
+      throw new Error(`Cannot get user ${id}`);
+    }
+  }
+  if (!user) {
+    throw new Error(`Error getting user ${id}`);
+  }
+  return user;
+}
 
 const nullChannel = {
   id: -1,
@@ -42,11 +61,23 @@ function App() {
   let [currentChannel, setCurrentChannel] = useState(nullChannel);
   const addUserIdRef = useRef(null);
   const addUserIdToWorkspaceRef = useRef(null);
+
+  useEffect(_ => {
+    if (currentWorkspace.id === -1)
+      return;
+    getAllChannels(currentWorkspace.id).catch(e => {
+      console.error(e);
+      alert(e);
+    });
+  }, [currentWorkspace]);
+
+
+
   let msgElems = [];
   for (let i = 0; i < msgList.length; i++) {
     const msg = msgList[i];
     let elem = <div key={i}>
-      <label>id: {msg.sender}</label>
+      <label>{msg.sender}</label>
       <div style={{fontSize: 'x-large'}}>{msg.message}</div>
     </div>;
     msgElems.push(elem);
@@ -61,7 +92,6 @@ function App() {
       setMsgList([]);
       msgListRef.current = [];
       setCurrentWorkspace(workspace);
-      getAllChannels(currentWorkspace.id);
     }
     let border = '1px solid black';
     if (currentWorkspace.id === workspace.id) {
@@ -173,16 +203,19 @@ function App() {
           setStatus(`logged in as (${res.result.userId})`);
           break;
         case 'newMessage':
-          let msg = {
-            message: res.data.preview,
-            sender: res.data.senderId   // TODO: obtain the user info and then set this sender properly
-          }
-          console.error(res.data);
-          if (res.data.channelId === currentChannel.id) {
-            let newMsgList = [...msgListRef.current, msg];
-            setMsgList(newMsgList);
-            msgListRef.current = newMsgList;
-          }
+          (async () => {
+            let user = await getUser(res.data.senderId, auth);
+            let msg = {
+              message: res.data.preview,
+              sender: user.name   // TODO: obtain the user info and then set this sender properly
+            }
+            console.error(res.data);
+            if (res.data.channelId === currentChannel.id) {
+              let newMsgList = [...msgListRef.current, msg];
+              setMsgList(newMsgList);
+              msgListRef.current = newMsgList;
+            }
+          }) ();
           break;
         case 'infoChanged':
           console.log(res);
@@ -224,8 +257,9 @@ function App() {
     }
     res = await res.json();
     auth.current = res.userId;
-    getAllWorkspaces().then(_ => {
-      return getAllChannels(currentWorkspace.id);
+    getAllWorkspaces().catch(e => {
+      console.error(e);
+      alert(e);
     });
     
     let newWs = new WebSocket('ws://127.0.0.1:11451/chat-ws');

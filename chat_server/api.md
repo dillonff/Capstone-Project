@@ -11,7 +11,7 @@
 
 #### Example headers:
 ```http request
-Authentication: 1
+Authorization: 1
 Content-Type: application/json
 ```
 
@@ -20,7 +20,7 @@ Content-Type: application/json
 ## Endpoints
 #### Auth (temporary)
 `POST /api/v1/auth`
-##### RequestBody:
+##### RequestBody
 ```json
 {
   "userName": "something"
@@ -35,12 +35,14 @@ Content-Type: application/json
 
 #### Send message
 `POST /api/v1/messages/send`
+##### RequestBody
 ```json
 {
   "content": "message content",
   "channelId": "numeric channel-id"
 }
 ```
+Response
 ```json
 {
   "messageId": 114514
@@ -49,7 +51,7 @@ Content-Type: application/json
 
 #### Get historical Messages (draft)
 `GET /api/v1/messages`
-##### RequestParam:
+##### RequestParam
 * `channelId: which channel to get message from`
 * `page: the page index, defaults to 0`
 * `pageSize: the page size defaults to ? (the max number of messages to return in this page)`
@@ -65,6 +67,8 @@ Content-Type: application/json
 
 #### Get single message detail
 `GET /api/v1/messages/{messageId}`
+##### PathVariable
+* messageId
 ##### Response
 ```json
 {
@@ -154,9 +158,45 @@ Content-Type: application/json
 
 #### Get workspace info
 `GET /api/v1/workspaces/{workspaceId}`  
-TODO
+##### PathVariable
+* workspaceId
+##### Response
+```json
+{
+  "id": 123,
+  "name": "workspace-name",
+  "memberIds": [1, 2, 4, 8],
+  "channelIds": [1, 2, 3, 4]
+}
+```
 
 #### Get workspace list
 `GET /api/v1/workspaces`  
-TODO
+##### Response
+```json
+{
+  "workspaceIds": [1, 2, 4, 8]
+}
+```
+
+#### Create workspace
+`POST /api/v1/workspaces`
+##### RequestBody
+```json
+{
+  "name": "workspace-name"
+}
+```
+##### Response
+(Same as get workspace info)
+
+#### join workspace
+`POST /api/v1/workspaces/join`
+##### RequestBody
+```json
+{
+  "workspaceId": 123,
+  "userId": 456
+}
+```
 
