@@ -5,6 +5,9 @@ import au.edu.sydney.comp5703.cs30.chat.Util;
 import au.edu.sydney.comp5703.cs30.chat.entity.Workspace;
 import au.edu.sydney.comp5703.cs30.chat.model.CreateWorkspaceRequest;
 import au.edu.sydney.comp5703.cs30.chat.model.GetWorkspacesResponse;
+import au.edu.sydney.comp5703.cs30.chat.model.InfoChangedPush;
+import au.edu.sydney.comp5703.cs30.chat.model.JoinWorkspaceRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,23 +16,34 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.LinkedList;
 
 import static au.edu.sydney.comp5703.cs30.chat.Repo.workspaceMemberMap;
+import static au.edu.sydney.comp5703.cs30.chat.WsUtil.*;
 
 @RestController
 public class WorkspaceController {
     @RequestMapping(
-            value = "/api/v1/workspace", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
+            value = "/api/v1/workspaces", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
-    public Workspace createWorkspace(@RequestBody CreateWorkspaceRequest req) {
+    public Workspace createWorkspace(@RequestBody CreateWorkspaceRequest req, @RequestHeader(HttpHeaders.AUTHORIZATION) long auth) throws Exception {
+        var user = Repo.userMap.get(auth);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "user not authorized");
+        }
         if (req.getName() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no workspace name provided");
         }
         var workspace = Util.createWorkspace(req.getName());
+        Repo.addMemberToWorkspace(workspace.getId(), user.getId());
+        // TODO: send to the user who created it only
+        var p = makeServerPush("infoChanged", new InfoChangedPush("workspace"));
+        broadcastMessages(p);
+        p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
+        broadcastMessages(p);
         return workspace;
     }
 
     // TODO: member check
     @RequestMapping(
-            value = "/api/v1/workspace/{workspaceId}", produces = "application/json", method = RequestMethod.GET
+            value = "/api/v1/workspaces/{workspaceId}", produces = "application/json", method = RequestMethod.GET
     )
     public Workspace getWorkspace(@PathVariable long workspaceId) {
         var workspace = Repo.workspaceMap.get(workspaceId);
@@ -37,6 +51,29 @@ public class WorkspaceController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "workspace not found");
         }
         return workspace;
+    }
+
+    @RequestMapping(
+            value = "/api/v1/workspaces/join", produces = "application/json", method = RequestMethod.POST
+    )
+    public String joinWorkspace(@RequestBody JoinWorkspaceRequest req) throws Exception {
+        var workspace = Repo.workspaceMap.get(req.getWorkspaceId());
+        var user = Repo.userMap.get(req.getUserId());
+        if (workspace == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "workspace not found");
+        }
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found");
+        }
+        for (var wm : workspaceMemberMap.values()) {
+            if (wm.getWorkspaceId() == workspace.getId() && wm.getUserId() == user.getId()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "already joined");
+            }
+        }
+        Repo.addMemberToWorkspace(workspace.getId(), user.getId());
+        var p = makeServerPush("infoChanged", new InfoChangedPush("workspace"));
+        broadcastMessages(p);
+        return "{}";
     }
 
     @RequestMapping(

@@ -11,6 +11,7 @@ public class WorkspaceChannel {
     }
 
     public WorkspaceChannel(long workspaceId, long channelId) {
+        this.id = getNextId();
         this.workspaceId = workspaceId;
         this.channelId = channelId;
     }

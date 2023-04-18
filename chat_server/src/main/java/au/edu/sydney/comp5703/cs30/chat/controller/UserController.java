@@ -18,6 +18,7 @@ public class UserController {
 
     @RequestMapping(value = "/api/v1/user/{userId}", produces = "application/json", method = RequestMethod.GET)
     public GetUserResponse handleGetUserInfo(@PathVariable long userId) {
+
         User user = userService.getUser(userId);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.");

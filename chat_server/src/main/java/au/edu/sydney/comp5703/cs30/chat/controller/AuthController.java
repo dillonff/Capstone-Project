@@ -45,6 +45,8 @@ public class AuthController {
 
             var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
             broadcastMessages(p);
+            p = makeServerPush("infoChanged", new InfoChangedPush("workspace"));
+            broadcastMessages(p);
         }
         System.err.println(sc.toString());
 
