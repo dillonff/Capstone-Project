@@ -17,18 +17,22 @@ public class MessageService {
     }
 
     public Message getMessageByChannelID(int channelID) {
-        return messageDao.getMessageByChannelID(channelID);
+        return null;
+        // return messageDao.getMessageByChannelID(channelID);
     }
 
     public Message getMessageByMessageID(int messageID) {
-        return MessageDao.getMessageByMessageID(messageID);
+        return null;
+        // return MessageDao.getMessageByMessageID(messageID);
     }
 
     public Message getMessageAfterMessageID(int messageID) {
-        return MessageDao.getMessageAfterMessageID(messageID);
+        return null;
+        // return MessageDao.getMessageAfterMessageID(messageID);
     }
 
     public Message getMessageAfterTime(Date date) {
-        return MessageDao.getMessageAfterTime(date);
+        return null;
+        // return MessageDao.getMessageAfterTime(date);
     }
 }

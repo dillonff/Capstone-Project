@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Repository
 public class MessageDao {
-    Connection connection = MyDB.getConnection(DBUrl, DBUser, DBPwd);
+    Connection connection = null;//MyDB.getConnection(DBUrl, DBUser, DBPwd);
 
     public ResultSet getMessageByChannelID(int channelID) throws SQLException {
         ResultSet result;

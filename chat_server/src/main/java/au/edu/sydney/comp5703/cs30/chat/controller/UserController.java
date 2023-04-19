@@ -14,8 +14,8 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserController extends BaseController {
 
     private UserService userService;
-    @Autowired
-    private IUserService iUserService;
+    // @Autowired
+    private IUserService iUserService = null;
 
     public UserController(UserService userService) {
         this.userService = userService;

@@ -17,6 +17,7 @@ import java.util.Date;
 @SpringBootTest
 //@RunWith(SpringRunner.class)
 //@MapperScan("au.edu.sydney.comp5703.cs30.chat.mapper")
+//@AutoConfigureMybatis
 public class UserMapperTest {
     @Resource(name = "userMapper")
     private UserMapper userMapper;
@@ -25,7 +26,6 @@ public class UserMapperTest {
     public void insert() {
         User user = new User("Merritt");
         userMapper.insert(user);
-
     }
 
 }
