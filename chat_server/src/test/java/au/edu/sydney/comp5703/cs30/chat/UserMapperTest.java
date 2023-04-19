@@ -19,7 +19,8 @@ import java.util.Date;
 //@MapperScan("au.edu.sydney.comp5703.cs30.chat.mapper")
 //@AutoConfigureMybatis
 public class UserMapperTest {
-    @Resource(name = "userMapper")
+    //@Resource(name = "userMapper")
+    @Autowired
     private UserMapper userMapper;
 
     @Test
