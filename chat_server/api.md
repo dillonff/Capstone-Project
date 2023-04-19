@@ -113,6 +113,21 @@ Response
 {}
 ```
 
+#### Pin a channel
+`POST /api/v1/channels/{channelId}/pin`
+##### RequestBody
+```json
+{
+  "isPin": true
+}
+```
+##### Response
+```json
+{}
+```
+
+
+
 #### Get Channels
 `GET /api/v1/channels`
 ##### RequestParam
