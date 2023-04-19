@@ -15,6 +15,12 @@ public class Channel {
     // This is the general channel that automatically adds anyone
     public static Channel general;
 
+    private long id;
+    private String name;
+    private Date timeCreated;
+
+    private long workspaceId;
+
     static {
         general = new Channel("general");
         Repo.channelMap.put(general.getId(), general);
@@ -27,14 +33,10 @@ public class Channel {
     public Channel(String name) {
         this.id = getNextId();
         this.name = name;
-        timeCreated = System.currentTimeMillis();
+        timeCreated = new Date();
     }
 
-    private long id;
-    private String name;
-    private long timeCreated;
 
-    private long workspaceId;
 
     @JsonProperty("participantIds")
     public List<Long> getParticipantIds() {
@@ -63,11 +65,11 @@ public class Channel {
         this.name = name;
     }
 
-    public long getTimeCreated() {
+    public Date getTimeCreated() {
         return timeCreated;
     }
 
-    public void setTimeCreated(long timeCreated) {
+    public void setTimeCreated(Date timeCreated) {
         this.timeCreated = timeCreated;
     }
 

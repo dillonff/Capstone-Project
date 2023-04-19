@@ -14,7 +14,7 @@ public class UserDao {
 
     public User getUserById(long userId) {
         try {
-            return entityManager.createQuery("SELECT u FROM User u WHERE u.id=:userId", User.class)
+            return entityManager.createQuery("SELECT u FROM users u WHERE u.id=:userId", User.class)
                     .setParameter("userId", userId)
                     .getSingleResult();
         } catch (NoResultException e) {

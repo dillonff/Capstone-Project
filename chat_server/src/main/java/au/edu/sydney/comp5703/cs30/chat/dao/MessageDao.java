@@ -1,3 +1,13 @@
+package au.edu.sydney.comp5703.cs30.chat.dao;
+
+import org.springframework.stereotype.Repository;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Date;
+
 @Repository
 public class MessageDao {
     Connection connection = MyDB.getConnection(DBUrl, DBUser, DBPwd);
@@ -15,7 +25,7 @@ public class MessageDao {
         ResultSet result;
         PreparedStatement st;
         st = connection.prepareStatement("select from message where id=?");
-        st.setInt(1, channelID);
+        st.setInt(1, messageID);
         result = st.executeQuery();
         return result;
     }

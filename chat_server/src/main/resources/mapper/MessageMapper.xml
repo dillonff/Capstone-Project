@@ -8,11 +8,11 @@
         <result column="sender_id" property="senderId"/>
         <result column="gmt_create" property="time"/>
         <result column="content" property="content"/>
-        <result column="group_id" property="channelId"/>
+        <result column="channel_id" property="channelId"/>
     </resultMap>
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="messageid">
-        insert into chatlog(
+    <insert id="insert">
+        insert into message(
             message_id,sender_id,group_id,gmt_create,content
         ) values (
                      #{id},#{senderId},#{channelId},#{time},#{content}
