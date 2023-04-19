@@ -4,6 +4,7 @@ import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.Util;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import static au.edu.sydney.comp5703.cs30.chat.Repo.workspaceMap;
 public class Workspace {
     public long id;
     public String name;
+    public Date time;
 
     private static SeqIdGen idGen = new SeqIdGen();
     public long getNextId() {
@@ -27,6 +29,7 @@ public class Workspace {
     public Workspace(String name) {
         this.id = getNextId();
         this.name = name;
+        this.time = new Date();
     }
 
     @JsonProperty("memberIds")
@@ -65,5 +68,13 @@ public class Workspace {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
     }
 }

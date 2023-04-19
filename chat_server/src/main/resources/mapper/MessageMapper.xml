@@ -11,15 +11,15 @@
         <result column="channel_id" property="channelId"/>
     </resultMap>
 
-    <insert id="insert">
+    <insert id="insertMessage">
         insert into message(
-            message_id,sender_id,group_id,gmt_create,content
+            message_id,sender_id,channel_id,gmt_create,content
         ) values (
                      #{id},#{senderId},#{channelId},#{time},#{content}
                  )
     </insert>
 
     <select id="findByChannel" resultMap="MessageMap">
-        select * from chatlog where group_id=#{channelId}
+        select * from message where channel_id=#{channelId}
     </select>
 </mapper>

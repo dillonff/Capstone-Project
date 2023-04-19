@@ -6,16 +6,16 @@
 <mapper namespace="au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper">
     <resultMap id="ChannelMap" type="au.edu.sydney.comp5703.cs30.chat.entity.Channel">
         <id column="channel_id" property="id"/>
-        <result column="channel_name" property="Name"/>
+        <result column="channel_name" property="name"/>
         <result column="gmt_create" property="timeCreated"/>
-        <result column="members" property="participants"/>
+        <result column="workspace_id" property="workspaceId"/>
     </resultMap>
 
-    <insert id="insert">
+    <insert id="insertChannel">
         insert into channel(
             channel_id,channel_name,gmt_create,members
         ) values (
-                     #{id},#{Name},#{time},#{particpants}
+                     #{id},#{name},#{timeCreated},#{workspaceId}
                  )
     </insert>
 

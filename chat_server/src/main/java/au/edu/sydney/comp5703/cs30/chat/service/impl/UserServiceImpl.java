@@ -30,7 +30,7 @@ public class UserServiceImpl implements IUserService {
 
         user.setCreatedTime(now);
 
-        Integer rows = userMapper.insert(user);
+        Integer rows = userMapper.insertUser(user);
 
         if (rows != 1) {
 

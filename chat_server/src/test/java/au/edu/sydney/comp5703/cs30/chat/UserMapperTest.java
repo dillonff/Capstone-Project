@@ -25,8 +25,9 @@ public class UserMapperTest {
 
     @Test
     public void insert() {
-        User user = new User("Merritt");
-        userMapper.insert(user);
+        User user = new User("bob");
+        user.setId(2);
+        userMapper.insertUser(user);
     }
 
 }

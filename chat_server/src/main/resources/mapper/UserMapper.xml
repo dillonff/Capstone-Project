@@ -11,7 +11,7 @@
         <result column="gmt_create" property="timeCreated"></result>
     </resultMap>
 
-    <insert id="insert">
+    <insert id="insertUser">
         insert into users(
             user_id,user_name,gmt_create
         ) values (
