@@ -100,9 +100,7 @@ public class ChannelController {
     }
 
     @RequestMapping(
-            value = "/api/v1/channel/{channelId}",
-            produces = "application/json",
-            method = RequestMethod.GET
+            value = "/api/v1/channel/{channelId}", produces = "application/json", method = RequestMethod.GET
 
     )
         public Channel handleGetChannelInfo(@PathVariable long channelId,
@@ -117,6 +115,40 @@ public class ChannelController {
         }
         return  channel;
     }
+
+
+
+    @RequestMapping(
+            value = "/api/v1/channels/pin", produces = "application/json", method = RequestMethod.POST
+    )
+    public PinChannelResponse handlePinChannel(@RequestParam Long channelId, @RequestParam boolean pinned, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
+        var user = Repo.userMap.get(auth);
+        var channel = Repo.channelMap.get(channelId);
+        if (channel == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found");
+        }
+        var isParticipant = false;
+        for (var m : channelMemberMap.values()) {
+            if (m.getChannelId() != channelId) {
+                continue;
+            }
+            if (m.getUserId() == user.getId()) {
+                isParticipant = true;
+                break;
+            }
+        }
+        if (!isParticipant) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a participant of the channel");
+        }
+        boolean isPinned = channel.getPinned();
+        channel.setPinned(!isPinned);
+        var result = new PinChannelResponse(channelId, isPinned);
+        return result;
+    }
+
+
+
+
 
 }
 

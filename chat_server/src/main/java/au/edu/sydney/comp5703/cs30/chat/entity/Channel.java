@@ -36,6 +36,8 @@ public class Channel {
 
     private long workspaceId;
 
+    private boolean isPinned = false;
+
     @JsonProperty("participantIds")
     public List<Long> getParticipantIds() {
         var ids = new LinkedList<Long>();
@@ -70,6 +72,13 @@ public class Channel {
     public void setTimeCreated(long timeCreated) {
         this.timeCreated = timeCreated;
     }
+    public boolean getPinned() {
+        return isPinned;
+    }
+    public void setPinned(boolean isPinned) {
+        this.isPinned = isPinned;
+    }
+
 
 //    public List<User> getParticipants() {
 //        return participants;
