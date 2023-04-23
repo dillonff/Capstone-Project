@@ -15,7 +15,8 @@ public class MessageMapperTest {
 
     @Test
     public void insertMessage(){
-        Message message = new Message("how about this.", new Channel("capstone"), new User("Merritt"));
+        Message message = new Message("how about that.", new Channel("capstone 1"), new User("bob"));
+        message.setId(1);
         messageMapper.insertMessage(message);
 
     }

@@ -22,7 +22,7 @@ public class UserServiceImpl implements IUserService {
 
         if (result != null) {
 
-            throw new DuplicateUsernameException("尝试注册的用户名[" + username + "]已经被占用");
+            throw new DuplicateUsernameException("Trying to register username [" + username + "] is already been used");
         }
 
 
@@ -34,7 +34,7 @@ public class UserServiceImpl implements IUserService {
 
         if (rows != 1) {
 
-            throw new InsertException("添加用户数据出现未知错误，请联系系统管理员");
+            throw new InsertException("There is an unknown error.");
         }
     }
 }
