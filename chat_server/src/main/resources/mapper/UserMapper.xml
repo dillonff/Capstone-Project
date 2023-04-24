@@ -11,8 +11,8 @@
         <result column="gmt_create" property="timeCreated"></result>
     </resultMap>
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="userid">
-        insert into user(
+    <insert id="insertUser">
+        insert into users(
             user_id,user_name,gmt_create
         ) values (
                      #{id},#{name},#{timeCreated}
@@ -20,6 +20,15 @@
     </insert>
 
     <select id="findByUid" resultMap="UserEntityMap">
-        select * from user where user_id=#{id}
+        select * from users where user_id=#{id}
+    </select>
+
+    <select id="findByName" resultMap="UserEntityMap">
+        SELECT
+            *
+        FROM
+            users
+        WHERE
+            user_name = #{name}
     </select>
 </mapper>

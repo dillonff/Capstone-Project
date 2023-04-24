@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper">
+    <resultMap id="WorkspaceMap" type="au.edu.sydney.comp5703.cs30.chat.entity.Workspace">
+        <id column="workspace_id" property="id"/>
+        <result column="gmt_created" property="time"/>
+        <result column="workspace_name" property="name"/>
+    </resultMap>
+
+    <insert id="insertWorkspace">
+        insert into workspace(
+            workspace_id,gmt_created,workspace_name
+        ) values (
+                     #{id},#{time},#{name}
+                 )
+    </insert>
+
+    <select id="findByWorkspaceId" resultMap="WorkspaceMap">
+        select * from workspace where workspace_id=#{id}
+    </select>
+</mapper>

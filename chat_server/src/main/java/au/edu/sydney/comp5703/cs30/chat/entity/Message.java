@@ -1,11 +1,16 @@
 package au.edu.sydney.comp5703.cs30.chat.entity;
 
+import java.util.Date;
+
 public class Message {
     private long id;
     private String content;
-    private long time;
+    private Date time;
     private Channel channel;
+
+    private long channelId;
     private User sender;
+    private long senderId;
 
     private static SeqIdGen idGen = new SeqIdGen();
     public long getNextId() {
@@ -16,8 +21,10 @@ public class Message {
         this.id = getNextId();
         this.content = content;
         this.channel = channel;
+        this.channelId = channel.getId();
         this.sender = sender;
-        this.time = System.currentTimeMillis();
+        this.senderId = sender.getId();
+        this.time = new Date();
     }
 
     public long getId() {
@@ -36,11 +43,11 @@ public class Message {
         this.content = content;
     }
 
-    public long getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(long time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 
@@ -58,5 +65,19 @@ public class Message {
 
     public void setSender(User sender) {
         this.sender = sender;
+    }
+    public long getSenderId(){
+        return senderId;
+    }
+    public void setSenderId(long senderId){
+        this.senderId = senderId;
+    }
+
+    public long getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(long channelId) {
+        this.channelId = channelId;
     }
 }
