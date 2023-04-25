@@ -5,30 +5,32 @@
 
 <mapper namespace="au.edu.sydney.comp5703.cs30.chat.mapper.UserMapper">
     <resultMap id="UserEntityMap" type="au.edu.sydney.comp5703.cs30.chat.entity.User">
-
+        <constructor>
+            <arg column="username" javaType="String" />
+        </constructor>
         <id column="user_id" property="id"></id>
         <result column="user_name" property="name"></result>
         <result column="gmt_create" property="timeCreated"></result>
     </resultMap>
 
     <insert id="insertUser">
-        insert into users(
-            user_id,user_name,gmt_create
+        insert into chat_user (
+            username, password
         ) values (
-                     #{id},#{name},#{timeCreated}
-                 )
+            #{username}, #{password}
+        )
     </insert>
 
-    <select id="findByUid" resultMap="UserEntityMap">
-        select * from users where user_id=#{id}
+    <select id="findById" resultMap="UserEntityMap">
+        select * from chat_user where id=#{id} and not is_deleted
     </select>
 
-    <select id="findByName" resultMap="UserEntityMap">
+    <select id="findByUsername" resultMap="UserEntityMap">
         SELECT
             *
         FROM
-            users
+            chat_user
         WHERE
-            user_name = #{name}
+            username = #{username} and not is_deleted
     </select>
 </mapper>

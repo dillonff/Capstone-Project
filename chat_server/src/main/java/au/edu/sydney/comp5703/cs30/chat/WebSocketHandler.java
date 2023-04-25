@@ -13,7 +13,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import static au.edu.sydney.comp5703.cs30.chat.Repo.channelMemberMap;
 import static au.edu.sydney.comp5703.cs30.chat.Repo.userMap;
 
 
@@ -96,9 +95,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     private void broadcastMessagesToChannel(String payload, Channel channel) throws Exception {
-        for (var m : channelMemberMap.values()) {
-            if (m.getChannelId() != channel.getId())
-                continue;;
+        var members = Repo.channelMemberMapper.getChannelMembers(channel.getId());
+        for (var m : members) {
             var user = userMap.get(m.getUserId());
             var sessions = ClientSession.getByUserId(user.getId());
             for(var session : sessions) {
@@ -117,7 +115,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         User user = null;
         // workaround for the temporary authentication
         for (var tmp : Repo.userMap.values()) {
-            if (tmp.getName().equals(ar.getUserName())) {
+            if (tmp.getUsername().equals(ar.getUserName())) {
                 user = tmp;
             }
         }

@@ -13,7 +13,7 @@
 
     <insert id="insertMessage">
         insert into message(
-            message_id,sender_id,channel_id,gmt_create,content
+            sender_id,channel_id,gmt_create,content
         ) values (
                      #{id},#{senderId},#{channelId},#{time},#{content}
                  )

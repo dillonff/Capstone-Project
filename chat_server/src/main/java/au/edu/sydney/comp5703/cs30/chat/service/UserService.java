@@ -1,5 +1,6 @@
 package au.edu.sydney.comp5703.cs30.chat.service;
 
+import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.dao.UserDao;
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,8 @@ public class UserService {
     }
 
     public User getUser(long userId) {
-        return userDao.getUserById(userId);
+        return Repo.userMap.get(userId);
+        // return userDao.getUserById(userId);
     }
 
 }

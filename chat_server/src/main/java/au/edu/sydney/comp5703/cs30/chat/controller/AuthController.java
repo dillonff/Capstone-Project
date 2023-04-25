@@ -1,7 +1,7 @@
 package au.edu.sydney.comp5703.cs30.chat.controller;
 
 import au.edu.sydney.comp5703.cs30.chat.Repo;
-import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
+import au.edu.sydney.comp5703.cs30.chat.Util;
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import au.edu.sydney.comp5703.cs30.chat.entity.Workspace;
 import au.edu.sydney.comp5703.cs30.chat.model.AuthRequest;
@@ -28,11 +28,14 @@ public class AuthController {
         if (req.getUserName() == null) {
             throw new ResponseStatusException(400, "No user name specified", null);
         }
+        if (Workspace.def == null) {
+            Workspace.def = Util.createWorkspace("default");
+        }
         // construct a new user
         User user = null;
         // workaround for the temporary authentication
         for (var tmp : Repo.userMap.values()) {
-            if (tmp.getName().equals(req.getUserName())) {
+            if (tmp.getUsername().equals(req.getUserName())) {
                 user = tmp;
             }
         }

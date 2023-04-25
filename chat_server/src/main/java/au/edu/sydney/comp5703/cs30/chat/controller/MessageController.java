@@ -2,8 +2,10 @@ package au.edu.sydney.comp5703.cs30.chat.controller;
 
 import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.entity.Message;
+import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper;
 import au.edu.sydney.comp5703.cs30.chat.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContext;
@@ -14,6 +16,8 @@ import static au.edu.sydney.comp5703.cs30.chat.WsUtil.makeServerPush;
 
 @RestController
 public class MessageController {
+    @Autowired
+    public static ChannelMapper channelMapper;
 
     private static final ObjectMapper om = new ObjectMapper();
     @RequestMapping(
@@ -24,7 +28,7 @@ public class MessageController {
         var user = Repo.userMap.get(auth);
         // then figure out the channel by id
         var channelId = req.getChannelId();
-        var channel = Repo.channelMap.get(channelId);
+        var channel = channelMapper.findById(channelId);
         // save the message to the memory
         var message = new Message(req.getContent(), channel, user);
         Repo.messageMap.put(message.getId(), message);

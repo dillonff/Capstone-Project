@@ -3,11 +3,13 @@ package au.edu.sydney.comp5703.cs30.chat.controller;
 import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.Util;
 import au.edu.sydney.comp5703.cs30.chat.entity.Workspace;
+import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper;
 import au.edu.sydney.comp5703.cs30.chat.model.CreateWorkspaceRequest;
 import au.edu.sydney.comp5703.cs30.chat.model.GetWorkspacesResponse;
 import au.edu.sydney.comp5703.cs30.chat.model.InfoChangedPush;
 import au.edu.sydney.comp5703.cs30.chat.model.JoinWorkspaceRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -15,11 +17,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.LinkedList;
 
-import static au.edu.sydney.comp5703.cs30.chat.Repo.workspaceMemberMap;
 import static au.edu.sydney.comp5703.cs30.chat.WsUtil.*;
 
 @RestController
 public class WorkspaceController {
+    @Autowired
+    private static WorkspaceMapper workspaceMapper;
+
+
     @RequestMapping(
             value = "/api/v1/workspaces", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
@@ -46,7 +51,7 @@ public class WorkspaceController {
             value = "/api/v1/workspaces/{workspaceId}", produces = "application/json", method = RequestMethod.GET
     )
     public Workspace getWorkspace(@PathVariable long workspaceId) {
-        var workspace = Repo.workspaceMap.get(workspaceId);
+        var workspace = workspaceMapper.findById(workspaceId);
         if (workspace == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "workspace not found");
         }
@@ -57,7 +62,7 @@ public class WorkspaceController {
             value = "/api/v1/workspaces/join", produces = "application/json", method = RequestMethod.POST
     )
     public String joinWorkspace(@RequestBody JoinWorkspaceRequest req) throws Exception {
-        var workspace = Repo.workspaceMap.get(req.getWorkspaceId());
+        var workspace = workspaceMapper.findById(req.getWorkspaceId());
         var user = Repo.userMap.get(req.getUserId());
         if (workspace == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "workspace not found");
@@ -65,11 +70,7 @@ public class WorkspaceController {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found");
         }
-        for (var wm : workspaceMemberMap.values()) {
-            if (wm.getWorkspaceId() == workspace.getId() && wm.getUserId() == user.getId()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "already joined");
-            }
-        }
+        //TODO: avoid duplicate member
         Repo.addMemberToWorkspace(workspace.getId(), user.getId());
         var p = makeServerPush("infoChanged", new InfoChangedPush("workspace"));
         broadcastMessages(p);
@@ -81,11 +82,10 @@ public class WorkspaceController {
     )
     public GetWorkspacesResponse getWorkspaces(@RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
         var ids = new LinkedList<Long>();
-        for (var w : workspaceMemberMap.values()) {
-            if (w.getUserId() == auth) {
-                ids.add(w.getWorkspaceId());
-            }
-        }
+        var workspaces = workspaceMapper.findByMemberId(auth);
+        workspaces.forEach(workspace -> {
+            ids.add(workspace.getId());
+        });
         return new GetWorkspacesResponse(ids);
     }
 }

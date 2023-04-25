@@ -1,8 +1,12 @@
 package au.edu.sydney.comp5703.cs30.chat.controller;
 
 import au.edu.sydney.comp5703.cs30.chat.Repo;
+import au.edu.sydney.comp5703.cs30.chat.Util;
 import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
+import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper;
+import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper;
 import au.edu.sydney.comp5703.cs30.chat.model.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
@@ -13,30 +17,33 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.LinkedList;
 import java.util.Objects;
 
-import static au.edu.sydney.comp5703.cs30.chat.Repo.addMemberToChannel;
-import static au.edu.sydney.comp5703.cs30.chat.Repo.channelMemberMap;
+import static au.edu.sydney.comp5703.cs30.chat.Repo.*;
 import static au.edu.sydney.comp5703.cs30.chat.WsUtil.broadcastMessages;
 import static au.edu.sydney.comp5703.cs30.chat.WsUtil.makeServerPush;
 
 @RestController
 public class ChannelController {
+    @Autowired
+    private static ChannelMapper channelMapper;
+    @Autowired
+    private static WorkspaceMapper workspaceMapper;
+
+
     @RequestMapping(
             value = "/api/v1/channels", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
     public CreateChannelResponse handleCreateChannel(@RequestBody CreateChannelRequest req, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
         // this is a simple workaround to know the calling user
         var user = Repo.userMap.get(auth);
-        // create an in-memory channel
-        var channel = new Channel(req.getName());
-        if (channel == null) {
+        if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found");
         }
-        var workspace = Repo.workspaceMap.get(req.getWorkspace());
+        var workspace = workspaceMapper.findById(req.getWorkspace());
         if (workspace == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "workspace not found");
         }
-        Repo.channelMap.put(channel.getId(), channel);
-        Repo.addChannelToWorkspace(workspace.getId(), channel.getId());
+        // create an in-memory channel
+        var channel = Util.createChannel(workspace.getId(), req.getName());
         addMemberToChannel(channel.getId(), user.getId());
 
         // tell all the clients that the channel info has changed
@@ -53,12 +60,8 @@ public class ChannelController {
     public String handleJoinChannel(@RequestBody JoinChannelRequest req, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
         // for existing client, first figure out the clientSession that was created in auth
         var user = Repo.userMap.get(req.getUserId());
-        var channel = Repo.channelMap.get(req.getChannelId());
-        for (var m : channelMemberMap.values()) {
-            if (m.getUserId() == req.getUserId() && m.getChannelId() == channel.getId()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "already joined");
-            }
-        }
+        var channel = channelMapper.findById(req.getChannelId());
+        // TODO: avoid duplicate member entry
         addMemberToChannel(channel.getId(), user.getId());
 
         var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
@@ -73,24 +76,10 @@ public class ChannelController {
     public GetChannelsResponse handleGetChannels(@RequestParam Long workspaceId, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
         var user = Repo.userMap.get(auth);
         var channelIds = new LinkedList<Long>();
-        for (var wc : Repo.workspaceChannelMap.values()) {
-            if (!Objects.equals(wc.getWorkspaceId(), workspaceId)) {
-                continue;
-            }
-            var channel = Repo.channelMap.get(wc.getChannelId());
-            var isParticipant = false;
-            for (var m : channelMemberMap.values()) {
-                if (m.getChannelId() != channel.getId())
-                    continue;
-                if (m.getUserId() == user.getId()) {
-                    isParticipant = true;
-                    break;
-                }
-            }
-            if (isParticipant) {
-                channelIds.add(channel.getId());
-            }
-        }
+        var channels = channelMapper.findByWorkspaceAndMember(workspaceId, user.getId());
+        channels.forEach(channel -> {
+            channelIds.add(channel.getId());
+        });
         var result = new GetChannelsResponse(channelIds);
         return result;
     }
@@ -100,8 +89,8 @@ public class ChannelController {
     )
     public Channel handleGetChannelInfo(@PathVariable long channelId, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
         var user = Repo.userMap.get(auth);
-        System.out.println(user.getName());
-        var channel = Repo.channelMap.get(channelId);
+        System.out.println(user.getUsername());
+        var channel = channelMapper.findById(channelId);
         if (channel == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "");
         }

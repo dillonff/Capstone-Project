@@ -8,7 +8,6 @@ import au.edu.sydney.comp5703.cs30.chat.service.exception.InsertException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
-import java.util.UUID;
 
 public class UserServiceImpl implements IUserService {
     @Autowired
@@ -16,19 +15,14 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public void reg(User user) {
-        String username = user.getName();
+        String username = user.getUsername();
 
-        User result = userMapper.findByName(username);
+        User result = userMapper.findByUsername(username);
 
         if (result != null) {
 
             throw new DuplicateUsernameException("尝试注册的用户名[" + username + "]已经被占用");
         }
-
-
-        Date now = new Date();
-
-        user.setCreatedTime(now);
 
         Integer rows = userMapper.insertUser(user);
 

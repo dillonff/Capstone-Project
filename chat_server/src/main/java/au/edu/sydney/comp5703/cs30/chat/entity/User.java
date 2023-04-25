@@ -1,37 +1,15 @@
 package au.edu.sydney.comp5703.cs30.chat.entity;
 
-import java.io.Serializable;
-import java.util.Date;
-
-public class User extends BaseEntity implements Serializable {
+public class User {
     // Note: temporarily use this before integrating the database
     private long id;
-    private String name;
-    private Date timeCreated;
-
+    private String username;
     private String password;
 
-
-    private static SeqIdGen idGen = new SeqIdGen();
-    public long getNextId() {
-        return idGen.getNextId();
+    public User(String username) {
+        this.username = username;
+        this.password = "";
     }
-
-    public Date getTimeCreated() {
-        return timeCreated;
-    }
-
-    public void setTimeCreated(Date timeCreated) {
-        this.timeCreated = timeCreated;
-    }
-
-    public User(String name) {
-        this.id = getNextId();
-        this.name = name;
-        timeCreated = new Date();
-    }
-
-
 
     public long getId() {
         return id;
@@ -41,12 +19,12 @@ public class User extends BaseEntity implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
