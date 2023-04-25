@@ -22,7 +22,7 @@ import static au.edu.sydney.comp5703.cs30.chat.WsUtil.*;
 @RestController
 public class WorkspaceController {
     @Autowired
-    private static WorkspaceMapper workspaceMapper;
+    private WorkspaceMapper workspaceMapper;
 
 
     @RequestMapping(

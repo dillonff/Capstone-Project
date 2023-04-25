@@ -17,7 +17,7 @@ import static au.edu.sydney.comp5703.cs30.chat.WsUtil.makeServerPush;
 @RestController
 public class MessageController {
     @Autowired
-    public static ChannelMapper channelMapper;
+    public ChannelMapper channelMapper;
 
     private static final ObjectMapper om = new ObjectMapper();
     @RequestMapping(

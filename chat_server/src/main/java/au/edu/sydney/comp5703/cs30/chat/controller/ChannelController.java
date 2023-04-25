@@ -24,9 +24,9 @@ import static au.edu.sydney.comp5703.cs30.chat.WsUtil.makeServerPush;
 @RestController
 public class ChannelController {
     @Autowired
-    private static ChannelMapper channelMapper;
+    private ChannelMapper channelMapper;
     @Autowired
-    private static WorkspaceMapper workspaceMapper;
+    private WorkspaceMapper workspaceMapper;
 
 
     @RequestMapping(
