@@ -53,4 +53,15 @@ public class UserServiceImpl implements IUserService {
             throw new UpdateException("Unknown exception for information updating.");
         }
     }
+
+    @Override
+    public void updateInfoByUid(String username, String phone, String email, Integer id) {
+
+        User result = userMapper.findById(id);
+        if (result == null || result.getIsDeleted() == 1) {
+            throw new UsernameErrorException("user not exists");
+        }else
+            userMapper.updateInfoById(username, phone, email, id);
+
+    }
 }

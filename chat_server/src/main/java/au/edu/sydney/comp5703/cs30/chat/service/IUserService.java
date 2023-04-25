@@ -10,4 +10,6 @@ public interface IUserService {
                         String oldPassword,
                         String newPassword);
 
+    void updateInfoByUid(String username, String phone, String email, Integer id);
+
 }
