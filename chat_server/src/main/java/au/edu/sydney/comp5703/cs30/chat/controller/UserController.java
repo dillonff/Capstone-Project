@@ -2,6 +2,7 @@ package au.edu.sydney.comp5703.cs30.chat.controller;
 
 import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
+import au.edu.sydney.comp5703.cs30.chat.mapper.UserMapper;
 import au.edu.sydney.comp5703.cs30.chat.model.GetUserResponse;
 import au.edu.sydney.comp5703.cs30.chat.service.IUserService;
 import au.edu.sydney.comp5703.cs30.chat.util.JsonResult;
@@ -13,12 +14,14 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 public class UserController extends BaseController {
 
+    private UserMapper userMapper;
+
     // @Autowired
     private IUserService iUserService = null;
 
     @RequestMapping(value = "/api/v1/users/{userId}", produces = "application/json", method = RequestMethod.GET)
     public User handleGetUser(@PathVariable long userId) {
-        User user = Repo.userMap.get(userId);
+        User user = userMapper.findById(userId);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.");
         }

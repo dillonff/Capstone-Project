@@ -4,19 +4,26 @@ package au.edu.sydney.comp5703.cs30.chat;
 import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
 import au.edu.sydney.comp5703.cs30.chat.entity.ClientSession;
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
+import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMemberMapper;
+import au.edu.sydney.comp5703.cs30.chat.mapper.UserMapper;
 import au.edu.sydney.comp5703.cs30.chat.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import static au.edu.sydney.comp5703.cs30.chat.Repo.userMap;
-
 
 public class WebSocketHandler extends TextWebSocketHandler {
+
+    @Autowired
+    private ChannelMemberMapper channelMemberMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     private static ObjectMapper om = new ObjectMapper();
     @Override
@@ -95,9 +102,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     private void broadcastMessagesToChannel(String payload, Channel channel) throws Exception {
-        var members = Repo.channelMemberMapper.getChannelMembers(channel.getId());
+        var members = channelMemberMapper.getChannelMembers(channel.getId());
         for (var m : members) {
-            var user = userMap.get(m.getUserId());
+            var user = userMapper.findById(m.getUserId());
             var sessions = ClientSession.getByUserId(user.getId());
             for(var session : sessions) {
                 try {
@@ -111,15 +118,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
 
     private void handleAuthRequest(WebSocketSession wssession, AuthRequest ar) throws Exception {
-        // construct a new user
-        User user = null;
         // workaround for the temporary authentication
-        for (var tmp : Repo.userMap.values()) {
-            if (tmp.getUsername().equals(ar.getUserName())) {
-                user = tmp;
-            }
-        }
+        var user = userMapper.findByUsername(ar.getUserName());
         if (user == null) {
+            user = new User(ar.getUserName());
+            userMapper.insertUser(user);
             wssession.close();
             throw new RuntimeException("user not authenticated");
         }

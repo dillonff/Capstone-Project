@@ -3,6 +3,7 @@ package au.edu.sydney.comp5703.cs30.chat.controller;
 import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.entity.Message;
 import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper;
+import au.edu.sydney.comp5703.cs30.chat.mapper.UserMapper;
 import au.edu.sydney.comp5703.cs30.chat.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +20,16 @@ public class MessageController {
     @Autowired
     public ChannelMapper channelMapper;
 
+    @Autowired
+    public UserMapper userMapper;
+
     private static final ObjectMapper om = new ObjectMapper();
     @RequestMapping(
             value = "/api/v1/messages/send", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
     public SendMessageResponse handleSendMessage(@RequestBody SendMessageRequest req, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
         // for existing client, first figure out the clientSession that was created in auth
-        var user = Repo.userMap.get(auth);
+        var user = userMapper.findById(auth);
         // then figure out the channel by id
         var channelId = req.getChannelId();
         var channel = channelMapper.findById(channelId);
