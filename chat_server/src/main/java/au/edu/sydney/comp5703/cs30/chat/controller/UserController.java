@@ -27,9 +27,9 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping("reg")
-    public JsonResult<Void> reg(User user) {
+    public JsonResult<Void> reg(String username, String password) {
 
-        iUserService.reg(user);
+        iUserService.reg(username, password);
 
         return new JsonResult<Void>(OK);
     }

@@ -10,4 +10,10 @@ public interface UserMapper {
     Integer insertUser(User user);
     User findById(long id);
     User findByUsername(String username);
+
+    Integer updatePassById(Integer uid,
+                           String password);
+
+
+
 }

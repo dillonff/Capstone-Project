@@ -8,9 +8,11 @@
         <constructor>
             <arg column="username" javaType="String" />
         </constructor>
-        <id column="user_id" property="id"></id>
-        <result column="user_name" property="name"></result>
-        <result column="gmt_create" property="timeCreated"></result>
+        <id column="id" property="id"></id>
+        <result column="username" property="name"></result>
+        <result column="phone" property="phone"></result>
+        <result column="email" property="email"></result>
+        <result column="password" property="password"></result>
     </resultMap>
 
     <insert id="insertUser">
@@ -33,4 +35,22 @@
         WHERE
             username = #{username} and not is_deleted
     </select>
+
+    <update id="updatePassById">
+        update chat_user set
+                             password=#{password}
+        where id=#{id}
+    </update>
+
+    <update id="updateInfoById">
+        update chat_user set
+                             username=#{username},
+                             email=#{email},
+                             phone=#{phone}
+        where id=#{id}
+    </update>
+
+
+
+
 </mapper>
