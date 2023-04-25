@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpSession;
+
 @RestController
 public class UserController extends BaseController {
 
@@ -35,6 +37,22 @@ public class UserController extends BaseController {
         iUserService.reg(username, password);
 
         return new JsonResult<Void>(OK);
+    }
+
+    @RequestMapping("change_password")
+    public JsonResult<Void> changePassword(String oldPassword,
+                                           String newPassword,
+                                           HttpSession session) {
+        Integer uid = getUidFromSession(session);
+        String username = getUsernameFromSession(session);
+        iUserService.changePassword(uid,username,oldPassword,newPassword);
+        return new JsonResult<>(OK);
+    }
+
+    @RequestMapping("change_info")
+    public JsonResult<User> updateInfo(String username, String phone, String email, HttpSession session) {
+        iUserService.updateInfoByUid(username, phone, email, getUidFromSession(session));
+        return new JsonResult<User>(OK);
     }
 
 }

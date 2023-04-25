@@ -50,6 +50,15 @@
         where id=#{id}
     </update>
 
+    <update id="updateInfoByUid">
+        update user
+        set
+        <if test="email!=null">email = #{email},</if>
+        <if test="phobe!=null">phone = #{phone},</if>
+        <if test="username!=null">username = #{username},</if>
+        where id=#{id}
+    </update>
+
 
 
 

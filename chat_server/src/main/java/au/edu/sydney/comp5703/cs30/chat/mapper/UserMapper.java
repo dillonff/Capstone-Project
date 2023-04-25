@@ -14,6 +14,6 @@ public interface UserMapper {
     Integer updatePassById(Integer uid,
                            String password);
 
-
+    Integer updateInfoById(String username, String phone, String email, Integer id);
 
 }
