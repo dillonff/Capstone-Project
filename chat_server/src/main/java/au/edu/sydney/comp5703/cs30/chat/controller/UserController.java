@@ -22,12 +22,13 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/api/v1/users/{userId}", produces = "application/json", method = RequestMethod.GET)
-    public GetUserResponse handleGetUser(@PathVariable long userId) {
+    public User handleGetUser(@PathVariable long userId) {
         User user = userService.getUser(userId);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.");
         }
-        return new GetUserResponse(user.getId(), user.getName(), user.getName());
+        return user;
+        // return new GetUserResponse(user.getId(), user.getName(), user.getName());
     }
 
     @RequestMapping("reg")
