@@ -57,6 +57,9 @@ public class Channel {
     public void setTimeCreated(Instant timeCreated) {
         this.timeCreated = timeCreated;
     }
+    public void setPinned(boolean isPinned) {
+        this.pinned = isPinned;
+    }
 
     public long getWorkspaceId() {
         return workspaceId;
@@ -76,10 +79,6 @@ public class Channel {
 
     public boolean isPinned() {
         return pinned;
-    }
-
-    public void setPinned(boolean pinned) {
-        this.pinned = pinned;
     }
 
     public boolean isDeleted() {

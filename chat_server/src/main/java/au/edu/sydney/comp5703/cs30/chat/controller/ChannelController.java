@@ -85,16 +85,47 @@ public class ChannelController {
     }
 
     @RequestMapping(
-            value = "/api/v1/channels/{channelId}", produces = "application/json", method = RequestMethod.GET
+            value = "/api/v1/channel/{channelId}", produces = "application/json", method = RequestMethod.GET
+
     )
-    public Channel handleGetChannelInfo(@PathVariable long channelId, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
+        public Channel handleGetChannelInfo(@PathVariable long channelId,
+                                        @CurrentSecurityContext SecurityContext sc,
+                                        @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
         var user = Repo.userMap.get(auth);
         System.out.println(user.getUsername());
         var channel = channelMapper.findById(channelId);
         if (channel == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "");
         }
-        return channel;
+        return  channel;
     }
 
+
+
+    @RequestMapping(
+            value = "/api/v1/channels/pin", produces = "application/json", method = RequestMethod.POST
+    )
+    public PinChannelResponse handlePinChannel(@RequestParam Long channelId, @RequestParam boolean pinned, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
+        var user = Repo.userMap.get(auth);
+        var channel = channelMapper.findById(channelId);
+        if (channel == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found");
+        }
+        var isParticipant = true;
+        // TODO: fix this
+        if (!isParticipant) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a participant of the channel");
+        }
+        boolean isPinned = channel.isPinned();
+        channel.setPinned(!isPinned);
+        var result = new PinChannelResponse(channelId, isPinned);
+        return result;
+    }
+
+
+
+
+
 }
+
+

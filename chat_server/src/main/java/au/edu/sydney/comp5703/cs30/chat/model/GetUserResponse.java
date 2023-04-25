@@ -4,8 +4,8 @@ public class GetUserResponse {
     Long UserId;
     String UserName;
     String UserDisplayName;
-    public GetUserResponse(Long UserId, String UserName, String UserDisplayName){
-        this.UserDisplayName = UserDisplayName;
+    public GetUserResponse(Long UserId, String UserName){
+
         this.UserId = UserId;
         this.UserName = UserName;
     }

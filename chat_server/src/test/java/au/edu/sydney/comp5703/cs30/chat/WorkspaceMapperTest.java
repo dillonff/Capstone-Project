@@ -13,7 +13,8 @@ public class WorkspaceMapperTest {
 
     @Test
     public void insertWorkspace(){
-        Workspace workspace = new Workspace("#123");
+        Workspace workspace = new Workspace("#12345");
+        workspace.setId(3);
         workspaceMapper.insertWorkspace(workspace);
     }
 
