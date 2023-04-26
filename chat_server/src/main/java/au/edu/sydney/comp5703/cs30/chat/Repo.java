@@ -5,19 +5,20 @@ import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper;
 import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMemberMapper;
 import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.ibatis.binding.MapperProxy;
+
+@Component
 public class Repo {
-    @Autowired
     public static WorkspaceMapper workspaceMapper;
 
-    @Autowired
     public static ChannelMemberMapper channelMemberMapper;
 
-    @Autowired
     public static ChannelMapper channelMapper;
 
     @Autowired
@@ -34,6 +35,7 @@ public class Repo {
         channelMapper = auChannelMapper;
         workspaceMapper = auWorkspaceMapper;
         channelMemberMapper = auChannelMemberMapper;
+        System.err.println("mappers: " + channelMapper + workspaceMapper + channelMemberMapper);
     }
 
     // This is the in-memory repositories

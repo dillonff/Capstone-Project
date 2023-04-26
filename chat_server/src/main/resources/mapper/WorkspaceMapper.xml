@@ -7,8 +7,8 @@
         <constructor>
             <arg column="name" javaType="String" />
         </constructor>
-        <id column="workspace_id" property="id"/>
-        <result column="workspace_name" property="name"/>
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
     </resultMap>
 
     <insert id="insertWorkspace" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
@@ -35,7 +35,7 @@
         )
     </insert>
 
-    <select id="getMemberIds">
+    <select id="getMemberIds" resultType="long">
         select user_id from chat_workspace_member where workspace_id = #{workspaceId} and not is_deleted
     </select>
 </mapper>

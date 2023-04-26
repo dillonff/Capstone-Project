@@ -16,6 +16,7 @@ import javax.servlet.http.HttpSession;
 @RestController
 public class UserController extends BaseController {
 
+    @Autowired
     private UserMapper userMapper;
 
     // @Autowired

@@ -42,8 +42,8 @@ public class Util {
 
     public static Channel createChannel(long workspaceId, String name) {
         var channel = new Channel(name, workspaceId, false);
-        var id = channelMapper.insertChannel(channel);
-        return channelMapper.findById(id);
+        channelMapper.insertChannel(channel);
+        return channelMapper.findById(channel.getId());
     }
 
     public static Channel getChannelForName(long workspaceId, String channelName) {

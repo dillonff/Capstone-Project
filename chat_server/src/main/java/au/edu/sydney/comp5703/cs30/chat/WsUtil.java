@@ -26,9 +26,11 @@ public class WsUtil {
     public static void broadcastMessagesToChannel(String payload, Channel channel) throws Exception {
         var members = Repo.channelMemberMapper.getChannelMembers(channel.getId());
         for (var m : members) {
-            if (m.getChannelId() != channel.getId())
-                continue;
             var sessions = ClientSession.getByUserId(m.getUserId());
+            if (sessions == null) {
+                // user not logged in
+                continue;
+            }
             for(var session : sessions) {
                 try {
                     sendOneMessage(session.getWssession(), payload);

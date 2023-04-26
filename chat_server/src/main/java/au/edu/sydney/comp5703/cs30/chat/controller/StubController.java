@@ -1,5 +1,6 @@
 package au.edu.sydney.comp5703.cs30.chat.controller;
 
+import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import au.edu.sydney.comp5703.cs30.chat.mapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,14 @@ public class StubController {
     // controller for manual testing only
     @RequestMapping(value = "/stub1", method = RequestMethod.GET)
     public void handleStub() {
-        var user = new User("test" + System.currentTimeMillis());
-        var res = userMapper.insertUser(user);
+//        var user = new User("test" + System.currentTimeMillis());
+//        var res = userMapper.insertUser(user);
+//
+//        System.err.println("user id: " + user.getId());
+        var ids = Repo.workspaceMapper.getMemberIds(10);
+        System.err.println(ids);
 
-        System.err.println("user id: " + user.getId());
+        var ms = Repo.channelMemberMapper.getChannelMembers(12);
+        System.err.println(ms);
     }
 }

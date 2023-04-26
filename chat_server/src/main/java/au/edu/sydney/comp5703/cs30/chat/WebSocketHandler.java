@@ -11,18 +11,22 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-
+@Component
 public class WebSocketHandler extends TextWebSocketHandler {
 
-    @Autowired
+    public WebSocketHandler(ChannelMemberMapper channelMemberMapper, UserMapper userMapper) {
+        this.channelMemberMapper = channelMemberMapper;
+        this.userMapper = userMapper;
+    }
+
     private ChannelMemberMapper channelMemberMapper;
 
-    @Autowired
     private UserMapper userMapper;
 
     private static ObjectMapper om = new ObjectMapper();

@@ -18,11 +18,11 @@ public interface ChannelMemberMapper {
             @Result(property = "deleted", column = "is_deleted")
     })
     @ConstructorArgs(value = {
-            @Arg(column = "channel_id"),
-            @Arg(column = "user_id")
+            @Arg(column = "channel_id", javaType = long.class),
+            @Arg(column = "user_id", javaType = long.class)
     })
     @Select("select id, channel_id, user_id, last_read_message_id, is_mentioned, is_deleted from chat_channel_member where channel_id = #{channelId} and not is_deleted")
-    List<ChannelMember> getChannelMembers(@Param(" channelId") long channelId);
+    List<ChannelMember> getChannelMembers(@Param("channelId") long channelId);
 
     @Insert("insert into chat_channel_member (channel_id, user_id, last_read_message_id, is_mentioned) values (#{channelId}, #{userId}, #{lastReadMessageId}, #{mentioned})")
     Integer insertChannelMember(ChannelMember member);

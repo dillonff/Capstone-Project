@@ -18,7 +18,7 @@
         <result column="is_pinned" property="pinned"/>
     </resultMap>
 
-    <insert id="insertChannel">
+    <insert id="insertChannel" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         insert into chat_channel(
             name, workspace_id, is_public, is_pinned
         ) values (
@@ -34,7 +34,7 @@
         select * from chat_channel where workspace_id = #{workspaceId} and name = #{name} and not is_deleted
     </select>
 
-    <select id="findIdByWorkspaceId">
+    <select id="findIdByWorkspaceId" resultType="long">
         select id from chat_channel where workspace_id = #{workspaceId} and not is_deleted
     </select>
 

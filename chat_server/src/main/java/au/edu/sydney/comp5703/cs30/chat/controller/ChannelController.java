@@ -38,7 +38,7 @@ public class ChannelController {
     )
     public CreateChannelResponse handleCreateChannel(@RequestBody CreateChannelRequest req, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
         // this is a simple workaround to know the calling user
-        var user = userMapper.findByUsername(req.getName());
+        var user = userMapper.findById(auth);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found");
         }
@@ -88,7 +88,7 @@ public class ChannelController {
     }
 
     @RequestMapping(
-            value = "/api/v1/channel/{channelId}", produces = "application/json", method = RequestMethod.GET
+            value = "/api/v1/channels/{channelId}", produces = "application/json", method = RequestMethod.GET
 
     )
         public Channel handleGetChannelInfo(@PathVariable long channelId,
