@@ -24,7 +24,7 @@ async function getUser(id, auth, refresh=false) {
 const nullChannel = {
   id: -1,
   name: '(not loaded)',
-  participantIds: []
+  memberIds: []
 }
 
 const nullWorkspace = {
@@ -123,7 +123,7 @@ function App() {
     }
     let elem = <div key={i} style={{padding: '5px', margin: '5px', border: border, cursor: 'pointer'}} onClick={clickCb}>
       <div>{channel.name}</div>
-      <div>{channel.participantIds.length} people</div>
+      <div>{channel.memberIds.length} people</div>
     </div>
     channelElems.push(elem);
   }
@@ -207,7 +207,7 @@ function App() {
             let user = await getUser(res.data.senderId, auth);
             let msg = {
               message: res.data.preview,
-              sender: user.name   // TODO: obtain the user info and then set this sender properly
+              sender: user.username   // TODO: obtain the user info and then set this sender properly
             }
             console.error(res.data);
             if (res.data.channelId === currentChannel.id) {
