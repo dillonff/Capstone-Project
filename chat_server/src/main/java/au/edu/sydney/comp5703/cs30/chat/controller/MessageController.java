@@ -61,15 +61,15 @@ public class MessageController {
             value = "/api/v1/messages", produces = "application/json", method = RequestMethod.GET
     )
     public GetMessageResponse handleGetMessages(
-            @PathVariable Long id,
-            @PathVariable Long channelId,
-            @PathVariable Long page,
-            @PathVariable Long pageSize,
-            @PathVariable Boolean isDesc,
-            @PathVariable String afterTime,
-            @PathVariable String beforeTime,
-            @PathVariable String notAfterTime,
-            @PathVariable String notBeforeTime
+            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) Long channelId,
+            @RequestParam(required = false) Long page,
+            @RequestParam(required = false) Long pageSize,
+            @RequestParam(required = false) Boolean isDesc,
+            @RequestParam(required = false) String afterTime,
+            @RequestParam(required = false) String beforeTime,
+            @RequestParam(required = false) String notAfterTime,
+            @RequestParam(required = false) String notBeforeTime
     ) {
         Long offset = 0L;
         Instant after = null;
@@ -80,6 +80,9 @@ public class MessageController {
             channelId = null;
             pageSize = null;
         } else {
+            if (channelId == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either message id or channel id must be specified");
+            }
             if (pageSize == null) {
                 pageSize = 20L;
             }
