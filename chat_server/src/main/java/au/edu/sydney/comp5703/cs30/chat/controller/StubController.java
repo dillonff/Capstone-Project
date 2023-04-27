@@ -5,6 +5,9 @@ import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import au.edu.sydney.comp5703.cs30.chat.mapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,5 +40,10 @@ public class StubController {
 
         var ms = Repo.channelMemberMapper.getChannelMembers(12);
         System.err.println(ms);
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
+        var res = encoder.encode("12345");
+        encoder.matches("12345", res);
+        System.err.println(res);
     }
 }
