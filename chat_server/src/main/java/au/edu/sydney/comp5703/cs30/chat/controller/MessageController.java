@@ -76,28 +76,27 @@ public class MessageController {
         Instant before = null;
         Instant notAfter = null;
         Instant notBefore = null;
+        if (isDesc == null) {
+            isDesc = true;
+        }
+        if (pageSize == null) {
+            pageSize = 20L;
+        }
+        if (pageSize <= 0 || pageSize > 100) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "page size must > 0 and <= 100");
+        }
+        if (page == null) {
+            page = 0L;
+        }
+        if (page < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "page must > 0");
+        }
+        offset = page * pageSize;
         if (id != null) {
             channelId = null;
-            pageSize = null;
         } else {
             if (channelId == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either message id or channel id must be specified");
-            }
-            if (pageSize == null) {
-                pageSize = 20L;
-            }
-            if (pageSize <= 0 || pageSize > 100) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "page size must > 0 and <= 100");
-            }
-            if (page == null) {
-                page = 0L;
-            }
-            if (page < 0) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "page must > 0");
-            }
-            offset = page * pageSize;
-            if (isDesc == null) {
-                isDesc = true;
             }
             if (channelId != null) {
                 var channel = channelMapper.findById(channelId);
@@ -140,7 +139,7 @@ public class MessageController {
         try {
             return Instant.parse(timeText);
         } catch (DateTimeParseException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, name + " format is incorrect. " + desc, e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, name + " format is incorrect (" + timeText + "). " + desc, e);
         }
     }
 

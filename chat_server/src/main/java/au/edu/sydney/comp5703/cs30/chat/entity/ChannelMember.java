@@ -8,6 +8,8 @@ public class ChannelMember {
     private boolean mentioned;
     private boolean deleted;
 
+    private Boolean pinned;
+
     public ChannelMember(long channelId, long userId) {
         this.channelId = channelId;
         this.userId = userId;
@@ -59,5 +61,13 @@ public class ChannelMember {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public Boolean getPinned() {
+        return pinned;
+    }
+
+    public void setPinned(Boolean pinned) {
+        this.pinned = pinned;
     }
 }

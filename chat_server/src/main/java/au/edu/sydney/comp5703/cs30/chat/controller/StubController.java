@@ -42,8 +42,12 @@ public class StubController {
         System.err.println(ms);
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
+        var start = System.currentTimeMillis();
         var res = encoder.encode("12345");
+        var mid = System.currentTimeMillis();
         encoder.matches("12345", res);
+        var end = System.currentTimeMillis();
         System.err.println(res);
+        System.err.println("" + (mid - start) + " " + (end - mid));
     }
 }

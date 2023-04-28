@@ -16,8 +16,8 @@ public class Workspace {
     public long id;
     public String name;
 
-    // default workspace where everyone will be joined automatically
-    public static Workspace def;
+//    // removed, please look for 'default' workspace in the database
+//    public static Workspace def;
     @PostConstruct
     private void init() {
 

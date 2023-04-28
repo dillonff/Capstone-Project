@@ -38,4 +38,8 @@
     <select id="getMemberIds" resultType="long">
         select user_id from chat_workspace_member where workspace_id = #{workspaceId} and not is_deleted
     </select>
+
+    <select id="findByName" resultMap="WorkspaceMap">
+        select * from chat_workspace where name=#{#id} and not is_deleted order by id desc limit 1
+    </select>
 </mapper>

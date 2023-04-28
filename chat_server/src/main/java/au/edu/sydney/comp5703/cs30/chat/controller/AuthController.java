@@ -5,6 +5,7 @@ import au.edu.sydney.comp5703.cs30.chat.Util;
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import au.edu.sydney.comp5703.cs30.chat.entity.Workspace;
 import au.edu.sydney.comp5703.cs30.chat.mapper.UserMapper;
+import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper;
 import au.edu.sydney.comp5703.cs30.chat.model.AuthRequest;
 import au.edu.sydney.comp5703.cs30.chat.model.AuthResponse;
 import au.edu.sydney.comp5703.cs30.chat.model.InfoChangedPush;
@@ -26,6 +27,9 @@ public class AuthController {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private WorkspaceMapper workspaceMapper;
+
     @RequestMapping(
             value = "/api/v1/auth", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
@@ -33,8 +37,9 @@ public class AuthController {
         if (req.getUserName() == null) {
             throw new ResponseStatusException(400, "No user name specified", null);
         }
-        if (Workspace.def == null) {
-            Workspace.def = Util.createWorkspace("default");
+        var defaultWorkspace = workspaceMapper.findByName("default");
+        if (defaultWorkspace == null) {
+            defaultWorkspace = Util.createWorkspace("default");
         }
         // construct a new user
         // workaround for the temporary authentication
@@ -43,7 +48,7 @@ public class AuthController {
             user = new User(req.getUserName());
             userMapper.insertUser(user);
             // add the user to default workspace and general channel
-            Repo.addMemberToWorkspace(Workspace.def.getId(), user.getId());
+            Repo.addMemberToWorkspace(defaultWorkspace.getId(), user.getId());
             var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
             broadcastMessages(p);
             p = makeServerPush("infoChanged", new InfoChangedPush("workspace"));

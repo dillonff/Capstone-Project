@@ -19,4 +19,6 @@ public interface WorkspaceMapper {
     Integer addMember(@Param("workspaceId") long workspaceId, @Param("userId") long userId);
 
     List<Long> getMemberIds(long workspaceId);
+
+    Workspace findByName(String name);
 }

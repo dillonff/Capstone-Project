@@ -3,6 +3,7 @@ package au.edu.sydney.comp5703.cs30.chat.controller;
 import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.Util;
 import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
+import au.edu.sydney.comp5703.cs30.chat.entity.ChannelMember;
 import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper;
 import au.edu.sydney.comp5703.cs30.chat.mapper.UserMapper;
 import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper;
@@ -104,29 +105,53 @@ public class ChannelController {
     }
 
 
-
     @RequestMapping(
-            value = "/api/v1/channels/pin", produces = "application/json", method = RequestMethod.POST
+            value = "/api/v1/channels/{channelId}/memberInfo", produces = "application/json", method = RequestMethod.GET
+
     )
-    public PinChannelResponse handlePinChannel(@RequestParam Long channelId, @RequestParam boolean pinned, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
+    public ChannelMember handleGetChannelMember(@PathVariable long channelId,
+                                                @CurrentSecurityContext SecurityContext sc,
+                                                @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
         var user = userMapper.findById(auth);
-        var channel = channelMapper.findById(channelId);
-        if (channel == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found");
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "user not authenticated");
         }
-        var isParticipant = true;
-        // TODO: fix this
-        if (!isParticipant) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a participant of the channel");
+        var channelMember = channelMemberMapper.findByUserAndChannelId(user.getId(), channelId);
+        if (channelMember == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "channel member not found");
         }
-        boolean isPinned = channel.isPinned();
-        channel.setPinned(!isPinned);
-        var result = new PinChannelResponse(channelId, isPinned);
-        return result;
+        return  channelMember;
     }
 
 
 
+    @RequestMapping(
+            value = "/api/v1/channels/{channelId}/{action}", method = RequestMethod.PUT
+    )
+    public void handleChannelAction(@PathVariable Long channelId, @PathVariable String action, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
+        var user = userMapper.findById(auth);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authenticated");
+        }
+        var channel = channelMapper.findById(channelId);
+        if (channel == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found");
+        }
+        var member = channelMemberMapper.findByUserAndChannelId(user.getId(), channelId);
+        if (member == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not a channel member");
+        }
+        switch (action) {
+            case "pin":
+                channelMemberMapper.setPinned(member.getId(), true);
+                break;
+            case "unpin":
+                channelMemberMapper.setPinned(member.getId(), false);
+                break;
+            default:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid action: " + action);
+        }
+    }
 
 
 }

@@ -15,15 +15,23 @@ public interface ChannelMemberMapper {
             @Result(property = "userId", column = "user_id"),
             @Result(property = "lastReadMessageId", column = "last_read_message_id"),
             @Result(property = "mentioned", column = "is_mentioned"),
+            @Result(property = "pinned", column = "is_pinned"),
             @Result(property = "deleted", column = "is_deleted")
     })
     @ConstructorArgs(value = {
             @Arg(column = "channel_id", javaType = long.class),
             @Arg(column = "user_id", javaType = long.class)
     })
-    @Select("select id, channel_id, user_id, last_read_message_id, is_mentioned, is_deleted from chat_channel_member where channel_id = #{channelId} and not is_deleted")
+    @Select("select id, channel_id, user_id, last_read_message_id, is_mentioned, is_pinned, is_deleted from chat_channel_member where channel_id = #{channelId} and not is_deleted")
     List<ChannelMember> getChannelMembers(@Param("channelId") long channelId);
 
     @Insert("insert into chat_channel_member (channel_id, user_id, last_read_message_id, is_mentioned) values (#{channelId}, #{userId}, #{lastReadMessageId}, #{mentioned})")
     Integer insertChannelMember(ChannelMember member);
+
+    @Select("select id, 'aaaa' as avoid_bad_constructor, channel_id, user_id, last_read_message_id, is_mentioned, is_pinned, is_deleted from chat_channel_member where channel_id = #{channelId} and user_id = #{userId} and not is_deleted limit 1")
+    @ResultMap("channelMemberMap")
+    ChannelMember findByUserAndChannelId(Long userId, Long channelId);
+
+    @Update("update chat_channel_member set is_pinned = #{pinned} where id = #{channelMemberId}")
+    Integer setPinned(long channelMemberId, boolean pinned);
 }

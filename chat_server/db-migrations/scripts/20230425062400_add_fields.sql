@@ -1,7 +1,7 @@
 -- // add fields
 -- Migration SQL that makes the change goes here.
-alter table chat_user add column phone varchar(20) not null default '' comment 'user phone number';
-alter table chat_user add column email varchar(20) not null default '' comment 'user email';
+alter table chat_user add column phone varchar(32) not null default '' comment 'user phone number';
+alter table chat_user add column email varchar(255) not null default '' comment 'user email';
 
 
 -- //@UNDO
