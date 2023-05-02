@@ -3,54 +3,45 @@ package au.edu.sydney.comp5703.cs30.chat.entity;
 import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.Util;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import static au.edu.sydney.comp5703.cs30.chat.Repo.workspaceMap;
 
+@Component
 public class Workspace {
     public long id;
     public String name;
-    public Date time;
 
-    private static SeqIdGen idGen = new SeqIdGen();
-    public long getNextId() {
-        return idGen.getNextId();
+//    // removed, please look for 'default' workspace in the database
+//    public static Workspace def;
+    @PostConstruct
+    private void init() {
+
     }
 
-    // default workspace where everyone will be joined automatically
-    public static Workspace def;
-    static {
-        def = Util.createWorkspace("default");
+    public Workspace() {
+        name = "";
     }
 
     public Workspace(String name) {
-        this.id = getNextId();
         this.name = name;
-        this.time = new Date();
     }
 
     @JsonProperty("memberIds")
     public List<Long> getMemberIds() {
-        var ids = new LinkedList<Long>();
-        for (var wm : Repo.workspaceMemberMap.values()) {
-            if (wm.getWorkspaceId() == id) {
-                ids.add(wm.getUserId());
-            }
-        }
+        var ids = Repo.workspaceMapper.getMemberIds(id);
+        System.err.println(ids);
         return ids;
     }
 
     @JsonProperty("channelIds")
     public List<Long> getChannelIds() {
-        var ids = new LinkedList<Long>();
-        for (var wc : Repo.workspaceChannelMap.values()) {
-            if (wc.getWorkspaceId() == id) {
-                ids.add(wc.getChannelId());
-            }
-        }
+        var ids = Repo.channelMapper.findIdByWorkspaceId(id);
+        System.err.println(ids);
         return ids;
     }
 
@@ -70,11 +61,4 @@ public class Workspace {
         this.name = name;
     }
 
-    public Date getTime() {
-        return time;
-    }
-
-    public void setTime(Date time) {
-        this.time = time;
-    }
 }

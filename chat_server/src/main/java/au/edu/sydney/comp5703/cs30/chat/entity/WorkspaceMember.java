@@ -5,13 +5,7 @@ public class WorkspaceMember {
     private long workspaceId;
     private long userId;
 
-    private static SeqIdGen idGen = new SeqIdGen();
-    public long getNextId() {
-        return idGen.getNextId();
-    }
-
     public WorkspaceMember(long workspaceId, long userId) {
-        id = getNextId();
         this.workspaceId = workspaceId;
         this.userId = userId;
     }
@@ -26,10 +20,6 @@ public class WorkspaceMember {
 
     public long getWorkspaceId() {
         return workspaceId;
-    }
-
-    public void setWorkspaceId(long workspaceId) {
-        this.workspaceId = workspaceId;
     }
 
     public long getUserId() {

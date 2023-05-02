@@ -2,32 +2,55 @@ package au.edu.sydney.comp5703.cs30.chat;
 
 import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
 import au.edu.sydney.comp5703.cs30.chat.entity.Workspace;
+import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper;
+import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 import static au.edu.sydney.comp5703.cs30.chat.Repo.*;
 
+@Component
 public class Util {
+    @Autowired
+    public static ChannelMapper channelMapper;
+
+    @Autowired
+    public static WorkspaceMapper workspaceMapper;
+
+    @Autowired
+    public ChannelMapper auChannelMapper;
+
+    @Autowired
+    public WorkspaceMapper auWorkspaceMapper;
+
+    @PostConstruct
+    private void init() throws Exception {
+        channelMapper = auChannelMapper;
+        workspaceMapper = auWorkspaceMapper;
+    }
+
     public static Workspace createWorkspace(String name) {
         var workspace = new Workspace(name);
-        var defaultChannel = createChannel("general");
-        addChannelToWorkspace(workspace.getId(), defaultChannel.getId());
-        workspaceMap.put(workspace.getId(), workspace);
+        workspaceMapper.insertWorkspace(workspace);
+        var defaultChannel = createChannel(workspace.getId(), "general");
         return workspace;
     }
 
-    public static Channel createChannel(String name) {
-        var channel = new Channel(name);
-        channelMap.put(channel.getId(), channel);
-        return channel;
+    public static Channel createChannel(long workspaceId, String name) {
+        var channel = new Channel(name, workspaceId, false);
+        channelMapper.insertChannel(channel);
+        return channelMapper.findById(channel.getId());
     }
 
     public static Channel getChannelForName(long workspaceId, String channelName) {
-        for (var c : workspaceChannelMap.values()) {
-            if (c.getWorkspaceId() == workspaceId) {
-                var channel = channelMap.get(c.getChannelId());
-                if (channel != null && channel.getName().equals(channelName))
-                    return channel;
-            }
+        var channels = channelMapper.findByWorkspaceAndName(workspaceId, channelName);
+        if (channels.size() == 0) {
+            throw new RuntimeException("channel " + channelName + "not found");
         }
-        throw new RuntimeException("channel " + channelName + "not found");
+        return channels.get(0);
     }
 }

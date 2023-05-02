@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import static au.edu.sydney.comp5703.cs30.chat.Repo.channelMemberMap;
 
 public class WsUtil {
     private static final ObjectMapper om = new ObjectMapper();
@@ -25,10 +24,13 @@ public class WsUtil {
     }
 
     public static void broadcastMessagesToChannel(String payload, Channel channel) throws Exception {
-        for (var m : channelMemberMap.values()) {
-            if (m.getChannelId() != channel.getId())
-                continue;
+        var members = Repo.channelMemberMapper.getChannelMembers(channel.getId());
+        for (var m : members) {
             var sessions = ClientSession.getByUserId(m.getUserId());
+            if (sessions == null) {
+                // user not logged in
+                continue;
+            }
             for(var session : sessions) {
                 try {
                     sendOneMessage(session.getWssession(), payload);

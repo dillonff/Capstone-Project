@@ -1,0 +1,3 @@
+#!/bin/bash
+cd db-migrations || exit 1
+./mybatis-migrations-3.3.11/bin/migrate "$@"

@@ -6,6 +6,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
+import java.util.TimeZone;
+
 @Configuration
 @SpringBootApplication
 @MapperScan("au.edu.sydney.comp5703.cs30.chat.mapper")
@@ -15,4 +18,8 @@ public class ChatApplication {
 		SpringApplication.run(ChatApplication.class, args);
 	}
 
+	@PostConstruct
+	public void init() {
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+	}
 }

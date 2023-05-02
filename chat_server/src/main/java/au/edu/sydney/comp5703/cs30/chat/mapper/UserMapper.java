@@ -8,6 +8,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserMapper {
     Integer insertUser(User user);
-    User findByUid(long id);
-    User findByName(String username);
+    User findById(long id);
+    User findByUsername(String username);
+
+    Integer updatePassById(Integer uid,
+                           String password);
+
+    Integer updateInfoById(String username, String phone, String email, Integer id);
+
 }

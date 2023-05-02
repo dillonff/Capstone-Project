@@ -17,7 +17,8 @@ public class ChannelMapperTest {
 
     @Test
     public void insertChannel(){
-        Channel channel = new Channel("capstone");
+        Channel channel = new Channel("capstone 2", 1, true);
+        channel.setId(3);
         channelMapper.insertChannel(channel);
     }
 }

@@ -1,51 +1,37 @@
 package au.edu.sydney.comp5703.cs30.chat.entity;
 
 import au.edu.sydney.comp5703.cs30.chat.Repo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.time.Instant;
 import java.util.*;
 
-import static au.edu.sydney.comp5703.cs30.chat.Repo.channelMemberMap;
 
 public class Channel {
-    // Note: temporarily use this before integrating the database
-
-    private static SeqIdGen idGen = new SeqIdGen();
-    // This is the general channel that automatically adds anyone
-    public static Channel general;
-
     private long id;
     private String name;
-    private Date timeCreated;
-
     private long workspaceId;
+    private boolean publicChannel;
+    private boolean deleted;
+    private Instant timeCreated;
+    private Instant timeModified;
 
-    static {
-        general = new Channel("general");
-        Repo.channelMap.put(general.getId(), general);
-    }
+    private Boolean directMessage;
 
-    public long getNextId() {
-        return idGen.getNextId();
-    }
-
-    public Channel(String name) {
-        this.id = getNextId();
+    public Channel(String name, long workspaceId, boolean isPublic) {
         this.name = name;
-        timeCreated = new Date();
+        this.workspaceId = workspaceId;
+        this.publicChannel = isPublic;
+        this.directMessage = false;
     }
 
-
-
-    @JsonProperty("participantIds")
-    public List<Long> getParticipantIds() {
+    @JsonProperty("memberIds")
+    public List<Long> getMemberIds() {
         var ids = new LinkedList<Long>();
-        for (var m : channelMemberMap.values()) {
-            if (m.getChannelId() == id) {
-                ids.add(m.getUserId());
-            }
-        }
+        var ms = Repo.channelMemberMapper.getChannelMembers(id);
+        ms.forEach(m -> {
+            ids.add(m.getUserId());
+        });
         return ids;
     }
 
@@ -65,19 +51,51 @@ public class Channel {
         this.name = name;
     }
 
-    public Date getTimeCreated() {
+    public Instant getTimeCreated() {
         return timeCreated;
     }
 
-    public void setTimeCreated(Date timeCreated) {
+    public void setTimeCreated(Instant timeCreated) {
         this.timeCreated = timeCreated;
     }
 
-//    public List<User> getParticipants() {
-//        return participants;
-//    }
+    public long getWorkspaceId() {
+        return workspaceId;
+    }
 
-//    public void setParticipants(List<User> participants) {
-//        this.participants = participants;
-//    }
+    public void setWorkspaceId(long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
+    public boolean isPublicChannel() {
+        return publicChannel;
+    }
+
+    public void setPublicChannel(boolean isPublic) {
+        this.publicChannel = isPublic;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public Instant getTimeModified() {
+        return timeModified;
+    }
+
+    public void setTimeModified(Instant timeModified) {
+        this.timeModified = timeModified;
+    }
+
+    public Boolean isDirectMessage() {
+        return directMessage;
+    }
+
+    public void setDirectMessage(Boolean directMessage) {
+        this.directMessage = directMessage;
+    }
 }

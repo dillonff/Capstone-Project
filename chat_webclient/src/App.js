@@ -24,7 +24,7 @@ async function getUser(id, auth, refresh = false) {
 const nullChannel = {
   id: -1,
   name: '(not loaded)',
-  memberIds: [],
+  participantIds: [],
 };
 
 const nullWorkspace = {
@@ -59,8 +59,6 @@ function App() {
   let [currentWorkspace, setCurrentWorkspace] = useState(nullWorkspace);
   let [channels, setChannels] = useState([]);
   let [currentChannel, setCurrentChannel] = useState(nullChannel);
-  let [workspaceMembers, setWorkspaceMembers] = useState([]);
-  let [channelMembers, setChannelMembers] = useState([]);
   const addUserIdRef = useRef(null);
   const addUserIdToWorkspaceRef = useRef(null);
 
@@ -71,51 +69,16 @@ function App() {
         console.error(e);
         alert(e);
       });
-      getMembersInfo(currentWorkspace.memberIds)
-        .then((ms) => {
-          setWorkspaceMembers(ms);
-        })
-        .catch((e) => {
-          console.error(e);
-          alert(e);
-        });
     },
     [currentWorkspace]
-  );
-
-  useEffect(
-    (_) => {
-      if (currentChannel.id === -1) return;
-      getMembersInfo(currentChannel.memberIds)
-        .then((ms) => {
-          setChannelMembers(ms);
-        })
-        .catch((e) => {
-          console.error(e);
-          alert(e);
-        });
-
-      getMessages(currentChannel.id, auth)
-        .then((ms) => {
-          setMsgList(ms);
-          msgListRef.current = ms;
-        })
-        .catch((e) => {
-          console.error(e);
-          alert('cannot get historical messages');
-        });
-    },
-    [currentChannel]
   );
 
   let msgElems = [];
   for (let i = 0; i < msgList.length; i++) {
     const msg = msgList[i];
     let elem = (
-      <div key={i} style={{ padding: '5px' }}>
-        <label>
-          {msg.sender} - {msg.time}
-        </label>
+      <div key={i}>
+        <label>{msg.sender}</label>
         <div style={{ fontSize: 'x-large' }}>{msg.message}</div>
       </div>
     );
@@ -156,29 +119,6 @@ function App() {
     workspaceElems.push(<div key="-1">No workspace</div>);
   }
 
-  const renderMembers = (members) => {
-    let elems = [];
-    if (members.length > 0) {
-      elems.push(
-        <div key="0" style={{ marginTop: '3px' }}>
-          Members
-        </div>
-      );
-    }
-    for (const member of members) {
-      let elem = (
-        <div key={member.id} style={{ margin: '3px' }}>
-          {member.username} ({member.id})
-        </div>
-      );
-      elems.push(elem);
-    }
-    return elems;
-  };
-
-  let workspaceMembersElem = renderMembers(workspaceMembers);
-  let channelMembersElem = renderMembers(channelMembers);
-
   let channelElems = [];
   for (let i = 0; i < channels.length; i++) {
     const channel = channels[i];
@@ -204,7 +144,7 @@ function App() {
         onClick={clickCb}
       >
         <div>{channel.name}</div>
-        <div>{channel.memberIds.length} people</div>
+        <div>{channel.participantIds.length} people</div>
       </div>
     );
     channelElems.push(elem);
@@ -257,43 +197,6 @@ function App() {
     setWorkspaces(newWorkspaces);
   };
 
-  const getMembersInfo = async (memberIds) => {
-    const members = [];
-    for (const id of memberIds) {
-      let res = await callApi('/users/' + id, 'GET', auth);
-      if (res.ok) {
-        res = await res.json();
-        members.push(res);
-      } else {
-        console.error(res);
-        alert('Cannot get member info');
-        break;
-      }
-    }
-    return members;
-  };
-
-  const getMessages = async (channelId) => {
-    let res = await callApi('/messages?channelId=' + channelId);
-    if (!res.ok) {
-      console.error(res);
-      alert('cannot get historical messages');
-    }
-    res = await res.json();
-    let newMessages = [];
-    for (let m of res.messages) {
-      let user = await getUser(m.senderId, auth);
-      let message = {
-        sender: user.username,
-        message: m.content,
-        time: new Date(m.timeCreated).toLocaleString(),
-      };
-      newMessages.push(message);
-    }
-    newMessages.reverse();
-    return newMessages;
-  };
-
   const addUserToChannel = (ws, cid, uid) => {
     let req = {
       userId: parseInt(uid),
@@ -326,8 +229,7 @@ function App() {
             let user = await getUser(res.data.senderId, auth);
             let msg = {
               message: res.data.preview,
-              sender: user.username, // TODO: obtain the user info and then set this sender properly
-              time: new Date().toLocaleString(),
+              sender: user.name, // TODO: obtain the user info and then set this sender properly
             };
             console.error(res.data);
             if (res.data.channelId === currentChannel.id) {
@@ -456,10 +358,7 @@ function App() {
             <input type="text" ref={addUserIdToWorkspaceRef}></input>
           </div>
         </div>
-
         {workspaceElems}
-
-        <div style={{ marginTop: '15px' }}>{workspaceMembersElem}</div>
       </div>
 
       {/* channels */}
@@ -518,8 +417,6 @@ function App() {
           </div>
         </div>
         {channelElems}
-
-        <div style={{ marginTop: '15px' }}>{channelMembersElem}</div>
       </div>
 
       <div style={{ width: '400px', margin: 'auto', padding: '5px' }}>
