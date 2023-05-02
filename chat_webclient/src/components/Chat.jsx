@@ -1,6 +1,4 @@
-import logo from './logo.svg';
 import React, { useEffect, useRef, useState } from 'react';
-import './App.css';
 
 const userCache = {};
 async function getUser(id, auth, refresh = false) {
@@ -47,7 +45,7 @@ function callApi(path, method, auth, body) {
   });
 }
 
-function App() {
+const Chat = () => {
   let [status, setStatus] = React.useState('disconnected');
   let [ws, setWs] = useState(null);
   let [msgList, setMsgList] = useState([]);
@@ -591,6 +589,6 @@ function App() {
       </div>
     </div>
   );
-}
+};
 
-export default App;
+export default Chat;
