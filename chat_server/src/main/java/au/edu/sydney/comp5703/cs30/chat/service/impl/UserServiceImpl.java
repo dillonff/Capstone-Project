@@ -5,17 +5,21 @@ import au.edu.sydney.comp5703.cs30.chat.mapper.UserMapper;
 import au.edu.sydney.comp5703.cs30.chat.service.IUserService;
 import au.edu.sydney.comp5703.cs30.chat.service.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
-
+@Service
 public class UserServiceImpl implements IUserService {
     @Autowired
     private UserMapper userMapper;
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
 
     @Override
     public void reg(String username, String password) {
 
         User result = userMapper.findByUsername(username);
+        String hashedPass;
 
         if (result != null) {
 
@@ -23,7 +27,8 @@ public class UserServiceImpl implements IUserService {
         }
 
         User user = new User(username);
-        user.setPassword(password);
+        hashedPass = encoder.encode(password);
+        user.setPassword(hashedPass);
 
         Integer rows = userMapper.insertUser(user);
 
@@ -37,17 +42,18 @@ public class UserServiceImpl implements IUserService {
     public void changePassword(Integer id, String username, String oldPassword, String newPassword) {
 
         User result = userMapper.findById(id);
+        String newHashedPass;
 
         if (result ==null || result.getIsDeleted() == 1) {
             throw new UsernameErrorException("This user dose not exist.");
         }
 
 
-        if (!result.getPassword().equals(oldPassword)) {
+        if (!encoder.matches(result.getPassword(), oldPassword)) {
             throw new PasswordErrorException("Wrong password.");
         }
-
-        Integer rows = userMapper.updatePassById(id, newPassword);
+        newHashedPass = encoder.encode(newPassword);
+        Integer rows = userMapper.updatePassById(id, newHashedPass);
 
         if (rows != 1) {
             throw new UpdateException("Unknown exception for information updating.");
