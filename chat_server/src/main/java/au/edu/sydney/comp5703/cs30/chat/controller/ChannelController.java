@@ -65,7 +65,10 @@ public class ChannelController {
         // for existing client, first figure out the clientSession that was created in auth
         var user = userMapper.findById(req.getUserId());
         var channel = channelMapper.findById(req.getChannelId());
-        // TODO: avoid duplicate member entry
+        var member = channelMemberMapper.findByUserAndChannelId(user.getId(), channel.getId());
+        if (member != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already a member");
+        }
         addMemberToChannel(channel.getId(), user.getId());
 
         var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));

@@ -21,4 +21,6 @@ public interface WorkspaceMapper {
     List<Long> getMemberIds(long workspaceId);
 
     Workspace findByName(String name);
+
+    boolean isMember(long workspaceId, long userId);
 }

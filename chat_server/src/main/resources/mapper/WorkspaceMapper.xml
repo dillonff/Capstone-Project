@@ -42,4 +42,8 @@
     <select id="findByName" resultMap="WorkspaceMap">
         select * from chat_workspace where name=#{#id} and not is_deleted order by id desc limit 1
     </select>
+
+    <select id="isMember" resultType="boolean">
+        select count(*) from chat_workspace_member where workspace_id = #{workspaceId} and user_id = #{userId} and not is_deleted limit 1
+    </select>
 </mapper>

@@ -13,6 +13,7 @@
         <id column="id" property="id"/>
         <result column="name" property="name"/>
         <result column="gmt_create" property="timeCreated"/>
+        <result column="gmt_modified" property="timeModified"/>
         <result column="workspace_id" property="workspaceId"/>
         <result column="is_public" property="publicChannel"/>
         <result column="is_direct_message" property="directMessage"/>

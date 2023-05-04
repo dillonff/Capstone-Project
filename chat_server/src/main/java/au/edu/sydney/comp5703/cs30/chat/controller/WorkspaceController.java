@@ -72,7 +72,9 @@ public class WorkspaceController {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found");
         }
-        //TODO: avoid duplicate member
+        if (workspaceMapper.isMember(workspace.getId(), user.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already a member");
+        }
         Repo.addMemberToWorkspace(workspace.getId(), user.getId());
         var p = makeServerPush("infoChanged", new InfoChangedPush("workspace"));
         broadcastMessages(p);
