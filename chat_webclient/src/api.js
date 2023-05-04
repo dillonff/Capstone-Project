@@ -1,14 +1,29 @@
-'use strict';
+import Event from './event';
 
-const auth = {
-  token: null
+export const auth = {
+  token: null,
+  user: null
+}
+
+export async function login(username, password) {
+  let res = await callApi('/auth', 'POST', JSON.stringify({
+    userName: username
+  }));
+  if (!res.ok) {
+    throw new Error('login failed');
+  }
+  res = await res.json();
+  auth.user = await getUser(res.userId);
+  auth.token = res.userId;
+  Event.start();
+  console.error(auth);
 }
 
 const userCache = {};
-async function getUser(id, auth, refresh = false) {
+export async function getUser(id, refresh = false) {
   let user = userCache[id];
   if (!user || refresh) {
-    let res = await callApi('/users/' + id, 'GET', auth);
+    let res = await callApi('/users/' + id, 'GET');
     if (res.ok) {
       res = await res.json();
       userCache[res.id] = res;
@@ -23,13 +38,13 @@ async function getUser(id, auth, refresh = false) {
   return user;
 }
 
-const nullChannel = {
+export const nullChannel = {
   id: -1,
   name: '(not loaded)',
   memberIds: [],
 };
 
-const nullWorkspace = {
+export const nullWorkspace = {
   id: -1,
   name: '(not loaded)',
   memberIds: [],
@@ -37,29 +52,28 @@ const nullWorkspace = {
 };
 
 const API_ENDPOINT = 'http://127.0.0.1:11451/api/v1';
-function callApi(path, method, auth, body) {
+export function callApi(path, method, body) {
   return fetch(API_ENDPOINT + path, {
     method: method,
     mode: 'cors',
     body: body,
     headers: {
-      authorization: auth,
+      authorization: auth.token,
       'content-type': 'application/json',
     },
   });
 }
 
-const getAllChannels = async (workspaceId) => {
+export const getAllChannels = async (workspaceId) => {
   let res = await callApi(
     '/channels?workspaceId=' + workspaceId,
-    'GET',
-    auth.token
+    'GET'
   );
   if (!res.ok) throw new Error('api failed');
   res = await res.json();
   let newChannels = [];
   for (let channelId of res.channelIds) {
-    res = await callApi('/channels/' + channelId, 'GET', auth.token);
+    res = await callApi('/channels/' + channelId, 'GET');
     if (!res.ok) throw new Error('api failed');
     res = await res.json();
     newChannels.push(res);
@@ -67,13 +81,13 @@ const getAllChannels = async (workspaceId) => {
   return newChannels;
 };
 
-const createChannel = (wid, name) => {
+export const createChannel = (wid, name) => {
   let req = {
     name: name,
     workspace: wid
   };
   req = JSON.stringify(req);
-  return callApi('/channels', 'POST', auth.current, req).then((res) => {
+  return callApi('/channels', 'POST', req).then((res) => {
     if (!res.ok) {
       console.error(res);
       throw new Error('Failed to create channel');
@@ -81,12 +95,12 @@ const createChannel = (wid, name) => {
   });
 }
 
-const createWorkspace = (name) => {
+export const createWorkspace = (name) => {
   let req = {
     name: name,
   };
   req = JSON.stringify(req);
-  return callApi('/workspaces', 'POST', auth.token, req)
+  return callApi('/workspaces', 'POST', req)
     .then((res) => {
       if (!res.ok) {
         console.error(res);
@@ -95,13 +109,13 @@ const createWorkspace = (name) => {
     });
 }
 
-const getAllWorkspaces = async () => {
-  let res = await callApi('/workspaces', 'GET', auth.current);
+export const getAllWorkspaces = async () => {
+  let res = await callApi('/workspaces', 'GET');
   if (!res.ok) throw new Error('cannot get workspaces');
   res = await res.json();
   let newWorkspaces = [];
   for (let workspaceId of res.workspaceIds) {
-    res = await callApi('/workspaces/' + workspaceId, 'GET', auth.token);
+    res = await callApi('/workspaces/' + workspaceId, 'GET');
     if (!res.ok) throw new Error('cannot get workspace ' + workspaceId);
     res = await res.json();
     newWorkspaces.push(res);
@@ -109,14 +123,45 @@ const getAllWorkspaces = async () => {
   return newWorkspaces;
 };
 
-export default {
-  auth,
-  getUser,
-  nullChannel,
-  nullWorkspace,
-  callApi,
-  getAllChannels,
-  createChannel,
-  createWorkspace,
-  getAllWorkspaces
+export const addUserToChannel = (cid, uid) => {
+  let req = {
+    userId: parseInt(uid),
+    channelId: parseInt(cid),
+  };
+  req = JSON.stringify(req);
+  return callApi('/channels/join', 'POST', req).then(res => {
+    if (!res.ok) {
+      console.error(res);
+      throw Error('Api call failed');
+    }
+  });
 };
+
+export const getMessages = async (channelId) => {
+  let res = await callApi('/messages?channelId=' + channelId);
+  if (!res.ok) {
+    console.error(res);
+    throw new Error('cannot get historical messages');
+  }
+  res = await res.json();
+  let newMessages = [];
+  for (let m of res.messages.reverse()) {
+    let user = await getUser(m.senderId);
+    m.sender = user;
+    m.time = new Date(m.timeCreated).toLocaleString();
+    newMessages.push(m);
+  }
+  return newMessages;
+};
+
+
+export const addUserToWorkspace = (wid, uid) => {
+  let req = {
+    userId: parseInt(uid),
+    workspaceId: parseInt(wid)
+  };
+  req = JSON.stringify(req);
+  return callApi('/workspaces/join', 'POST', req);
+}
+
+

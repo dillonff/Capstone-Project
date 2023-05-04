@@ -1,7 +1,4 @@
-'use strict';
-
-function SimpleMemberList(props) {
-  const members = props.members;
+function SimpleMemberList({members}) {
   const renderMembers = (members) => {
     let elems = [];
     if (members.length > 0) {

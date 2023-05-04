@@ -1,4 +1,3 @@
-'use strict';
 
 function SimpleBoxItem(props) {
   let border = '1px solid black';
@@ -19,3 +18,5 @@ function SimpleBoxItem(props) {
     <div>{props.text}</div>
   </div>;
 }
+
+export default SimpleBoxItem;

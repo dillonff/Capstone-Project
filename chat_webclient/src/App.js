@@ -1,10 +1,19 @@
-import logo from './logo.svg';
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
-import Chat from './components/Chat';
+import WorkspaceContainer from './components/WorkspaceContainer';
+import {
+  auth
+} from './api';
+import SimpleLogin from './components/SimpleLogin';
 
 function App() {
-  return <Chat />;
+  const [currentUser, setCurrentUser] = React.useState(auth.user);
+  if (!currentUser) {
+    return <SimpleLogin onLoggedin={_ => {
+      setCurrentUser(auth.user);
+    }} />
+  }
+  return <WorkspaceContainer />;
 }
 
 export default App;

@@ -1,39 +1,29 @@
-'use strict';
 
 import React from 'react';
 import {
   auth,
   callApi,
   getAllChannels,
-  nullChannel
+  nullChannel,
+  addUserToWorkspace,
+  createChannel
 } from '../api.js';
+import ChannelList from './ChannelList.jsx';
+import ChannelContainer from './ChannelList.jsx';
+import Channel from './Channel';
 
-const Workspace = (props) => {
-  const workspace = props.workspace;
-  let [channels, setChannels] = useState([]);
-  let [currentChannel, setCurrentChannel] = useState(nullChannel);
+const Workspace = ({ initialWorkspace }) => {
+  const workspace = initialWorkspace;
+  let [channels, setChannels] = React.useState([]);
+  let [currentChannel, setCurrentChannel] = React.useState(nullChannel);
+  let addUserIdToWorkspaceRef = React.useRef();
 
-  let channelElems = [];
-  for (let i = 0; i < channels.length; i++) {
-    const channel = channels[i];
-    console.log(channel);
-    const clickCb = () => {
-      setCurrentChannel(channel);
-    };
-    let elem = <SimpleBoxItem 
-      name={channel.name}
-      text={channel.memberIds.length + 'people'}
-      key={i}
-      onClick={clickCb}
-      selected={channel.id === currentChannel.id} />
-    channelElems.push(elem);
-  }
-  if (channelElems.length === 0) {
-    channelElems.push(<div key="-1">No channel</div>);
-  }
+  React.useEffect(_ => {
+    getAndUpdateChannels();
+  }, []);
 
   const getAndUpdateChannels = async _ => {
-    const newChannels = channels;
+    let newChannels = channels;
     try {
       newChannels = await getAllChannels(workspace.id);
     } catch (e) {
@@ -44,42 +34,24 @@ const Workspace = (props) => {
       if (channel.id === currentChannel.id) {
         setCurrentChannel(channel);
       }
-      if (currentChannel.id === -1 && res.name === 'general') {
-        setCurrentChannel(res);
+      if (currentChannel.id === -1 && channel.name === 'general') {
+        setCurrentChannel(channel);
       }
     }
     setChannels(newChannels);
   }
 
-  
-  return <div style={{ width: '200px', marginLeft: '20px', overflow: 'hidden' }}>
 
-    {/* workspace info */}
-    <div>
-      <div>Current workspace ({workspace.id}): {workspace.name}</div>
-    </div>
+  return <div style={{ display: 'flex', height: '100%' }}>
+    {/**workspace stuff */}
+    <div style={{ width: '400px', marginLeft: '20px', overflow: 'hidden' }}>
 
-    {/* some buttons */}
-    <div style={{ marginBottom: '10px' }}>
-      <input
-        type="button"
-        value="create channel"
-        onClick={_ => {
-          let name = prompt('channel name');
-          if (name) {
-            createChannel(workspace.id, name).catch(e => {
-              alert(e);
-            })
-          }
-        }}
-      ></input>
-      <input
-        type="button"
-        value="refresh channel"
-        onClick={(_) => {
-          getAndUpdateChannels();
-        }}
-      ></input>
+      {/* workspace info */}
+      <div>
+        <div>Current workspace ({workspace.id}): {workspace.name}</div>
+      </div>
+
+      {/* some buttons */}
 
       <div style={{ display: 'flex' }}>
         <input
@@ -87,27 +59,59 @@ const Workspace = (props) => {
           value="Add user (id)"
           style={{ marginRight: '5px' }}
           onClick={(_) => {
-            addUserToChannel(
-              window.ws,
-              currentChannel.id,
-              addUserIdRef.current.value
+            addUserToWorkspace(
+              workspace.id,
+              addUserIdToWorkspaceRef.current.value
             ).then((res) => {
               if (!res.ok) {
                 console.error(res);
                 alert('cannot add user');
               } else {
+                addUserIdToWorkspaceRef.current.value = '';
                 alert('Added!');
               }
             });
-            addUserIdRef.current.value = '';
           }}
         ></input>
-        <input type="text" ref={addUserIdRef}></input>
+        <input type="text" ref={addUserIdToWorkspaceRef}></input>
       </div>
+
+      <div style={{ marginBottom: '10px' }}>
+        <input
+          type="button"
+          value="create channel"
+          onClick={_ => {
+            let name = prompt('channel name');
+            if (name) {
+              createChannel(workspace.id, name).catch(e => {
+                console.error(e);
+                alert(e);
+              })
+            }
+          }}
+        ></input>
+        <input
+          type="button"
+          value="refresh channel"
+          onClick={(_) => {
+            getAndUpdateChannels();
+          }}
+        ></input>
+
+
+      </div>
+
+      <ChannelList
+        channels={channels}
+        selectedChannel={currentChannel}
+        onChannelClick={c => setCurrentChannel(c)}
+      />
     </div>
 
-    {/* channel list */ }
-    {channelElems}
+    {/** channel component */}
+    <div style={{height: "100%", width: '100%'}}>
+      <Channel channel={currentChannel} />
+    </div>
   </div>
 };
 
