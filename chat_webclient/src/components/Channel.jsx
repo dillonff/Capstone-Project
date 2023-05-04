@@ -3,8 +3,11 @@ import ChatBox from './ChatBox';
 import React from 'react';
 import {
   getMessages,
-  addUserToChannel
+  addUserToChannel,
+  getMessageById,
+  getUser
 } from '../api.js';
+import Event from '../event.js';
 
 function Channel({
   channel
@@ -24,9 +27,31 @@ function Channel({
     });
   }, [channel]);
 
+  React.useEffect(_ => {
+    const cb = Event.getDefaultCallback();
+    cb.onNewMessage = async (data) => {
+      if (data.channelId !== channel.id) {
+        return;
+      }
+      console.log('new message arrived');
+      console.log(data);
+      let message = {
+        content: data.preview,
+        sender: await getUser(data.senderId),
+        timeCreated: new Date().toUTCString()
+      }
+      let newMessages = [...messages, message];
+      setMessages(newMessages);
+    }
+    Event.addListener(cb);
+    return _ => {
+      Event.removeListener(cb);
+    }
+  }, [messages]);
+
   return <div style={{display: 'flex', flexDirection: 'column', height: '100%', width: '100%', padding: '10px', boxSizing: 'border-box'}}>
     {/* title */}
-    <div>#{channel.id} {channel.name}</div>
+    <h3>#{channel.id} {channel.name}</h3>
 
     <div style={{ display: 'flex' }}>
       <input

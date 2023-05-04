@@ -11,6 +11,7 @@ import {
 import ChannelList from './ChannelList.jsx';
 import ChannelContainer from './ChannelList.jsx';
 import Channel from './Channel';
+import Event from '../event';
 
 const Workspace = ({ initialWorkspace }) => {
   const workspace = initialWorkspace;
@@ -40,6 +41,21 @@ const Workspace = ({ initialWorkspace }) => {
     }
     setChannels(newChannels);
   }
+
+  React.useEffect(_ => {
+    if (workspace.id === -1)
+      return;
+    let cb = Event.getDefaultCallback();
+    cb.onInfoChanged = (data) => {
+      if (data.infoType.startsWith('channel')) {
+        getAndUpdateChannels();
+      }
+    };
+    Event.addListener(cb);
+    return _ => {
+      Event.removeListener(cb);
+    }
+  }, [workspace, currentChannel]);
 
 
   return <div style={{ display: 'flex', height: '100%' }}>

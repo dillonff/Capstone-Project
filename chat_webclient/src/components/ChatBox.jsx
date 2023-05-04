@@ -20,17 +20,18 @@ function ChatBox({
     );
   }
 
-  return <div style={{ display: 'flex', height: '100%', flexDirection: 'column'}}>
+  return <div style={{ display: 'flex', maxHeight: '100%', height: '80vh', flexDirection: 'column'}}>
     {/* message list */}
-    <div
-      style={{
-        flexGrow: '1',
-        width: '100%',
-        backgroundColor: '#fafafa',
-        overflowY: 'scroll',
-      }}
-    >
-      {messageElems}
+    <div style={{overflowY: 'scroll', flexGrow: '1', height: '100%', backgroundColor: '#fafafa'}}>
+      <div
+        style={{
+          flexGrow: '1',
+          width: '100%',
+          
+        }}
+      >
+        {messageElems}
+      </div>
     </div>
 
     {/** message input box */}

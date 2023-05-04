@@ -9,6 +9,8 @@ import {
   createWorkspace
 } from '../api';
 
+import Event from '../event';
+
 
 function WorkspaceContainer({
 }) {
@@ -41,6 +43,16 @@ function WorkspaceContainer({
 
   React.useEffect(_ => {
     getAndUpdateWorkspaces();
+    let cb = Event.getDefaultCallback();
+    cb.onInfoChanged = (data) => {
+      if (data.infoType.startsWith('workspace')) {
+        getAndUpdateWorkspaces();
+      }
+    };
+    Event.addListener(cb);
+    return _ => {
+      Event.removeListener(cb);
+    }
   }, []);
 
   if (selectedWorkspace.id !== -1) {
@@ -59,7 +71,7 @@ function WorkspaceContainer({
   return (
     <div style={{ display: 'inline-block' }}>
       <div style={{ width: '300px', marginLeft: '20px', overflow: 'hidden' }}>
-        <div>Select a workspace</div>
+        <h3>Select a workspace</h3>
         <div style={{ marginBottom: '10px' }}>
           <input
             type="button"
@@ -70,7 +82,7 @@ function WorkspaceContainer({
                 createWorkspace(name).catch(e => {
                   console.error(e);
                   alert(e);
-                })
+                });
               }
             }}
           ></input>

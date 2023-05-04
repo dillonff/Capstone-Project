@@ -1,6 +1,6 @@
 import Event from './event';
 
-export const auth = {
+export let auth = {
   token: null,
   user: null
 }
@@ -153,6 +153,16 @@ export const getMessages = async (channelId) => {
   }
   return newMessages;
 };
+
+export const getMessageById = async (id) => {
+  let res = await callApi('/messages/' + id);
+  if (!res.ok) {
+    console.error(res);
+    throw new Error('cannot get message of id ' + id);
+  }
+  res = await res.json();
+  return res;
+}
 
 
 export const addUserToWorkspace = (wid, uid) => {

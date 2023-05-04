@@ -5,7 +5,7 @@ import {
 const WS_URL = 'ws://127.0.0.1:11451/chat-ws';
 
 let socket = null;
-const callbacks = {};
+const callbacks = new Set();
 const defaultCallback = {
   onAuth: null, //(ok) => {},
   onNewMessage: null, //(data) => {},
@@ -40,23 +40,29 @@ function onWsError(event) {
 }
 
 function callAllCallback(name, ...args) {
-  for (const cb in callbacks) {
+  console.log('callAllCallback: ', arguments);
+  for (const cb of callbacks) {
+    console.log(cb);
     try {
       if (cb[name]) {
         cb[name](...args);
       }
-    } finally {}
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 
 function onMessage(event) {
   let res = JSON.parse(event.data);
   console.log(res);
+  console.log(callbacks);
   switch (res.type) {
     case 'res':
       handleRes(res);
       break;
     case 'newMessage':
+      console.log('calling all onNewMessage...');
       callAllCallback('onNewMessage', res.data);
       break;
     case 'infoChanged':
@@ -117,15 +123,20 @@ function getDefaultCallback() {
 }
 
 function addListener(callback) {
+  console.log("add listener:");
+  console.log(callback);
   checkCallback(callback);
-  Object.defineProperty(callbacks, callback);
+  callbacks.add(callback);
+  // Object.defineProperty(callbacks, callback, {});
 }
 
 function removeListener(callback) {
-  if (!(callback in callbacks)) {
+  console.log("remove listener:");
+  console.log(callback);
+  if (!callbacks.has(callback)) {
     throw new Error('invalid callback: ' + callback);
   }
-  delete callbacks[callback];
+  callbacks.delete(callback);
 }
 
 function checkCallback(cb) {
