@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import 'react-chat-elements/dist/main.css';
+import { MessageBox } from 'react-chat-elements';
 
 const userCache = {};
 async function getUser(id, auth, refresh = false) {
@@ -110,11 +112,14 @@ const Chat = () => {
   for (let i = 0; i < msgList.length; i++) {
     const msg = msgList[i];
     let elem = (
-      <div key={i} style={{ padding: '5px' }}>
-        <label>
-          {msg.sender} - {msg.time}
-        </label>
-        <div style={{ fontSize: 'x-large' }}>{msg.message}</div>
+      <div key={i}>
+        <MessageBox
+          position={'left'}
+          type={'text'}
+          title={msg.sender}
+          text={msg.message}
+          date={new Date()}
+        />
       </div>
     );
     msgElems.push(elem);
