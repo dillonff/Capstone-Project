@@ -6,10 +6,12 @@ import {
   nullWorkspace,
   getAllWorkspaces,
   addUserToWorkspace,
-  createWorkspace
+  createWorkspace,
+  auth
 } from '../api';
 
 import Event from '../event';
+import Button from 'react-bootstrap/Button';
 
 
 function WorkspaceContainer({
@@ -58,6 +60,7 @@ function WorkspaceContainer({
   if (selectedWorkspace.id !== -1) {
     return <div style={{height: "100%", display: 'flex', flexDirection: 'column'}}>
       <nav style={{padding: '10px'}}>
+        <h4 style={{display: 'inline', marginRight: '10px'}}>Hi, {auth.user.username} ({auth.user.id})</h4>
         <button onClick={_ => {
           setSelectedWorkspace(nullWorkspace);
         }}>Re-select workspace</button>
@@ -69,13 +72,21 @@ function WorkspaceContainer({
   }
 
   return (
-    <div style={{ display: 'inline-block' }}>
-      <div style={{ width: '300px', marginLeft: '20px', overflow: 'hidden' }}>
+    <div style={{ display: 'block', width: '250px', margin: 'auto', marginTop: '80px' }}>
+      <div style={{ width: '250px', marginLeft: '20px', overflow: 'hidden' }}>
         <h3>Select a workspace</h3>
-        <div style={{ marginBottom: '10px' }}>
-          <input
+
+        <WorkspaceList
+          workspaces={workspaces}
+          selectedWorkspace={selectedWorkspace}
+          onWorkspaceClick={(w) => {
+          setSelectedWorkspace(w)
+        }} />
+
+        <div style={{ marginBottom: '10px', marginLeft: '10px' }} className='d-grid gap-2'>
+          <Button
             type="button"
-            value="create workspace"
+            variant="outline-primary"
             onClick={(_) => {
               let name = prompt('workspace name: ');
               if (name) {
@@ -85,27 +96,22 @@ function WorkspaceContainer({
                 });
               }
             }}
-          ></input>
-          <input
+          >create workspace</Button>
+          <Button
             type="button"
-            value="refresh workspace"
+            variant="outline-secondary"
             onClick={(_) => {
               getAndUpdateWorkspaces().catch((e) => {
                 console.error(e);
                 alert(e);
               });
             }}
-          ></input>
+          >refresh workspace</Button>
 
           
         </div>
 
-        <WorkspaceList
-          workspaces={workspaces}
-          selectedWorkspace={selectedWorkspace}
-          onWorkspaceClick={(w) => {
-          setSelectedWorkspace(w)
-        }} />
+        
 
       </div>
 

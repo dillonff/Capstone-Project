@@ -1,5 +1,7 @@
 import React from 'react';
 
+import InputEmoji from 'react-input-emoji';
+
 import {
   callApi
 } from '../api';
@@ -12,6 +14,7 @@ function ChatBox({
   messages
 }) {
   const msgInputRef = React.useRef();
+  const [text, setText] = React.useState('');
 
   const messageElems = [];
   for (const message of messages) {
@@ -20,7 +23,25 @@ function ChatBox({
     );
   }
 
-  return <div style={{ display: 'flex', maxHeight: '100%', height: '80vh', flexDirection: 'column'}}>
+  const sendMessage = (msg) => {
+    let body = {
+      content: msg,
+      channelId: channel.id,
+    };
+    body = JSON.stringify(body);
+    callApi('/messages/send', 'POST', body).then(
+      (res) => {
+        if (res.ok) {
+          setText('');
+        } else {
+          console.error(res);
+          alert('Cannot send message');
+        }
+      }
+    );
+  }
+
+  return <div style={{ display: 'flex', maxHeight: '100%', height: '75vh', flexDirection: 'column'}}>
     {/* message list */}
     <div style={{overflowY: 'scroll', flexGrow: '1', height: '100%', backgroundColor: '#fafafa'}}>
       <div
@@ -42,30 +63,22 @@ function ChatBox({
         marginTop: '15px',
       }}
     >
+      <InputEmoji
+        value={text}
+        onChange={setText}
+        cleanOnEnter
+        onEnter={sendMessage}
+        placeholder="Type a message"
+      />
       <input
         type="text"
         ref={msgInputRef}
+        style={{display: 'none'}}
       ></input>
       <input
         type="button"
         value="Send"
-        onClick={() => {
-          let body = {
-            content: msgInputRef.current.value,
-            channelId: channel.id,
-          };
-          body = JSON.stringify(body);
-          callApi('/messages/send', 'POST', body).then(
-            (res) => {
-              if (res.ok) {
-                msgInputRef.current.value = '';
-              } else {
-                console.error(res);
-                alert('Cannot send message');
-              }
-            }
-          );
-        }}
+        onClick={_ => sendMessage(text)}
       ></input>
     </div>
   </div>

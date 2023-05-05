@@ -1,6 +1,12 @@
 
 import ChatBox from './ChatBox';
 import React from 'react';
+
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+
+import ChannelMember from './ChannelMember';
+
 import {
   getMessages,
   addUserToChannel,
@@ -10,11 +16,16 @@ import {
 import Event from '../event.js';
 
 function Channel({
+  workspace,
   channel
 }) {
   const [messages, setMessages] = React.useState([]);
   const addUserIdRef = React.useRef();
+  
+  const [show, setShow] = React.useState(false);
 
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
   // get messages when the component is mounted
   React.useEffect(_ => {
     if (channel.id === -1)
@@ -54,7 +65,7 @@ function Channel({
     <h3>#{channel.id} {channel.name}</h3>
 
     <div style={{ display: 'flex' }}>
-      <input
+      {/* <input
         type="button"
         value="Add user (id)"
         style={{ marginRight: '5px' }} 
@@ -73,7 +84,31 @@ function Channel({
           addUserIdRef.current.value = '';
         }}
       ></input>
-      <input type="text" ref={addUserIdRef}></input>
+      <input type="text" ref={addUserIdRef}></input> */}
+      
+      <Button variant="link" onClick={handleShow}>
+        Edit members
+      </Button>
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Channel members</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ChannelMember
+            channel={channel}
+            workspaceMemberIds={workspace.memberIds}
+            channelMemberIds={channel.memberIds}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+
     </div>
 
     <hr />

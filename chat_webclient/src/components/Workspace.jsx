@@ -1,5 +1,8 @@
 
 import React from 'react';
+
+import Button from 'react-bootstrap/Button';
+
 import {
   auth,
   callApi,
@@ -17,11 +20,28 @@ const Workspace = ({ initialWorkspace }) => {
   const workspace = initialWorkspace;
   let [channels, setChannels] = React.useState([]);
   let [currentChannel, setCurrentChannel] = React.useState(nullChannel);
+  let [members, setMembers] = React.useState([]);
   let addUserIdToWorkspaceRef = React.useRef();
 
   React.useEffect(_ => {
     getAndUpdateChannels();
   }, []);
+
+  const getMembersInfo = async (memberIds) => {
+    const members = [];
+    for (const id of memberIds) {
+      let res = await callApi('/users/' + id, 'GET');
+      if (res.ok) {
+        res = await res.json();
+        members.push(res);
+      } else {
+        console.error(res);
+        alert('Cannot get member info');
+        break;
+      }
+    }
+    return members;
+  }
 
   const getAndUpdateChannels = async _ => {
     let newChannels = channels;
@@ -57,23 +77,32 @@ const Workspace = ({ initialWorkspace }) => {
     }
   }, [workspace, currentChannel]);
 
+  React.useEffect(_ => {
+    if (workspace.id === -1)
+      return;
+    getMembersInfo(workspace.memberIds).then(ms => {
+      setMembers(ms);
+    });
+  }, [workspace]);
+
 
   return <div style={{ display: 'flex', height: '100%' }}>
     {/**workspace stuff */}
-    <div style={{ width: '400px', marginLeft: '20px', overflow: 'hidden' }}>
+    <div style={{ width: '420px', marginLeft: '20px', overflow: 'hidden' }}>
 
       {/* workspace info */}
       <div>
-        <div>Current workspace ({workspace.id}): {workspace.name}</div>
+        <h3>Workspace ({workspace.id}): {workspace.name}</h3>
       </div>
 
       {/* some buttons */}
 
-      <div style={{ display: 'flex' }}>
-        <input
+      <div style={{ display: 'flex', marginBottom: '5px', alignItems: 'center' }}>
+        <Button
           type="button"
-          value="Add user (id)"
-          style={{ marginRight: '5px' }}
+          style={{margin: '5px'}}
+          value=""
+          variant='outline-primary'
           onClick={(_) => {
             addUserToWorkspace(
               workspace.id,
@@ -88,14 +117,18 @@ const Workspace = ({ initialWorkspace }) => {
               }
             });
           }}
-        ></input>
-        <input type="text" ref={addUserIdToWorkspaceRef}></input>
+        >Add user (id)</Button>
+        <div style={{margin: '5px', display: 'inline'}}>
+          <input style={{padding: '5px'}} type="text" ref={addUserIdToWorkspaceRef}></input>
+        </div>
       </div>
 
       <div style={{ marginBottom: '10px' }}>
-        <input
+        <Button
+          style={{margin: '5px'}}
           type="button"
-          value="create channel"
+          value=""
+          variant='outline-success'
           onClick={_ => {
             let name = prompt('channel name');
             if (name) {
@@ -105,29 +138,45 @@ const Workspace = ({ initialWorkspace }) => {
               })
             }
           }}
-        ></input>
-        <input
+        >create channel</Button>
+        <Button
           type="button"
           value="refresh channel"
+          variant='outline-secondary'
           onClick={(_) => {
             getAndUpdateChannels();
           }}
-        ></input>
+        >refresh channels</Button>
 
 
       </div>
-
+      <hr />
+      <h4>Channels</h4>
       <ChannelList
         channels={channels}
         selectedChannel={currentChannel}
         onChannelClick={c => setCurrentChannel(c)}
       />
+
+      <hr />
+
+      {/**workspace members */}
+      <h4>Workspace Members</h4>
+      <ul>
+          {members.map(m => {
+            return <li>{m.username}</li>
+          })}
+      </ul>
+
     </div>
+    
 
     {/** channel component */}
     <div style={{height: "100%", width: '100%'}}>
-      <Channel channel={currentChannel} />
+      <Channel channel={currentChannel} workspace={workspace} />
     </div>
+
+
   </div>
 };
 
