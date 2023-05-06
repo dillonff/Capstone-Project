@@ -127,7 +127,6 @@ public class ChannelController {
     }
 
 
-
     @RequestMapping(
             value = "/api/v1/channels/{channelId}/{action}", method = RequestMethod.PUT
     )

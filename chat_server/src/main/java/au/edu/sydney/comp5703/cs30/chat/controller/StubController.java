@@ -1,6 +1,7 @@
 package au.edu.sydney.comp5703.cs30.chat.controller;
 
 import au.edu.sydney.comp5703.cs30.chat.Repo;
+import au.edu.sydney.comp5703.cs30.chat.entity.File;
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import au.edu.sydney.comp5703.cs30.chat.mapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ public class StubController {
     private UserMapper userMapper;
     @Autowired
     private WorkspaceMapper workspaceMapper;
+    @Autowired
+    private FileMapper fileMapper;
 
 
     // controller for manual testing only
@@ -41,7 +44,7 @@ public class StubController {
         var ms = Repo.channelMemberMapper.getChannelMembers(12);
         System.err.println(ms);
 
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(14);
         var start = System.currentTimeMillis();
         var res = encoder.encode("12345");
         var mid = System.currentTimeMillis();
@@ -49,5 +52,8 @@ public class StubController {
         var end = System.currentTimeMillis();
         System.err.println(res);
         System.err.println("" + (mid - start) + " " + (end - mid));
+
+        fileMapper.insertFile(new File("name", "path", 12345L, 0L));
+        fileMapper.findById(1);
     }
 }
