@@ -35,7 +35,7 @@ const WorkspaceList = ({
   }
 
   return <div style={{display: 'inline-block'}}>
-    <div style={{ width: '200px', marginLeft: '20px', overflow: 'hidden' }}>
+    <div style={{ maxWidth: '800px', display: "flex", flexDirection: "column" }}>
 
       {workspaceElems}
 

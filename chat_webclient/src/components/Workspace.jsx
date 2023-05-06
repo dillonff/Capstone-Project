@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 import Button from 'react-bootstrap/Button';
@@ -9,7 +8,7 @@ import {
   getAllChannels,
   nullChannel,
   addUserToWorkspace,
-  createChannel
+  createChannel,
 } from '../api.js';
 import ChannelList from './ChannelList.jsx';
 import ChannelContainer from './ChannelList.jsx';
@@ -23,7 +22,7 @@ const Workspace = ({ initialWorkspace }) => {
   let [members, setMembers] = React.useState([]);
   let addUserIdToWorkspaceRef = React.useRef();
 
-  React.useEffect(_ => {
+  React.useEffect((_) => {
     getAndUpdateChannels();
   }, []);
 
@@ -86,9 +85,9 @@ const Workspace = ({ initialWorkspace }) => {
   }, [workspace]);
 
 
-  return <div style={{ display: 'flex', height: '100%' }}>
+  return <div style={{ display: 'flex', height: '100%', flexShrink: '0' }}>
     {/**workspace stuff */}
-    <div style={{ width: '420px', marginLeft: '20px', overflow: 'hidden' }}>
+    <div style={{ flex: '0 0 380px', paddingLeft: '20px', overflow: 'auto', height: "100%" }}>
 
       {/* workspace info */}
       <div>
@@ -100,9 +99,9 @@ const Workspace = ({ initialWorkspace }) => {
       <div style={{ display: 'flex', marginBottom: '5px', alignItems: 'center' }}>
         <Button
           type="button"
-          style={{margin: '5px'}}
-          value=""
-          variant='outline-primary'
+          style={{margin: '5px', flexGrow: 1}}
+          size="sm"
+          variant='primary'
           onClick={(_) => {
             addUserToWorkspace(
               workspace.id,
@@ -119,7 +118,7 @@ const Workspace = ({ initialWorkspace }) => {
           }}
         >Add user (id)</Button>
         <div style={{margin: '5px', display: 'inline'}}>
-          <input style={{padding: '5px'}} type="text" ref={addUserIdToWorkspaceRef}></input>
+          <input style={{padding: '5px', minWidth: '30px'}} type="text" ref={addUserIdToWorkspaceRef}></input>
         </div>
       </div>
 
@@ -128,7 +127,7 @@ const Workspace = ({ initialWorkspace }) => {
           style={{margin: '5px'}}
           type="button"
           value=""
-          variant='outline-success'
+          variant='success'
           onClick={_ => {
             let name = prompt('channel name');
             if (name) {
@@ -142,7 +141,7 @@ const Workspace = ({ initialWorkspace }) => {
         <Button
           type="button"
           value="refresh channel"
-          variant='outline-secondary'
+          variant='secondary'
           onClick={(_) => {
             getAndUpdateChannels();
           }}

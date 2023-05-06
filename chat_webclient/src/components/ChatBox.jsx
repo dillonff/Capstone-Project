@@ -8,19 +8,13 @@ import {
 
 import SimpleMessage from './SimpleMessage';
 
-
-function ChatBox({
-  channel,
-  messages
-}) {
+function ChatBox({ channel, messages }) {
   const msgInputRef = React.useRef();
   const [text, setText] = React.useState('');
 
   const messageElems = [];
   for (const message of messages) {
-    messageElems.push(
-      <SimpleMessage key={message.id} message={message} />
-    );
+    messageElems.push(<SimpleMessage key={message.id} message={message} />);
   }
 
   const sendMessage = (msg) => {
@@ -41,18 +35,17 @@ function ChatBox({
     );
   }
 
-  return <div style={{ display: 'flex', maxHeight: '100%', height: '75vh', flexDirection: 'column'}}>
+  return <div style={{ display: 'flex', height: '100%', flexDirection: 'column', color: 'black'}}>
     {/* message list */}
-    <div style={{overflowY: 'scroll', flexGrow: '1', height: '100%', backgroundColor: '#fafafa'}}>
-      <div
-        style={{
-          flexGrow: '1',
-          width: '100%',
-          
-        }}
-      >
-        {messageElems}
-      </div>
+    <div
+      style={{
+        flexGrow: '1',
+        width: '100%',
+        overflow: 'auto',
+        backgroundColor: '#fafafa'
+      }}
+    >
+      {messageElems}
     </div>
 
     {/** message input box */}

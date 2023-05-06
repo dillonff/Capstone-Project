@@ -60,7 +60,7 @@ function Channel({
     }
   }, [messages]);
 
-  return <div style={{display: 'flex', flexDirection: 'column', height: '100%', width: '100%', padding: '10px', boxSizing: 'border-box'}}>
+  return <div style={{display: 'flex', flexDirection: 'column', height: '100%', width: '100%', padding: '10px', boxSizing: 'border-box', backgroundColor: 'white', color: 'black'}}>
     {/* title */}
     <h3>#{channel.id} {channel.name}</h3>
 
