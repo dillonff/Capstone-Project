@@ -34,4 +34,11 @@ public interface ChannelMemberMapper {
 
     @Update("update chat_channel_member set is_pinned = #{pinned} where id = #{channelMemberId}")
     Integer setPinned(long channelMemberId, boolean pinned);
+
+    @Select("SELECT id FROM chat_message WHERE channelId = #{channelId} AND senderId != #{userId} AND timeCreated = (SELECT MAX(timeCreated) FROM Message WHERE channelId = #{channelId} AND senderId != #{userId})")
+    Long getLastMessageIdByChannelId(@Param("channelId") Long channelId, @Param("userId") Long userId);
+
+    @Update("update chat_channel_member set last_read_message_id = #{messageId} where id = #{channelMemberId}")
+    Integer setLastReadMessageId(long messageId, long ChannelMemberId);
+
 }

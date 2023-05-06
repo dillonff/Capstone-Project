@@ -5,6 +5,7 @@ import au.edu.sydney.comp5703.cs30.chat.Util;
 import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
 import au.edu.sydney.comp5703.cs30.chat.entity.ChannelMember;
 import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper;
+import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMemberMapper;
 import au.edu.sydney.comp5703.cs30.chat.mapper.UserMapper;
 import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper;
 import au.edu.sydney.comp5703.cs30.chat.model.*;
@@ -154,6 +155,30 @@ public class ChannelController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid action: " + action);
         }
     }
+
+    @RequestMapping(value = "/api/v1/channels/{channelId}/messages/{messageId}/read", method = RequestMethod.PUT)
+    public void markMessageAsRead(@PathVariable Long channelId, @PathVariable Long messageId,
+                                  @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
+        var user = userMapper.findById(auth);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authenticated");
+        }
+        var channel = channelMapper.findById(channelId);
+        if (channel == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found");
+        }
+        var member = channelMemberMapper.findByUserAndChannelId(user.getId(), channelId);
+        if (member == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not a channel member");
+        }
+        long userId = user.getId();
+        var lastMessage = channelMemberMapper.getLastMessageIdByChannelId(channelId, userId);
+        if(lastMessage < messageId){
+            channelMemberMapper.setLastReadMessageId(messageId, member.getId());
+        }
+
+    }
+
 
 
 }
