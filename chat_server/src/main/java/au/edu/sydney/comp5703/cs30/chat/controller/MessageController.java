@@ -58,6 +58,17 @@ public class MessageController {
     }
 
     @RequestMapping(
+            value = "/api/v1/messages/{messageId}", produces = "application/json", method = RequestMethod.GET
+    )
+    public Message handleGetMessage(@PathVariable Long messageId) {
+        var message = messageMapper.findById(messageId);
+        if (message == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "message of id " + messageId + " not found");
+        }
+        return message;
+    }
+
+    @RequestMapping(
             value = "/api/v1/messages", produces = "application/json", method = RequestMethod.GET
     )
     public GetMessageResponse handleGetMessages(

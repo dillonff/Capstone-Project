@@ -28,6 +28,10 @@
         select * from chat_message where channel_id=#{channelId}
     </select>
 
+    <select id="findById" resultMap="MessageMap">
+        select * from chat_message where id=#{messageId}
+    </select>
+
     <select id="filterMessages" resultMap="MessageMap">
         select
             id, content, channel_id, sender_id, gmt_create
