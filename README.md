@@ -11,7 +11,7 @@
 * the username and password are comp5703 and comp5703, which has been written into configuration files
 * comp5703 user must be created in the database, either use the db management tool to create the user or use the following sql:
 * `create user 'comp5703'@'%' identified by 'comp5703'`
-* `grant all privledges on *.* to 'comp5703'@'%'`
+* `grant all privileges on *.* to 'comp5703'@'%'`
 * when you can access the database using that username and password, you need to create the capstone schema, use db management tool or this sql:
 * `create database capstone`
 * the project is integrated with mybatis migration. To create the desired database table, see the following instruction
