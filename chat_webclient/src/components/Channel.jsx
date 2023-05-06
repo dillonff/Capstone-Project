@@ -113,7 +113,7 @@ function Channel({
 
     <hr />
     
-    <div style={{flexGrow: '1'}}>
+    <div style={{flexGrow: '1', overflow: 'hidden'}}>
       <ChatBox channel={channel} messages={messages} />
     </div>
   </div>

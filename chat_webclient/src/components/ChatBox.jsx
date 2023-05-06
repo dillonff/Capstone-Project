@@ -8,13 +8,44 @@ import {
 
 import SimpleMessage from './SimpleMessage';
 
-function ChatBox({ channel, messages }) {
+function ChatBox({ channel, messages, scrollTo }) {
   const msgInputRef = React.useRef();
+  const msgListRef = React.useRef();
+  const [scroll, setScroll] = React.useState(-1);
   const [text, setText] = React.useState('');
+
+  const checkScroll = _ => {
+    // check if we are at the bottom of the message list
+    // if that's true, then we scroll down to the newest message
+    const elem = msgListRef.current;
+    if (!elem)
+      return;
+    const totalheight = elem.scrollHeight;
+    const elemHeight = elem.clientHeight;
+    const scrollPos = elem.scrollTop;
+    console.log('debug scroll:', totalheight, elemHeight, scrollPos, messages.length);
+    if (elemHeight + scrollPos === totalheight) {
+      let m = messages[messages.length-1];
+      if (m) {
+        setScroll(m.id);
+      }
+    } else {
+      setScroll(-1);
+    }
+  }
+
+  // React.useEffect(checkScroll, [messages]);
+  React.useMemo(_ => {
+    checkScroll();
+  }, [messages]);
 
   const messageElems = [];
   for (const message of messages) {
-    messageElems.push(<SimpleMessage key={message.id} message={message} />);
+    let s = false;
+    if (message.id === scroll) {
+      s = true;
+    }
+    messageElems.push(<SimpleMessage key={message.id} message={message} shouldScrollTo={s} />);
   }
 
   const sendMessage = (msg) => {
@@ -44,6 +75,7 @@ function ChatBox({ channel, messages }) {
         overflow: 'auto',
         backgroundColor: '#fafafa'
       }}
+      ref={msgListRef}
     >
       {messageElems}
     </div>
@@ -73,6 +105,15 @@ function ChatBox({ channel, messages }) {
         value="Send"
         onClick={_ => sendMessage(text)}
       ></input>
+    </div>
+
+    <div>
+      {/**debug section */}
+      <button
+        onClick={_ => {
+          checkScroll();
+        }}
+      >get scroll</button>
     </div>
   </div>
 }
