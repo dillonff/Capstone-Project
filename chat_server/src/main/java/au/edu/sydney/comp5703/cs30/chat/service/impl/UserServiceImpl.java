@@ -49,7 +49,7 @@ public class UserServiceImpl implements IUserService {
         }
 
 
-        if (!encoder.matches(result.getPassword(), oldPassword)) {
+        if (!encoder.matches(oldPassword, result.getPassword())) {
             throw new PasswordErrorException("Wrong password.");
         }
         newHashedPass = encoder.encode(newPassword);

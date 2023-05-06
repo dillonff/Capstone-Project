@@ -11,7 +11,7 @@ public interface UserMapper {
     User findById(long id);
     User findByUsername(String username);
 
-    Integer updatePassById(Integer uid,
+    Integer updatePassById(Integer id,
                            String password);
 
     Integer updateInfoById(String username, String phone, String email, Integer id);

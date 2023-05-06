@@ -6,7 +6,7 @@ public interface IUserService {
     void reg(String username,
              String password);
 
-    void changePassword(Integer uid,
+    void changePassword(Integer id,
                         String username,
                         String oldPassword,
                         String newPassword);

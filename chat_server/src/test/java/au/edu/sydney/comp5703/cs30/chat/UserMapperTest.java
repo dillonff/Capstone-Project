@@ -30,8 +30,8 @@ public class UserMapperTest {
 
     @Test
     public void insert() {
-        User user = new User("merritt");
-        user.setId(4);
+        User user = new User("Yuzhe");
+        user.setId(6);
         user.setPassword("wyz123456");
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
         String hashedPass = encoder.encode(user.getPassword());
@@ -49,8 +49,8 @@ public class UserMapperTest {
     @Test
     public void reg(){
         try {
-            User user = new User("wyz");
-            user.setPassword("123456");
+            User user = new User("MWYZ");
+            user.setPassword("nsmyibc");
             user.setPhone("1785880");
             user.setEmail("merritt@gmail.com");
             iUserService.reg(user.getUsername(), user.getPassword());
@@ -62,12 +62,21 @@ public class UserMapperTest {
     }
 
     @Test
-    public void updateInofByUid(){
-        int id = 4;
-        String username = "abc";
+    public void updateInfoByUid(){
+        int id = 3;
+        String username = "merr";
         String phone = "223311";
         String email = "1234@123.com";
         iUserService.updateInfoByUid(username, phone, email, id);
+    }
+
+    @Test
+    public void changePassword(){
+        Integer id = 8;
+        String username = "MWYZ";
+        String oldPassword = "nsmyibc";
+        String newPassword = "654321";
+        iUserService.changePassword(id, username, oldPassword, newPassword);
     }
 
 
