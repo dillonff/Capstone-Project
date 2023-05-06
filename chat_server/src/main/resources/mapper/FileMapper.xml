@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="au.edu.sydney.comp5703.cs30.chat.mapper.FileMapper">
+    <resultMap id="FileMap" type="au.edu.sydney.comp5703.cs30.chat.entity.File">
+        <constructor>
+            <arg column="filename" javaType="String" />
+            <arg column="path" javaType="String" />
+            <arg column="size" javaType="long" />
+            <arg column="uploader_id" javaType="long" />
+        </constructor>
+        <id column="id" property="id"/>
+        <result column="filename" property="filename"/>
+        <result column="gmt_create" property="timeCreated"/>
+        <result column="path" property="path"/>
+        <result column="size" property="size"/>
+        <result column="status" property="status"/>
+        <result column="uploader_id" property="uploaderId"/>
+    </resultMap>
+
+    <insert id="insertFile" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        insert into chat_file (
+            filename,
+            path,
+            size,
+            uploader_id,
+            status
+        ) values (#{filename}, #{path}, #{size}, #{uploaderId}, #{status})
+    </insert>
+
+    <select id="findById" resultMap="FileMap">
+        select * from chat_file where id = #{id} and not is_deleted
+    </select>
+
+</mapper>

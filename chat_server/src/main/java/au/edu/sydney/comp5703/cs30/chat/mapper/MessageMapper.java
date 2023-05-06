@@ -23,4 +23,6 @@ public interface MessageMapper {
             long offset,
             long count
     );
+
+    Message findById(Long messageId);
 }
