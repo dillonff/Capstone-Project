@@ -171,6 +171,7 @@ public class ChannelController {
         if (member == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not a channel member");
         }
+
         long userId = user.getId();
         var lastMessage = channelMemberMapper.getLastMessageIdByChannelId(channelId, userId);
         if(lastMessage < messageId){
