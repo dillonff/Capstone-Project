@@ -156,7 +156,8 @@ public class ChannelController {
         }
     }
 
-    @RequestMapping(value = "/api/v1/channels/{channelId}/messages/{messageId}/read", method = RequestMethod.PUT)
+    @RequestMapping(value = "/api/v1/channels/{channelId}/messages/{messageId}/read",
+            method = RequestMethod.PUT)
     public void markMessageAsRead(@PathVariable Long channelId, @PathVariable Long messageId,
                                   @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
         var user = userMapper.findById(auth);

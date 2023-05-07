@@ -39,6 +39,6 @@ public interface ChannelMemberMapper {
     Long getLastMessageIdByChannelId(@Param("channelId") Long channelId, @Param("userId") Long userId);
 
     @Update("update chat_channel_member set last_read_message_id = #{messageId} where id = #{channelMemberId}")
-    Integer setLastReadMessageId(long messageId, long channelMemberId);
+    Long setLastReadMessageId(long messageId, long channelMemberId);
 
 }
