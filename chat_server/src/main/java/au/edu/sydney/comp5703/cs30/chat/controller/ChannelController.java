@@ -4,10 +4,7 @@ import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.Util;
 import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
 import au.edu.sydney.comp5703.cs30.chat.entity.ChannelMember;
-import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper;
-import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMemberMapper;
-import au.edu.sydney.comp5703.cs30.chat.mapper.UserMapper;
-import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper;
+import au.edu.sydney.comp5703.cs30.chat.mapper.*;
 import au.edu.sydney.comp5703.cs30.chat.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -173,9 +170,14 @@ public class ChannelController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not a channel member");
         }
 
-        long userId = user.getId();
-        var lastMessage = channelMemberMapper.getLastMessageIdByChannelId(channelId, userId);
-        if(lastMessage < messageId){
+
+        long lastMessageId = channelMemberMapper.getLastMessageIdByChannelId(channelId, user.getId());
+
+        if (lastMessageId >= messageId) {
+            return;
+        }
+
+        if(lastMessageId < messageId){
             channelMemberMapper.setLastReadMessageId(messageId, member.getId());
         }
 
