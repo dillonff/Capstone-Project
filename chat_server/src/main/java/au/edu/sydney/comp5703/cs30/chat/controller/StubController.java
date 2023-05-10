@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +34,9 @@ public class StubController {
     @Autowired
     private FileMapper fileMapper;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     // controller for manual testing only
     @RequestMapping(value = "/stub1", method = RequestMethod.GET)
@@ -44,16 +51,18 @@ public class StubController {
         var ms = Repo.channelMemberMapper.getChannelMembers(12);
         System.err.println(ms);
 
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(14);
+        var encoder =  Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();// Argon2PasswordEncoder.defaultsForSpringSecurity_v5_2(); // PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        // encoder = new Argon2PasswordEncoder(16, 32, 1, 65536, 2);
+        var enc  = SCryptPasswordEncoder.defaultsForSpringSecurity_v5_8();
         var start = System.currentTimeMillis();
-        var res = encoder.encode("12345");
+        var res = passwordEncoder.encode("123456789");
         var mid = System.currentTimeMillis();
-        encoder.matches("12345", res);
+        passwordEncoder.matches("123456789", res);
         var end = System.currentTimeMillis();
         System.err.println(res);
         System.err.println("" + (mid - start) + " " + (end - mid));
 
-        fileMapper.insertFile(new File("name", "path", 12345L, 0L));
+        // fileMapper.insertFile(new File("name", "path", 12345L, 0L));
         fileMapper.findById(1);
     }
 }
