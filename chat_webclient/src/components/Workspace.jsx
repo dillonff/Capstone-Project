@@ -1,6 +1,8 @@
 import React from 'react';
 
 import Button from 'react-bootstrap/Button';
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 import {
   auth,
@@ -14,6 +16,12 @@ import ChannelList from './ChannelList.jsx';
 import ChannelContainer from './ChannelList.jsx';
 import Channel from './Channel';
 import Event from '../event';
+
+
+const WorkspaceDropdown = ({workspace}) => {
+  return 
+}
+
 
 const Workspace = ({ initialWorkspace }) => {
   const workspace = initialWorkspace;
@@ -84,59 +92,67 @@ const Workspace = ({ initialWorkspace }) => {
     });
   }, [workspace]);
 
+  const onAddUserClick = (_) => {
+    let res = prompt('User id to join');
+    if (!res) {
+      return;
+    }
+    addUserToWorkspace(
+      workspace.id,
+      res
+    ).then((res) => {
+      if (!res.ok) {
+        console.error(res);
+        alert('cannot add user');
+      } else {
+        // addUserIdToWorkspaceRef.current.value = '';
+        alert('Added!');
+      }
+    });
+  }
+
+  const onCreateChannelClick = _ => {
+    let name = prompt('channel name');
+    if (name) {
+      createChannel(workspace.id, name).catch(e => {
+        console.error(e);
+        alert(e);
+      })
+    }
+  }
+
 
   return <div style={{ display: 'flex', height: '100%', flexShrink: '0' }}>
     {/**workspace stuff */}
-    <div style={{ flex: '0 0 380px', paddingLeft: '20px', overflow: 'auto', height: "100%" }}>
+    <div style={{ flex: '0 0 330px', paddingLeft: '20px', overflow: 'auto', height: "100%" }}>
 
       {/* workspace info */}
       <div>
-        <h3>Workspace ({workspace.id}): {workspace.name}</h3>
+        {/* <h3>Workspace ({workspace.id}): {workspace.name}</h3> */}
+      </div>
+
+      <div>
+        <DropdownButton
+          id="workspace-dropdown"
+          variant="primary"
+          size="lg"
+          title={`${workspace.name} (${workspace.id})`}
+        >
+          <Dropdown.Item onClick={onAddUserClick}>Add user (id)</Dropdown.Item>
+          <Dropdown.Item onClick={onCreateChannelClick}>Create channel</Dropdown.Item>
+          <Dropdown.Item onClick={_ => {getAndUpdateChannels()}}>Refresh channel</Dropdown.Item>
+        </DropdownButton>
       </div>
 
       {/* some buttons */}
 
-      <div style={{ display: 'flex', marginBottom: '5px', alignItems: 'center' }}>
-        <Button
-          type="button"
-          style={{margin: '5px', flexGrow: 1}}
-          size="sm"
-          variant='primary'
-          onClick={(_) => {
-            addUserToWorkspace(
-              workspace.id,
-              addUserIdToWorkspaceRef.current.value
-            ).then((res) => {
-              if (!res.ok) {
-                console.error(res);
-                alert('cannot add user');
-              } else {
-                addUserIdToWorkspaceRef.current.value = '';
-                alert('Added!');
-              }
-            });
-          }}
-        >Add user (id)</Button>
-        <div style={{margin: '5px', display: 'inline'}}>
-          <input style={{padding: '5px', minWidth: '30px'}} type="text" ref={addUserIdToWorkspaceRef}></input>
-        </div>
-      </div>
-
-      <div style={{ marginBottom: '10px' }}>
+      <div style={{ marginBottom: '10px', display: 'none' }}>
         <Button
           style={{margin: '5px'}}
           type="button"
           value=""
           variant='success'
-          onClick={_ => {
-            let name = prompt('channel name');
-            if (name) {
-              createChannel(workspace.id, name).catch(e => {
-                console.error(e);
-                alert(e);
-              })
-            }
-          }}
+          onClick={null}
         >create channel</Button>
         <Button
           type="button"
@@ -160,7 +176,7 @@ const Workspace = ({ initialWorkspace }) => {
       <hr />
 
       {/**workspace members */}
-      <h4>Workspace Members</h4>
+      <h4>Direct Messages</h4>
       <ul>
           {members.map(m => {
             return <li>{m.username}</li>

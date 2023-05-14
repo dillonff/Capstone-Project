@@ -19,6 +19,19 @@ export async function login(username, password) {
   console.error(auth);
 }
 
+export async function signup(username, password, confirmPassword) {
+  if (password !== confirmPassword) {
+    throw new Error('Passwords mismatch.');
+  }
+  let res = await callApi('/users', 'POST', JSON.stringify({
+    username: username,
+    password: password
+  }));
+  if (!res.ok) {
+    throw new Error('Cannot signup');
+  }
+}
+
 const userCache = {};
 export async function getUser(id, refresh = false) {
   let user = userCache[id];

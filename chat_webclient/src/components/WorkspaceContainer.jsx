@@ -83,7 +83,7 @@ function WorkspaceContainer({}) {
   return <>
     {/* <div style={{backgroundColor: "#1868AF", height: "80px"}}>header...</div> */}
     <div style={{backgroundColor: "#1868AF", minHeight: "100%", boxSizing: "border-box", padding: "80px 0 40px 0"}}>
-      <div style={{ display: 'block', maxWidth: '65rem', margin: 'auto', backgroundColor: "white", boxSizing: 'border-box' }}>
+      <div style={{ display: 'block', maxWidth: '65rem', margin: 'auto', backgroundColor: "white", padding: '10px', boxSizing: 'border-box' }}>
           <h2>Workspace for {auth.user.username}</h2>
 
           <WorkspaceList
@@ -107,7 +107,7 @@ function WorkspaceContainer({}) {
                   });
                 }
               }}
-            >create workspace</Button>
+            >Create workspace</Button>
             <Button
               type="button"
               variant="outline-secondary"
@@ -117,7 +117,7 @@ function WorkspaceContainer({}) {
                   alert(e);
                 });
               }}
-            >refresh workspace</Button>
+            >Refresh workspace</Button>
 
             
           </div>

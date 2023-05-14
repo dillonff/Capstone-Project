@@ -109,11 +109,11 @@ function ChatBox({ channel, messages, scrollTo }) {
 
     <div>
       {/**debug section */}
-      <button
+      {/* <button
         onClick={_ => {
           checkScroll();
         }}
-      >get scroll</button>
+      >get scroll</button> */}
     </div>
   </div>
 }

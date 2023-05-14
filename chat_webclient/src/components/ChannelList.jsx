@@ -52,9 +52,9 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
 
   return (
     <>
-      <SideBar />
-      <div className="channel-list__list__wrapper">
-        <CompanyHeader />
+      {/* <SideBar /> */}
+      <div className="channel-list__list__wrapper" style={{padding: "5px"}}>
+        {/* <CompanyHeader /> */}
         <div>{channelElems}</div>
       </div>
     </>

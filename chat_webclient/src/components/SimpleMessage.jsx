@@ -1,4 +1,5 @@
 import React from 'react';
+import profilePic from './profile.png';
 
 function SimpleMessage({
     message,
@@ -14,11 +15,16 @@ function SimpleMessage({
     }, []);
 
     const time = new Date(message.timeCreated).toLocaleString();
-    return <div key={message.id} style={{padding: '5px'}} ref={msgRef}>
-        <label>
-            <div style={{display: 'inline', fontWeight: 'bold'}}>{message.sender.username}</div>  - {time}
-        </label>
-        <div style={{fontSize: 'x-large'}}>{message.content}</div>
+    return <div key={message.id} style={{padding: '6px', display: 'flex', alignItems: 'start'}} ref={msgRef}>
+        <div style={{padding: "5px"}}>
+            <img height="40px" src={profilePic}></img>
+        </div>
+        <div>
+            <label>
+                <div style={{display: 'inline', fontWeight: 'bold'}}>{message.sender.username}</div>  - {time}
+            </label>
+            <div style={{fontSize: 'x-large'}}>{message.content}</div>
+        </div>
     </div>
 }
 
