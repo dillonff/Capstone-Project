@@ -4,7 +4,9 @@ import au.edu.sydney.comp5703.cs30.chat.service.ServiceException;
 import au.edu.sydney.comp5703.cs30.chat.service.exception.*;
 import au.edu.sydney.comp5703.cs30.chat.util.JsonResult;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpSession;
 
@@ -19,6 +21,7 @@ public class BaseController {
     }
 
     @ExceptionHandler({ServiceException.class, FileUploadException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public JsonResult<Void> handleException(Throwable e) {
         JsonResult<Void> result = new JsonResult<>(e);
         if (e instanceof DuplicateUsernameException) {
