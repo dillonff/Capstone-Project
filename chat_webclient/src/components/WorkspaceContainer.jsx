@@ -83,46 +83,46 @@ function WorkspaceContainer({}) {
   return <>
     {/* <div style={{backgroundColor: "#1868AF", height: "80px"}}>header...</div> */}
     <div style={{backgroundColor: "#1868AF", minHeight: "100%", boxSizing: "border-box", padding: "80px 0 40px 0"}}>
-      <div style={{ display: 'block', maxWidth: '65rem', margin: 'auto', backgroundColor: "white", padding: '10px', boxSizing: 'border-box' }}>
-          <h2>Workspace for {auth.user.username}</h2>
+      <div style={{ display: 'block', maxWidth: '65rem', margin: 'auto', backgroundColor: "white", padding: '10px', boxSizing: 'border-box', borderRadius: '10px', boxShadow: '0px 0px 10px 5px rgba(0,0,0,0.2)'  }}>
+          <h2 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '25px' }}>
+              <span style={ {transform: "translateX(40px)"}}>Workspace for {auth.user.username}</span>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' ,  transform: "translateX(-40px)"}}>
+                  <Button
+                      type="button"
+                      variant="outline-primary"
+                      className='me-2'
+                      onClick={(_) => {
+                          let name = prompt('workspace name: ');
+                          if (name) {
+                              createWorkspace(name).catch(e => {
+                                  console.error(e);
+                                  alert(e);
+                              });
+                          }
+                      }}
+                  >Create workspace</Button>
+                  <Button
+                      type="button"
+                      variant="outline-secondary"
+                      onClick={(_) => {
+                          getAndUpdateWorkspaces().catch((e) => {
+                              console.error(e);
+                              alert(e);
+                          });
+                      }}
+                  >Refresh workspace</Button>
+              </div>
+          </h2>
 
-          <WorkspaceList
+
+        <WorkspaceList
             workspaces={workspaces}
             selectedWorkspace={selectedWorkspace}
             onWorkspaceClick={(w) => {
-            setSelectedWorkspace(w)
-          }} />
+              setSelectedWorkspace(w)
+            }}/>
 
-          <div className='mt-3' style={{ display: "block", justifyContent: "space-around" }}>
-            <Button
-              type="button"
-              variant="outline-primary"
-              className='me-2'
-              onClick={(_) => {
-                let name = prompt('workspace name: ');
-                if (name) {
-                  createWorkspace(name).catch(e => {
-                    console.error(e);
-                    alert(e);
-                  });
-                }
-              }}
-            >Create workspace</Button>
-            <Button
-              type="button"
-              variant="outline-secondary"
-              onClick={(_) => {
-                getAndUpdateWorkspaces().catch((e) => {
-                  console.error(e);
-                  alert(e);
-                });
-              }}
-            >Refresh workspace</Button>
 
-            
-          </div>
-
-          
 
       </div>
     </div>

@@ -4,8 +4,9 @@ import Workspace from './Workspace';
 import {
   nullWorkspace,
   getAllWorkspaces,
-  createWorkspace
+  createWorkspace, auth
 } from '../api.js';
+import React from "react";
 
 
 const WorkspaceList = ({
@@ -34,14 +35,9 @@ const WorkspaceList = ({
     workspaceElems.push(<div key="-1">No workspace</div>);
   }
 
-  return <div style={{display: 'inline-block'}}>
-    <div style={{ maxWidth: '800px', display: "flex", flexDirection: "column" }}>
-
+  return <div style={{display: 'block'}}>
       {workspaceElems}
-
-    </div>
-
-  </div>
+      </div>
 }
 
 export default WorkspaceList;

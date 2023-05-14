@@ -308,9 +308,18 @@ body {
 }
 
 .workspace__wrapper {
-  height: 50px;
-  display: flex;
-  align-items: center;
+  box-sizing: border-box;
+  box-shadow: 0 2px 5px rgba(0,0,0,.3);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+  width: 210px;
+  display: inline-block;
+  vertical-align: top;
+  margin: 36px 0 0 36px;
+  border-top: 90px solid ;
+  border-image: linear-gradient(to right, #0e3877, #ADD8E6) 22;
+  height: 150px;
 }
 
 .workspace__wrapper__selected {
