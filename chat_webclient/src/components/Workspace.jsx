@@ -195,7 +195,6 @@ const Workspace = ({ initialWorkspace }) => {
 
         <hr />
         <ChannelList
-          Icon={LockOutlinedIcon}
           channels={channels}
           selectedChannel={currentChannel}
           onChannelClick={(c) => setCurrentChannel(c)}

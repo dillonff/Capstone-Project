@@ -1,10 +1,10 @@
 import { Icon } from '@mui/material';
 
 function SimpleBoxItem(props) {
-  let border = '1px solid black';
-  if (props.selected) {
-    border = '2px solid red';
-  }
+  // let border = '1px solid black';
+  // if (props.selected) {
+  //   border = '2px solid red';
+  // }
   return (
     <div
       className={
@@ -14,7 +14,7 @@ function SimpleBoxItem(props) {
       onClick={props.onClick}
     >
       <div>
-        {Icon && <Icon Icon className="Sidebar__icon" />}
+        {/* {Icon && <Icon Icon className="Sidebar__icon" />} */}
         <div style={{ fontWeight: 'bold' }}>{props.title}</div>
         <div>{props.text}</div>
       </div>
