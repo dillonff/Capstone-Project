@@ -8,13 +8,7 @@ import {
 } from '../api.js';
 import React from "react";
 
-
-const WorkspaceList = ({
-  workspaces,
-  selectedWorkspace,
-  onWorkspaceClick
-}) => {
-
+const WorkspaceList = ({ workspaces, selectedWorkspace, onWorkspaceClick }) => {
   let workspaceElems = [];
   for (let i = 0; i < workspaces.length; i++) {
     const workspace = workspaces[i];
@@ -35,9 +29,16 @@ const WorkspaceList = ({
     workspaceElems.push(<div key="-1">No workspace</div>);
   }
 
-  return <div style={{display: 'block'}}>
-      {workspaceElems}
+  return (
+      <div style={{ display: 'inline-block' }}>
+          <div
+              style={{ maxWidth: '800px', display: 'flex', flexDirection: 'column' }}
+          >
+              {workspaceElems}
+          </div>
       </div>
+  );
 }
+
 
 export default WorkspaceList;
