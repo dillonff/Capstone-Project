@@ -86,7 +86,7 @@ function WorkspaceContainer({}) {
         </nav> */}
                 {/** flex box for automatically use all the available spaces */}
                 <div style={{flexGrow: '1', overflow: 'hidden'}}>
-                    <Workspace initialWorkspace={selectedWorkspace}/>
+                    <Workspace initialWorkspace={selectedWorkspace} setSelectedWorkspace={setSelectedWorkspace}/>
                 </div>
             </div>
         );

@@ -25,14 +25,12 @@ const WorkspaceDropdown = ({ workspace }) => {
   return;
 };
 
-const Workspace = ({ initialWorkspace }) => {
+const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
   const workspace = initialWorkspace;
   let [channels, setChannels] = React.useState([]);
   let [currentChannel, setCurrentChannel] = React.useState(nullChannel);
   let [members, setMembers] = React.useState([]);
   let addUserIdToWorkspaceRef = React.useRef();
-  const [selectedWorkspace, setSelectedWorkspace] =
-    React.useState(nullWorkspace);
   React.useEffect((_) => {
     getAndUpdateChannels();
   }, []);
@@ -159,6 +157,7 @@ const Workspace = ({ initialWorkspace }) => {
             <Dropdown.Item
               onClick={(_) => {
                 console.log('TODO: Select Workspace');
+                setSelectedWorkspace(nullWorkspace)
               }}
             >
               Swhich Workspace
