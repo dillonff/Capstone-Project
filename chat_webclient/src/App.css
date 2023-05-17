@@ -69,6 +69,12 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
@@ -412,7 +418,7 @@ body {
 .channel-list__list__wrapper {
   display: flex;
   flex-direction: column;
-  background: var(--primary-color);
+  background: #1e2b55;
   width: 240px;
 }
 
@@ -465,4 +471,162 @@ body {
   color: rgba(255, 255, 255, 0.66);
   white-space: nowrap;
   width: 150px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  color: white;
+  background-color: #1e2b55;
+}
+
+.header .MuiSvgIcon-root {
+  opacity: 0.6;
+}
+
+.header__left {
+  flex: 0.3;
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.header__left > .MuiSvgIcon-root {
+  margin-left: auto;
+  margin-right: 20px;
+}
+
+.header__middle {
+  flex: 0.4;
+  background-color: #1868af;
+  text-align: center;
+  display: flex;
+  padding: 0 50px;
+  color: gray;
+  border: 1px solid gray;
+  border-radius: 6px;
+}
+
+.header__middle > input {
+  background-color: transparent;
+  border: none;
+  color: white;
+  text-align: center;
+  min-width: 35vw;
+}
+
+.header__middle > input:focus {
+  outline: none;
+}
+
+.header__right {
+  flex: 0.3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 20px;
+}
+
+.header__right .MuiAvatar-root {
+  border-radius: 20%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.sidebar {
+  color: white;
+  background-color: #1e2b55;
+  border-top: 1px solid white;
+  flex: 0 0 330px;
+  padding: 20px;
+  overflow: auto;
+  height: 100%;
+}
+
+.sidebar__header {
+  display: flex;
+  border: 1px solid #49274b;
+  padding: 13px;
+  padding-bottom: 10px;
+}
+
+.sidebar__header > .MuiSvgIcon-root {
+  padding: 8px;
+  color: #49274b;
+  font-size: 18px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+.sidebar__info {
+  flex: 1;
+}
+
+.sidebar__info > h2 {
+  font-size: 15px;
+  font-weight: 900;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.sidebar__info > h2 > a {
+  text-decoration: none;
+  color: white;
+}
+
+.sidebar__info > h3 {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 400;
+  text-transform: capitalize;
+}
+
+.sidebar__info > h3 > .MuiSvgIcon-root {
+  font-size: 14px;
+  margin-top: 1px;
+  margin-right: 2px;
+  color: green;
+}
+
+.sidebar__options {
+  overflow-y: auto;
+  height: calc(100vh - 170px);
+  min-height: calc(100vh - 150px);
+}
+
+.sidebar__options > hr {
+  border: 1px solid #49274b;
+}
+
+.sidebar__options::-webkit-scrollbar {
+  width: 0.8em;
+}
+
+.sidebar__options::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar__options::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  outline: none;
+  border-radius: 9px;
+}
+
+.sidebar__logout {
+  width: 100%;
+  padding: 10px 0;
+  outline: none;
+  border: none;
+  background-color: #340e36;
+  color: white;
+  cursor: pointer;
+}
+.sidebar__icon {
+  padding: 10px;
+  font-size: 15px !important;
+  opacity: 0.6;
 }
