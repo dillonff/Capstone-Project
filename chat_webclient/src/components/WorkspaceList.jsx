@@ -22,7 +22,7 @@ const WorkspaceList = ({
     const clickCb = () => {
       onWorkspaceClick(workspace);
     };
-    let elem = <SimpleBoxItem
+    let elem = <SimpleBoxItem classNamePrefix="workspace"
       title={workspace.name}
       text={workspace.memberIds.length + ' people'}
       key={i}

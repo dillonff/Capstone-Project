@@ -36,7 +36,7 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
       }
     };
     let elem = (
-      <SimpleBoxItem
+      <SimpleBoxItem classNamePrefix="channel"
         title={channel.name}
         text={channel.memberIds.length + ' people'}
         key={i}

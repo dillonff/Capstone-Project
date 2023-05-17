@@ -6,7 +6,8 @@ function SimpleBoxItem(props) {
   return (
     <div
       className={
-        props.selected ? 'workspace__wrapper__selected' : 'workspace__wrapper'
+          // `workspace__wrapper--${props.classNamePrefix}` + (props.selected ? ` ${props.classNamePrefix}__wrapper__selected` : '')
+        props.selected ? 'workspace__wrapper__selected' : `workspace__wrapper--${props.classNamePrefix}`
       }
       key={props.key}
       onClick={props.onClick}
