@@ -66,6 +66,15 @@ function ChatBox({ channel, messages, scrollTo }) {
     );
   }
 
+  const handleBoldClick = () => {
+    setText(prevText => `**${prevText}**`);
+  };
+
+  const handleItalicClick = () => {
+    setText(prevText => `_${prevText}_`);
+  };
+
+
   return <div style={{ display: 'flex', height: '100%', flexDirection: 'column', color: 'black'}}>
     {/* message list */}
     <div
@@ -88,6 +97,14 @@ function ChatBox({ channel, messages, scrollTo }) {
         marginTop: '15px',
       }}
     >
+      <div style={{ display: 'flex' }}>
+        <button onClick={handleBoldClick} style={{ fontWeight: 'bold', width: '30px', height: '30px' }}>
+          B
+        </button>
+        <button onClick={handleItalicClick} style={{ fontStyle: 'italic', width: '30px', height: '30px' }}>
+          I
+        </button>
+      </div>
       <InputEmoji
         value={text}
         onChange={setText}
