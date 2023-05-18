@@ -3,6 +3,8 @@ import React from 'react';
 import Button from 'react-bootstrap/Button';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 import {
   auth,
@@ -11,25 +13,24 @@ import {
   nullChannel,
   addUserToWorkspace,
   createChannel,
+  nullWorkspace,
 } from '../api.js';
 import ChannelList from './ChannelList.jsx';
+import WorkspaceContainer from './WorkspaceContainer.jsx';
 import ChannelContainer from './ChannelList.jsx';
 import Channel from './Channel';
 import Event from '../event';
 
+const WorkspaceDropdown = ({ workspace }) => {
+  return;
+};
 
-const WorkspaceDropdown = ({workspace}) => {
-  return 
-}
-
-
-const Workspace = ({ initialWorkspace }) => {
+const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
   const workspace = initialWorkspace;
   let [channels, setChannels] = React.useState([]);
   let [currentChannel, setCurrentChannel] = React.useState(nullChannel);
   let [members, setMembers] = React.useState([]);
   let addUserIdToWorkspaceRef = React.useRef();
-
   React.useEffect((_) => {
     getAndUpdateChannels();
   }, []);
@@ -48,9 +49,9 @@ const Workspace = ({ initialWorkspace }) => {
       }
     }
     return members;
-  }
+  };
 
-  const getAndUpdateChannels = async _ => {
+  const getAndUpdateChannels = async (_) => {
     let newChannels = channels;
     try {
       newChannels = await getAllChannels(workspace.id);
@@ -67,40 +68,41 @@ const Workspace = ({ initialWorkspace }) => {
       }
     }
     setChannels(newChannels);
-  }
+  };
 
-  React.useEffect(_ => {
-    if (workspace.id === -1)
-      return;
-    let cb = Event.getDefaultCallback();
-    cb.onInfoChanged = (data) => {
-      if (data.infoType.startsWith('channel')) {
-        getAndUpdateChannels();
-      }
-    };
-    Event.addListener(cb);
-    return _ => {
-      Event.removeListener(cb);
-    }
-  }, [workspace, currentChannel]);
+  React.useEffect(
+    (_) => {
+      if (workspace.id === -1) return;
+      let cb = Event.getDefaultCallback();
+      cb.onInfoChanged = (data) => {
+        if (data.infoType.startsWith('channel')) {
+          getAndUpdateChannels();
+        }
+      };
+      Event.addListener(cb);
+      return (_) => {
+        Event.removeListener(cb);
+      };
+    },
+    [workspace, currentChannel]
+  );
 
-  React.useEffect(_ => {
-    if (workspace.id === -1)
-      return;
-    getMembersInfo(workspace.memberIds).then(ms => {
-      setMembers(ms);
-    });
-  }, [workspace]);
+  React.useEffect(
+    (_) => {
+      if (workspace.id === -1) return;
+      getMembersInfo(workspace.memberIds).then((ms) => {
+        setMembers(ms);
+      });
+    },
+    [workspace]
+  );
 
   const onAddUserClick = (_) => {
     let res = prompt('User id to join');
     if (!res) {
       return;
     }
-    addUserToWorkspace(
-      workspace.id,
-      res
-    ).then((res) => {
+    addUserToWorkspace(workspace.id, res).then((res) => {
       if (!res.ok) {
         console.error(res);
         alert('cannot add user');
@@ -109,90 +111,117 @@ const Workspace = ({ initialWorkspace }) => {
         alert('Added!');
       }
     });
-  }
+  };
 
-  const onCreateChannelClick = _ => {
+  const onCreateChannelClick = (_) => {
     let name = prompt('channel name');
     if (name) {
-      createChannel(workspace.id, name).catch(e => {
+      createChannel(workspace.id, name).catch((e) => {
         console.error(e);
         alert(e);
-      })
+      });
     }
+  };
+
+  function handleSelectWorkspace() {
+    setSelectedWorkspace(nullWorkspace);
   }
 
+  return (
+    <div style={{ display: 'flex', height: '100%', flexShrink: '0' }}>
+      {/**workspace stuff */}
+      <div className="sidebar">
+        {/* workspace info */}
+        <div>{/* <h3>Workspace ({workspace.id}): {workspace.name}</h3> */}</div>
 
-  return <div style={{ display: 'flex', height: '100%', flexShrink: '0' }}>
-    {/**workspace stuff */}
-    <div style={{ flex: '0 0 330px', paddingLeft: '20px', overflow: 'auto', height: "100%" }}>
+        <div>
+          <DropdownButton
+            id="workspace-dropdown"
+            variant="primary"
+            size="lg"
+            title={`${workspace.name} (${workspace.id})`}
+          >
+            <Dropdown.Item onClick={onAddUserClick}>
+              Add user (id)
+            </Dropdown.Item>
+            <Dropdown.Item onClick={onCreateChannelClick}>
+              Create channel
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={(_) => {
+                getAndUpdateChannels();
+              }}
+            >
+              Refresh channel
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={(_) => {
+                console.log('TODO: Select Workspace');
+                setSelectedWorkspace(nullWorkspace)
+              }}
+            >
+              Swhich Workspace
+            </Dropdown.Item>
+          </DropdownButton>
+        </div>
 
-      {/* workspace info */}
-      <div>
-        {/* <h3>Workspace ({workspace.id}): {workspace.name}</h3> */}
-      </div>
+        {/* some buttons */}
 
-      <div>
-        <DropdownButton
-          id="workspace-dropdown"
-          variant="primary"
-          size="lg"
-          title={`${workspace.name} (${workspace.id})`}
-        >
-          <Dropdown.Item onClick={onAddUserClick}>Add user (id)</Dropdown.Item>
-          <Dropdown.Item onClick={onCreateChannelClick}>Create channel</Dropdown.Item>
-          <Dropdown.Item onClick={_ => {getAndUpdateChannels()}}>Refresh channel</Dropdown.Item>
-        </DropdownButton>
-      </div>
+        <div style={{ marginBottom: '10px', display: 'none' }}>
+          <Button
+            style={{ margin: '5px' }}
+            type="button"
+            value=""
+            variant="success"
+            onClick={null}
+          >
+            create channel
+          </Button>
+          <Button
+            type="button"
+            value="refresh channel"
+            variant="secondary"
+            onClick={(_) => {
+              getAndUpdateChannels();
+            }}
+          >
+            refresh channels
+          </Button>
+        </div>
+        <hr />
 
-      {/* some buttons */}
+        <h4>Channels</h4>
 
-      <div style={{ marginBottom: '10px', display: 'none' }}>
-        <Button
-          style={{margin: '5px'}}
-          type="button"
-          value=""
-          variant='success'
-          onClick={null}
-        >create channel</Button>
-        <Button
-          type="button"
-          value="refresh channel"
-          variant='secondary'
-          onClick={(_) => {
-            getAndUpdateChannels();
-          }}
-        >refresh channels</Button>
+        <hr />
+        <ChannelList
+          channels={channels}
+          selectedChannel={currentChannel}
+          onChannelClick={(c) => setCurrentChannel(c)}
+        />
 
+        <hr />
 
-      </div>
-      <hr />
-      <h4>Channels</h4>
-      <ChannelList
-        channels={channels}
-        selectedChannel={currentChannel}
-        onChannelClick={c => setCurrentChannel(c)}
-      />
-
-      <hr />
-
-      {/**workspace members */}
-      <h4>Direct Messages</h4>
-      <ul>
-          {members.map(m => {
-            return <li>{m.username}</li>
+        {/**workspace members */}
+        <h4>Direct Messages</h4>
+        <hr />
+        <ul>
+          {members.map((m) => {
+            return (
+              <div>
+                <li className="workspace__wrapper">{m.username}</li>
+                {/* TODO: Select User to send Direct MEssages */}
+              </div>
+            );
           })}
-      </ul>
+        </ul>
+      </div>
 
+      {/** channel component */}
+      <div style={{ height: '100%', width: '100%' }}>
+        <Channel channel={currentChannel} workspace={workspace} />
+      </div>
     </div>
-    
-
-    {/** channel component */}
-    <div style={{height: "100%", width: '100%'}}>
-      <Channel channel={currentChannel} workspace={workspace} />
-    </div>
-
-
-  </div>
+  );
 };
 
 export default Workspace;

@@ -4,27 +4,6 @@ import SimpleBoxItem from './SimpleBoxItem';
 import ValeIcon from '../assets/ValeIcon.png';
 import LogoutIcon from '../assets/logout.png';
 
-const SideBar = ({ logout }) => (
-  <div className="channel-list__sidebar">
-    <div className="channel-list__sidebar__icon1">
-      <div className="icon1__inner">
-        <img src={ValeIcon} alt="Vale" width="30" />
-      </div>
-    </div>
-    <div className="channel-list__sidebar__icon2">
-      <div className="icon1__inner">
-        <img src={LogoutIcon} alt="Logout" width="30" />
-      </div>
-    </div>
-  </div>
-);
-
-const CompanyHeader = () => (
-  <div className="channel-list__header">
-    <p className="channel-list__header__text">Vale</p>
-  </div>
-);
-
 const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
   let channelElems = [];
   for (let i = 0; i < channels.length; i++) {
@@ -36,7 +15,7 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
       }
     };
     let elem = (
-      <SimpleBoxItem
+      <SimpleBoxItem classNamePrefix="channel"
         title={channel.name}
         text={channel.memberIds.length + ' people'}
         key={i}
@@ -53,7 +32,7 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
   return (
     <>
       {/* <SideBar /> */}
-      <div className="channel-list__list__wrapper" style={{padding: "5px"}}>
+      <div className="channel-list__list__wrapper" style={{ padding: '5px' }}>
         {/* <CompanyHeader /> */}
         <div>{channelElems}</div>
       </div>
