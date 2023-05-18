@@ -94,17 +94,21 @@ export const getAllChannels = async (workspaceId) => {
   return newChannels;
 };
 
-export const createChannel = (wid, name) => {
+export const createChannel = (wid, name, peerUserId) => {
   let req = {
     name: name,
     workspace: wid
   };
+  if (peerUserId) {
+    req.peerUserId = parseInt(peerUserId);
+  }
   req = JSON.stringify(req);
   return callApi('/channels', 'POST', req).then((res) => {
     if (!res.ok) {
       console.error(res);
       throw new Error('Failed to create channel');
     }
+    return res.json();
   });
 }
 

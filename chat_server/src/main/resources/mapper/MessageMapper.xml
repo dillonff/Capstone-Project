@@ -18,9 +18,9 @@
 
     <insert id="insertMessage" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         insert into chat_message (
-            content, channel_id, sender_id
+            content, channel_id, sender_id, organization_id
         ) values (
-            #{content}, #{channelId}, #{senderId}
+            #{content}, #{channelId}, #{senderId}, #{organizationId}
         )
     </insert>
 

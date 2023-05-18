@@ -7,6 +7,7 @@ public class Message {
     private String content;
     private Long channelId;
     private Long senderId;
+    private Long organizationId;
 
     private Instant timeCreated;
 
@@ -14,6 +15,7 @@ public class Message {
         this.content = content;
         this.channelId = channelId;
         this.senderId = senderId;
+        this.organizationId = 0L;
     }
 
     public long getId() {
@@ -49,5 +51,13 @@ public class Message {
 
     public Instant getTimeCreated() {
         return timeCreated;
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 }

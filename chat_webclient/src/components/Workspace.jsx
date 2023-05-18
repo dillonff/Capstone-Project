@@ -26,9 +26,19 @@ const WorkspaceDropdown = ({workspace}) => {
 const Workspace = ({ initialWorkspace }) => {
   const workspace = initialWorkspace;
   let [channels, setChannels] = React.useState([]);
-  let [currentChannel, setCurrentChannel] = React.useState(nullChannel);
+  const [currentChannelId, setCurrentChannelId] = React.useState(-1);
   let [members, setMembers] = React.useState([]);
   let addUserIdToWorkspaceRef = React.useRef();
+
+  let currentChannel = nullChannel;
+  if (currentChannelId !== -1) {
+    for (const channel of channels) {
+      if (channel.id === currentChannelId) {
+        currentChannel = channel;
+        break;
+      }
+    }
+  }
 
   React.useEffect((_) => {
     getAndUpdateChannels();
@@ -60,10 +70,10 @@ const Workspace = ({ initialWorkspace }) => {
     }
     for (const channel of newChannels) {
       if (channel.id === currentChannel.id) {
-        setCurrentChannel(channel);
+        setCurrentChannelId(channel.id);
       }
       if (currentChannel.id === -1 && channel.name === 'general') {
-        setCurrentChannel(channel);
+        setCurrentChannelId(channel.id);
       }
     }
     setChannels(newChannels);
@@ -121,6 +131,29 @@ const Workspace = ({ initialWorkspace }) => {
     }
   }
 
+  const switchToDm = (peerUser) => {
+    for (const channel of channels) {
+      if (!channel.directMessage)
+        continue;
+      const ids = channel.memberIds;
+      if (ids.indexOf(auth.user.id) != -1 && ids.indexOf(peerUser.id) != -1) {
+        setCurrentChannelId(channel.id);
+        return;
+      }
+    }
+    // create DM channel
+    createChannel(workspace.id, `DM-${auth.user.id}-${peerUser}`, peerUser.id).then(res => {
+      return callApi('/channels/' + res.channelId).then(res => {
+        if (res.ok) {
+          return res.json();
+        }
+        throw new Error('Cannot get channel for DM');
+      }).then(res => {
+        setCurrentChannelId(res.id);
+      });
+    });
+  }
+
 
   return <div style={{ display: 'flex', height: '100%', flexShrink: '0' }}>
     {/**workspace stuff */}
@@ -170,7 +203,7 @@ const Workspace = ({ initialWorkspace }) => {
       <ChannelList
         channels={channels}
         selectedChannel={currentChannel}
-        onChannelClick={c => setCurrentChannel(c)}
+        onChannelClick={c => setCurrentChannelId(c.id)}
       />
 
       <hr />
@@ -179,7 +212,9 @@ const Workspace = ({ initialWorkspace }) => {
       <h4>Direct Messages</h4>
       <ul>
           {members.map(m => {
-            return <li>{m.username}</li>
+            return <li style={{cursor: 'pointer'}} onClick={_ => {
+              switchToDm(m);
+            }}>{m.username}</li>
           })}
       </ul>
 
