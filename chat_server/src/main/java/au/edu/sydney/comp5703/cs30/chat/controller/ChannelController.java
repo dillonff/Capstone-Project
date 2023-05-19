@@ -45,8 +45,19 @@ public class ChannelController {
         if (workspace == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "workspace not found");
         }
-        var channel = Util.createChannel(workspace.getId(), req.getName());
-        addMemberToChannel(channel.getId(), user.getId());
+        Channel channel;
+        if (req.getPeerUserId() == null) {
+            channel = Util.createChannel(workspace.getId(), req.getName());
+        } else {
+            var peerUser = userMapper.findById(req.getPeerUserId());
+            if (peerUser == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "peer user " + req.getPeerUserId() + " not found");
+            }
+            channel = Util.createChannel(workspace.getId(), req.getName(), req.getPeerUserId());
+        }
+        if (user.getId() != req.getPeerUserId()) {
+            addMemberToChannel(channel.getId(), user.getId());
+        }
 
         // tell all the clients that the channel info has changed
         var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));

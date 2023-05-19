@@ -28,9 +28,20 @@ const WorkspaceDropdown = ({ workspace }) => {
 const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
   const workspace = initialWorkspace;
   let [channels, setChannels] = React.useState([]);
-  let [currentChannel, setCurrentChannel] = React.useState(nullChannel);
+  const [currentChannelId, setCurrentChannelId] = React.useState(-1);
   let [members, setMembers] = React.useState([]);
   let addUserIdToWorkspaceRef = React.useRef();
+
+  let currentChannel = nullChannel;
+  if (currentChannelId !== -1) {
+    for (const channel of channels) {
+      if (channel.id === currentChannelId) {
+        currentChannel = channel;
+        break;
+      }
+    }
+  }
+
   React.useEffect((_) => {
     getAndUpdateChannels();
   }, []);
@@ -61,10 +72,10 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
     }
     for (const channel of newChannels) {
       if (channel.id === currentChannel.id) {
-        setCurrentChannel(channel);
+        setCurrentChannelId(channel.id);
       }
       if (currentChannel.id === -1 && channel.name === 'general') {
-        setCurrentChannel(channel);
+        setCurrentChannelId(channel.id);
       }
     }
     setChannels(newChannels);
@@ -122,6 +133,30 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
       });
     }
   };
+
+  const switchToDm = (peerUser) => {
+    for (const channel of channels) {
+      if (!channel.directMessage)
+        continue;
+      const ids = channel.memberIds;
+      if (ids.indexOf(auth.user.id) != -1 && ids.indexOf(peerUser.id) != -1) {
+        setCurrentChannelId(channel.id);
+        return;
+      }
+    }
+    // create DM channel
+    createChannel(workspace.id, `DM-${auth.user.id}-${peerUser.id}`, peerUser.id).then(res => {
+      return callApi('/channels/' + res.channelId).then(res => {
+        if (res.ok) {
+          return res.json();
+        }
+        throw new Error('Cannot get channel for DM');
+      }).then(res => {
+        setCurrentChannelId(res.id);
+      });
+    });
+  };
+
 
   function handleSelectWorkspace() {
     setSelectedWorkspace(nullWorkspace);
@@ -191,28 +226,22 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
         <hr />
 
         <h4>Channels</h4>
-
-        <hr />
         <ChannelList
           channels={channels}
           selectedChannel={currentChannel}
-          onChannelClick={(c) => setCurrentChannel(c)}
+          onChannelClick={(c) => setCurrentChannelId(c.id)}
         />
 
         <hr />
 
         {/**workspace members */}
         <h4>Direct Messages</h4>
-        <hr />
         <ul>
-          {members.map((m) => {
-            return (
-              <div>
-                <li className="workspace__wrapper">{m.username}</li>
-                {/* TODO: Select User to send Direct MEssages */}
-              </div>
-            );
-          })}
+            {members.map(m => {
+              return <li className="workspace__wrapper" style={{cursor: 'pointer'}} onClick={_ => {
+                switchToDm(m);
+              }}>{m.username}</li>
+            })}
         </ul>
       </div>
 
@@ -220,6 +249,11 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
       <div style={{ height: '100%', width: '100%' }}>
         <Channel channel={currentChannel} workspace={workspace} />
       </div>
+
+      <hr />
+
+      
+
     </div>
   );
 };

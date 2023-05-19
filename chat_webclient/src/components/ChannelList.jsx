@@ -9,6 +9,9 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
   for (let i = 0; i < channels.length; i++) {
     const channel = channels[i];
     console.log(channel);
+    if (channel.directMessage) {
+      continue;
+    }
     const clickCb = () => {
       if (onChannelClick) {
         onChannelClick(channel);

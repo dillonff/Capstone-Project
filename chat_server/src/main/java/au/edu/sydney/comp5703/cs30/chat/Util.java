@@ -46,6 +46,14 @@ public class Util {
         return channelMapper.findById(channel.getId());
     }
 
+    public static Channel createChannel(long workspaceId, String name, long peerUserId) {
+        var channel = new Channel(name, workspaceId, false);
+        channel.setDirectMessage(true);
+        channelMapper.insertChannel(channel);
+        addMemberToChannel(channel.getId(), peerUserId);
+        return channelMapper.findById(channel.getId());
+    }
+
     public static Channel getChannelForName(long workspaceId, String channelName) {
         var channels = channelMapper.findByWorkspaceAndName(workspaceId, channelName);
         if (channels.size() == 0) {

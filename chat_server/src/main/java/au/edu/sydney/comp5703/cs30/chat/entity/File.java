@@ -6,12 +6,12 @@ public class File {
     private Long id;
     private String filename;
     private String path;
-    private Long size;
+    private long size;
     private Byte status;
     private Instant timeCreated;
     private Long uploaderId;
 
-    public File(String filename, String path, Long size, Long uploaderId) {
+    public File(String filename, String path, long size) {
         this.filename = filename;
         this.path = path;
         this.size = size;
