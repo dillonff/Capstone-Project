@@ -30,12 +30,10 @@ const WorkspaceList = ({ workspaces, selectedWorkspace, onWorkspaceClick }) => {
   }
 
   return (
-      <div style={{ display: 'inline-block' }}>
-          <div
-              style={{ maxWidth: '800px', display: 'flex', flexDirection: 'column' }}
-          >
+      <div style={{ display: 'block' }}>
+
               {workspaceElems}
-          </div>
+
       </div>
   );
 }
