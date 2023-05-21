@@ -3,6 +3,7 @@ import React from 'react';
 import SimpleBoxItem from './SimpleBoxItem';
 import ValeIcon from '../assets/ValeIcon.png';
 import LogoutIcon from '../assets/logout.png';
+import TagIcon from '@mui/icons-material/Tag';
 
 const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
   let channelElems = [];
@@ -18,7 +19,8 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
       }
     };
     let elem = (
-      <SimpleBoxItem classNamePrefix="channel"
+      <SimpleBoxItem
+        classNamePrefix="channel"
         title={channel.name}
         text={channel.memberIds.length + ' people'}
         key={i}
