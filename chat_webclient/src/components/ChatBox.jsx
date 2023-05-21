@@ -13,10 +13,10 @@ import Button from '@mui/joy/Button';
 import Input from '@mui/joy/Input';
 import IconButton from '@mui/material/IconButton';
 import SendIcon from '@mui/icons-material/Send';
-import {EmojiEmotions} from "@mui/icons-material";
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
+import HistoryIcon from '@mui/icons-material/History';
 
 
 
@@ -161,6 +161,15 @@ function ChatBox({ channel, messages, scrollTo }) {
                 }}
             >
                 <UploadFileIcon/>
+            </IconButton>
+            <IconButton
+                color="neutral"
+                variant="outlined"
+                style={{
+                    marginTop:'5px',
+                }}
+            >
+                <HistoryIcon/>
             </IconButton>
 
             <Button
