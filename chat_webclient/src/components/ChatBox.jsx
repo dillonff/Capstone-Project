@@ -8,7 +8,7 @@ import {
 
 import SimpleMessage from './SimpleMessage';
 
-function ChatBox({ channel, messages, scrollTo }) {
+function ChatBox({ channel, messages, scrollTo, organization }) {
   const msgInputRef = React.useRef();
   const msgListRef = React.useRef();
   const [scroll, setScroll] = React.useState(-1);
@@ -24,7 +24,7 @@ function ChatBox({ channel, messages, scrollTo }) {
     const elemHeight = elem.clientHeight;
     const scrollPos = elem.scrollTop;
     console.log('debug scroll:', totalheight, elemHeight, scrollPos, messages.length);
-    if (elemHeight + scrollPos === totalheight) {
+    if (totalheight - elemHeight - scrollPos <= 1) {
       let m = messages[messages.length-1];
       if (m) {
         setScroll(m.id);
@@ -53,6 +53,9 @@ function ChatBox({ channel, messages, scrollTo }) {
       content: msg,
       channelId: channel.id,
     };
+    if (organization && organization.id > 0) {
+      body.organizationId = organization.id;
+    }
     body = JSON.stringify(body);
     callApi('/messages/send', 'POST', body).then(
       (res) => {

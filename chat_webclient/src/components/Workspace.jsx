@@ -6,6 +6,14 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+
 import {
   auth,
   callApi,
@@ -14,11 +22,15 @@ import {
   addUserToWorkspace,
   createChannel,
   nullWorkspace,
+  getOrg,
+  getOrgs,
+  nullOrganization
 } from '../api.js';
 import ChannelList from './ChannelList.jsx';
 import WorkspaceContainer from './WorkspaceContainer.jsx';
 import ChannelContainer from './ChannelList.jsx';
 import Channel from './Channel';
+import CreateOrganization from './CreateOrganization';
 import Event from '../event';
 
 const WorkspaceDropdown = ({ workspace }) => {
@@ -157,10 +169,7 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
     });
   };
 
-
-  function handleSelectWorkspace() {
-    setSelectedWorkspace(nullWorkspace);
-  }
+  const [openCreateOrganization, setOpenCreateOrganization] = React.useState(false);
 
   return (
     <div style={{ display: 'flex', height: '100%', flexShrink: '0' }}>
@@ -238,7 +247,13 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
         <h4>Direct Messages</h4>
         <ul>
             {members.map(m => {
-              return <li className="workspace__wrapper" style={{cursor: 'pointer'}} onClick={_ => {
+              let className = "workspace__wrapper";
+              const ccm = currentChannel.memberIds;
+              // TODO: use channel list instead
+              if (ccm.length <= 2 && currentChannel.directMessage && ccm.includes(m.id)) {
+
+              }
+              return <li className={className} style={{cursor: 'pointer', listStyleType: 'none'}} onClick={_ => {
                 switchToDm(m);
               }}>{m.username}</li>
             })}
@@ -252,8 +267,7 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
 
       <hr />
 
-      
-
+    
     </div>
   );
 };

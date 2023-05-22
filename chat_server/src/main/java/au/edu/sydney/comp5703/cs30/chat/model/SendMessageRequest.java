@@ -4,11 +4,17 @@ public class SendMessageRequest {
     private String content;
     private long channelId;
 
+    private Long organizationId;
+
     public String getContent() {
         return content;
     }
 
     public long getChannelId() {
         return channelId;
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
     }
 }

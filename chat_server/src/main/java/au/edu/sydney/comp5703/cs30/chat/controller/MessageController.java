@@ -45,6 +45,9 @@ public class MessageController {
         var channel = channelMapper.findById(channelId);
         // save the message to the memory
         var message = new Message(req.getContent(), channel.getId(), user.getId());
+        if (req.getOrganizationId() != null && req.getOrganizationId() > 0) {
+            message.setOrganizationId(req.getOrganizationId());
+        }
         messageMapper.insertMessage(message);
 
         // send a new message push to all members in the channel

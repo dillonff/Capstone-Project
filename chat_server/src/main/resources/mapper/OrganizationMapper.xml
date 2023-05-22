@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="au.edu.sydney.comp5703.cs30.chat.mapper.OrganizationMapper">
+    <resultMap id="OrganizationMap" type="au.edu.sydney.comp5703.cs30.chat.entity.Organization">
+        <constructor>
+            <arg column="name" javaType="String" />
+            <arg column="full_name" javaType="String" />
+            <arg column="description" javaType="String" />
+            <arg column="email" javaType="String" />
+        </constructor>
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="full_name" property="fullName"/>
+        <result column="description" property="description"/>
+    </resultMap>
+
+    <insert id="insertOrganization" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into chat_organization (
+            name,
+            full_name,
+            email,
+            description
+        ) values (
+            #{name},
+            #{fullName},
+            #{email},
+            #{description}
+        )
+    </insert>
+
+    <select id="findById" resultMap="OrganizationMap">
+        select * from chat_organization where id=#{id} and not is_deleted
+    </select>
+
+    <insert id="addMember" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into chat_organization_member (
+            user_id,
+            organization_id,
+            display_name,
+            is_auto_join_channel
+        ) values (
+            #{userId},
+            #{organizationId},
+            #{displayName},
+            #{autoJoinChannel}
+        )
+    </insert>
+
+    <select id="findByUserId" resultMap="OrganizationMap">
+        select
+            *
+        from
+            chat_organization
+        where
+            id in (select organization_id from chat_organization_member where user_id = #{userId}) and not is_deleted
+    </select>
+
+</mapper>

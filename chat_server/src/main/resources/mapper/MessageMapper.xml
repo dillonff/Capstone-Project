@@ -13,6 +13,7 @@
         <result column="sender_id" property="senderId"/>
         <result column="gmt_create" property="timeCreated"/>
         <result column="content" property="content"/>
+        <result column="organization_id" property="organizationId"/>
         <result column="channel_id" property="channelId"/>
     </resultMap>
 
@@ -34,7 +35,7 @@
 
     <select id="filterMessages" resultMap="MessageMap">
         select
-            id, content, channel_id, sender_id, gmt_create
+            id, content, channel_id, sender_id, gmt_create, organization_id
         from
             chat_message
         <trim prefix="where" prefixOverrides="and | or">
