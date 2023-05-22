@@ -1,5 +1,4 @@
 import SimpleBoxItem from './SimpleBoxItem';
-import Workspace from './Workspace';
 
 import {
   nullWorkspace,
@@ -9,6 +8,7 @@ import {
 import React from "react";
 
 const WorkspaceList = ({ workspaces, selectedWorkspace, onWorkspaceClick }) => {
+  //return <div></div>
   let workspaceElems = [];
   for (let i = 0; i < workspaces.length; i++) {
     const workspace = workspaces[i];

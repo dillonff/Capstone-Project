@@ -24,6 +24,7 @@ import {
   getOrgs,
   nullOrganization
 } from '../api.js';
+
 import ChannelList from './ChannelList.jsx';
 import Channel from './Channel';
 import CreateOrganization from './CreateOrganization';
@@ -275,6 +276,7 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
       <hr />
     </div>
   );
+  
 };
 
 export default Workspace;

@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import WorkspaceContainer from './components/WorkspaceContainer';
+
 import {
   auth,
   nullUser
 } from './api';
+
 import SimpleLogin from './components/SimpleLogin';
 import OrganizationListener from './components/OrganizationListener';
 
@@ -14,18 +16,12 @@ import {
 } from './AppContext';
 
 
+
 function App() {
   const [currentUser, setCurrentUser] = React.useState(auth.user);
 
-  const [orgCtx, setOrgCtx] = React.useState({
-    currentId: -1,
-    organizations: []
-  })
-
   const [organizationId, setOrganizationId] = React.useState(-1);
   const [organizations, setOrganizations] = React.useState([]);
-
-
 
   if (Object.is(currentUser, nullUser)) {
     return <SimpleLogin onLoggedin={_ => {

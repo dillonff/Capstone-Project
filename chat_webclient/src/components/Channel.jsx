@@ -1,6 +1,5 @@
-
-import ChatBox from './ChatBox';
 import React from 'react';
+import ChatBox from './ChatBox';
 
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -162,6 +161,7 @@ function Channel({
       <ChatBox channel={channel} messages={messages} organization={organization} />
     </div>
   </div>
+  
 }
 
 export default Channel;

@@ -1,6 +1,9 @@
 import React from 'react';
+import { flushSync } from 'react-dom';
 
 import SimpleMessage from './SimpleMessage';
+import EmojiPicker from './EmojiPicker';
+
 import Button from '@mui/joy/Button';
 import Input from '@mui/joy/Input';
 import IconButton from '@mui/material/IconButton';
@@ -10,20 +13,28 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import HistoryIcon from '@mui/icons-material/History';
 
-import InputEmoji from 'react-input-emoji';
-import EmojiPicker from 'emoji-picker-react';
+
+
 
 import {
   callApi
 } from '../api';
 
 
-function ChatBox({ channel, messages, scrollTo, organization }) {
+// if (
+//   typeof customElements !== 'undefined' &&
+//   !customElements.get('em-emoji-picker')
+// ) {
+//   customElements.define('em-emoji-picker', Picker);
+// }
 
+
+function ChatBox({ channel, messages, scrollTo, organization }) {
   const msgInputRef = React.useRef();
   const msgListRef = React.useRef();
   const [scroll, setScroll] = React.useState(-1);
   const [text, setText] = React.useState('');
+  const [emojiAnchor, setEmojiAnchor] = React.useState(null);
 
   const checkScroll = _ => {
     // check if we are at the bottom of the message list
@@ -60,6 +71,8 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
   }
 
   const sendMessage = (msg) => {
+    if (msg === '')
+      return;
     let body = {
       content: msg,
       channelId: channel.id,
@@ -80,7 +93,26 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
     );
   }
 
-
+  const addEmoji = React.useCallback(nativeEmoji => {
+    const elem = msgInputRef.current;
+    console.log(elem);
+    const txt = elem.value;
+    const start = elem.selectionStart
+    const first = txt.slice(0, start);
+    const last = txt.slice(start);
+    elem.value = first + nativeEmoji + last;
+    const len = nativeEmoji.length;
+    console.log(start);
+    flushSync(_ => {
+      setText(first + nativeEmoji + last);
+      // setEmojiAnchor(null);
+    });
+    elem.focus();
+    console.log('before:', elem.selectionStart);
+    elem.setSelectionRange(start + len, start + len);
+    console.log('after:', elem.selectionStart);
+    elem.focus();
+  }, [msgInputRef]);
 
 
   return <div style={{ display: 'flex', height: '100%', flexDirection: 'column', color: 'black'}}>
@@ -96,6 +128,13 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
     >
       {messageElems}
     </div>
+
+    <EmojiPicker anchorEl={emojiAnchor} onClose={_ => {
+      flushSync(_ => {
+        setEmojiAnchor(null);
+      });
+      msgInputRef.current.focus();
+    }} onSelect={addEmoji} />
 
     {/** message input box */}
     <div
@@ -121,8 +160,19 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
             placeholder="Type a message"
             variant="solid"
             color="red"
+            slotProps={{
+              input: {
+                ref: msgInputRef
+              }
+            }}
+            value={text}
+            onChange={event => {
+              setText(event.target.value);
+              console.log('target:', event.target);
+            }}
             style={{
-                borderRadius: '25px'}}
+              borderRadius: '25px'
+            }}
         />
       </div>
 
@@ -143,6 +193,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
                 style={{
                     marginTop:'5px',
                 }}
+                onClick={_ => setEmojiAnchor(msgInputRef.current)}
             >
                 <InsertEmoticonIcon/>
             </IconButton>
@@ -187,6 +238,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
             >
                 <SendIcon />
             </Button>
+            
         </div>
 
     </div>
@@ -201,6 +253,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
       >get scroll</button> */}
     </div>
   </div>
+  
 }
 
 export default ChatBox;
