@@ -1,14 +1,25 @@
 import React from 'react';
 
+import SimpleMessage from './SimpleMessage';
+import Button from '@mui/joy/Button';
+import Input from '@mui/joy/Input';
+import IconButton from '@mui/material/IconButton';
+import SendIcon from '@mui/icons-material/Send';
+import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import HistoryIcon from '@mui/icons-material/History';
+
 import InputEmoji from 'react-input-emoji';
+import EmojiPicker from 'emoji-picker-react';
 
 import {
   callApi
 } from '../api';
 
-import SimpleMessage from './SimpleMessage';
 
 function ChatBox({ channel, messages, scrollTo, organization }) {
+
   const msgInputRef = React.useRef();
   const msgListRef = React.useRef();
   const [scroll, setScroll] = React.useState(-1);
@@ -69,13 +80,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
     );
   }
 
-  const handleBoldClick = () => {
-    setText(prevText => `**${prevText}**`);
-  };
 
-  const handleItalicClick = () => {
-    setText(prevText => `_${prevText}_`);
-  };
 
 
   return <div style={{ display: 'flex', height: '100%', flexDirection: 'column', color: 'black'}}>
@@ -100,31 +105,91 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
         marginTop: '15px',
       }}
     >
-      <div style={{ display: 'flex' }}>
-        <button onClick={handleBoldClick} style={{ fontWeight: 'bold', width: '30px', height: '30px' }}>
-          B
-        </button>
-        <button onClick={handleItalicClick} style={{ fontStyle: 'italic', width: '30px', height: '30px' }}>
-          I
-        </button>
+    <div style={{borderRadius: '25px',
+      border: '1px solid #ccc',
+      backgroundColor: '#f2f2f2',
+      padding: '10px',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+    width:'500px',
+      flexGrow: 1}}>
+      <div style={{flexGrow: 1,
+      }}>
+
+        <Input
+            placeholder="Type a message"
+            variant="solid"
+            color="red"
+            style={{
+                borderRadius: '25px'}}
+        />
       </div>
-      <InputEmoji
-        value={text}
-        onChange={setText}
-        cleanOnEnter
-        onEnter={sendMessage}
-        placeholder="Type a message"
-      />
-      <input
-        type="text"
-        ref={msgInputRef}
-        style={{display: 'none'}}
-      ></input>
-      <input
-        type="button"
-        value="Send"
-        onClick={_ => sendMessage(text)}
-      ></input>
+
+      {/*<input*/}
+      {/*    type="button"*/}
+      {/*    value="Send"*/}
+      {/*    onClick={_ => sendMessage(text)}*/}
+      {/*    style={{*/}
+      {/*      marginLeft: 'auto', */}
+      {/*      width: '100px', */}
+      {/*    }}*/}
+      {/*/>*/}
+        <div style={{display: 'flex', width: '100%'
+        }}>
+            <IconButton
+                color="neutral"
+                variant="outlined"
+                style={{
+                    marginTop:'5px',
+                }}
+            >
+                <InsertEmoticonIcon/>
+            </IconButton>
+            <IconButton
+                color="neutral"
+                variant="outlined"
+                style={{
+                    marginTop:'5px',
+                }}
+            >
+                <AlternateEmailIcon/>
+            </IconButton>
+            <IconButton
+                color="neutral"
+                variant="outlined"
+                style={{
+                    marginTop:'5px',
+                }}
+            >
+                <UploadFileIcon/>
+            </IconButton>
+            <IconButton
+                color="neutral"
+                variant="outlined"
+                style={{
+                    marginTop:'5px',
+                }}
+            >
+                <HistoryIcon/>
+            </IconButton>
+
+            <Button
+                color="neutral"
+                onClick={_ => sendMessage(text)}
+                variant="outlined"
+                style={{
+                    marginLeft: 'auto',
+                    width: '70px',
+                    height:'5px',
+                    marginTop:'5px'
+                }}
+            >
+                <SendIcon />
+            </Button>
+        </div>
+
+    </div>
     </div>
 
     <div>
