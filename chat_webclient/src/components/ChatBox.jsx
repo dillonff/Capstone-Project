@@ -13,6 +13,7 @@ import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import HistoryIcon from '@mui/icons-material/History';
+import AddTaskOutlinedIcon from '@mui/icons-material/AddTaskOutlined';
 
 
 
@@ -237,6 +238,15 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
                 }}
             >
                 <HistoryIcon/>
+            </IconButton>
+            <IconButton
+                color="neutral"
+                variant="outlined"
+                style={{
+                    marginTop:'5px',
+                }}
+            >
+                <AddTaskOutlinedIcon/>
             </IconButton>
 
             <Button
