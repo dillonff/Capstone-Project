@@ -1,6 +1,5 @@
-
-import ChatBox from './ChatBox';
 import React from 'react';
+import ChatBox from './ChatBox';
 
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -8,12 +7,23 @@ import Modal from 'react-bootstrap/Modal';
 import ChannelMember from './ChannelMember';
 
 import {
+  OrganizationIdContext,
+  OrganizationsContext
+} from '../AppContext';
+
+import {
   getMessages,
   addUserToChannel,
   getMessageById,
-  getUser
+  getUser,
+  auth,
+  nullOrganization,
+  getOrg
 } from '../api.js';
 import Event from '../event.js';
+import {
+  findById
+} from '../util';
 
 function Channel({
   workspace,
@@ -23,6 +33,9 @@ function Channel({
   const addUserIdRef = React.useRef();
   
   const [show, setShow] = React.useState(false);
+  const [organizationId] = React.useContext(OrganizationIdContext);
+  const [organizations] = React.useContext(OrganizationsContext);
+  const organization = findById(organizationId, organizations, nullOrganization);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -51,6 +64,9 @@ function Channel({
         sender: await getUser(data.senderId),
         timeCreated: new Date().toUTCString()
       }
+      if (organization.id > 0) {
+        message.organization = organization;
+      }
       let newMessages = [...messages, message];
       setMessages(newMessages);
     }
@@ -58,16 +74,39 @@ function Channel({
     return _ => {
       Event.removeListener(cb);
     }
-  }, [messages]);
+  }, [messages, organization]);
 
+  const [dmName, setDmName] = React.useState('');
+  React.useEffect(_ => {
+    let mounted = true;
+    const peerIds = channel.memberIds.filter(i => i !== auth.user.id);
+    if (peerIds.length === 0) {
+      peerIds.push(auth.user.id);
+    }
+    (async _ => {
+      const names = [];
+      for (const i of peerIds) {
+        let u = await getUser(i);
+        names.push(u.username);
+        if (names.length > 3) {
+          names.push('...');
+          break;
+        }
+      }
+      if (mounted) {
+        setDmName(names.join(', '));
+      }
+    }) ();
+    return _ => {mounted = false;}
+  }, [channel])
   let name = channel.name;
   if (channel.directMessage) {
-    name = "Direct Message";
+    name = dmName ? dmName : "Direct Message";
   }
 
   return <div style={{display: 'flex', flexDirection: 'column', height: '100%', width: '100%', padding: '10px', boxSizing: 'border-box', backgroundColor: 'white', color: 'black'}}>
     {/* title */}
-    <h3>#{channel.id} {channel.name}</h3>
+    <h3>#{channel.id} {name}</h3>
 
     <div style={{ display: 'flex' }}>
       {/* <input
@@ -119,9 +158,10 @@ function Channel({
     <hr />
     
     <div style={{flexGrow: '1', overflow: 'hidden'}}>
-      <ChatBox channel={channel} messages={messages} />
+      <ChatBox channel={channel} messages={messages} organization={organization} />
     </div>
   </div>
+  
 }
 
 export default Channel;

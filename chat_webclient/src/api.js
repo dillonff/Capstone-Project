@@ -1,9 +1,28 @@
 import Event from './event';
+import {
+  auth,
+  nullUser
+} from './cred';
 
-export let auth = {
-  token: null,
-  user: null
+export {
+  auth,
+  nullUser
+};
+
+export class ApiError extends Error {
+  constructor(message, cause) {
+    super(message, {cause: cause});
+  }
 }
+
+export const nullOrganization = {
+  id: -1,
+  name: "Unknown Org",
+  fullName: "Unknown Organization",
+  description: "unknown organization"
+}
+
+
 
 export async function login(username, password) {
   let res = await callApi('/auth', 'POST', JSON.stringify({
@@ -75,6 +94,25 @@ export function callApi(path, method, body) {
       'content-type': 'application/json',
     },
   });
+}
+
+export async function callApiJsonChecked(path, method, body) {
+  let res;
+  try {
+    res = await callApi(path, method, body);
+  } catch (e) {
+    throw new ApiError("Cannot contack chat server.", e);
+  }
+  if (!res.ok) {
+    // TODO: pass error messages to UI
+    throw new ApiError("Chat server error.");
+  }
+  try {
+    res = await res.json();
+  } catch (e) {
+    throw new ApiError("Invalid response from chat server.", e);
+  }
+  return res;
 }
 
 export const getAllChannels = async (workspaceId) => {
@@ -164,6 +202,12 @@ export const getMessages = async (channelId) => {
   let newMessages = [];
   for (let m of res.messages.reverse()) {
     let user = await getUser(m.senderId);
+    if (m.organizationId > 0) {
+      let org = await getOrg(m.organizationId);
+      m.organization = org;
+    } else {
+      m.organization = nullOrganization;
+    }
     m.sender = user;
     m.time = new Date(m.timeCreated).toLocaleString();
     newMessages.push(m);
@@ -191,4 +235,39 @@ export const addUserToWorkspace = (wid, uid) => {
   return callApi('/workspaces/join', 'POST', req);
 }
 
+const orgCache = {};
+export const getOrg = async (id, refresh) => {
+  if (orgCache[id] && !refresh) {
+    return orgCache[id];
+  }
+  let res = await callApi('/organizations/' + id, 'GET');
+  if (res.ok) {
+    res = await res.json();
+    orgCache[res.id] = res;
+    return res;
+  }
+  throw new Error('Cannot get org ' + id);
+}
+
+export const getOrgs = async () => {
+  let res = await callApi('/organizations', 'GET');
+  if (res.ok) {
+    res = await res.json();
+    res.data.map(org => {
+      orgCache[org.id] = org;
+    });
+    return res.data;
+  }
+  throw new Error('Cannot get orgs');
+}
+
+export const createOrg = (name, fullName, email, description) => {
+  const body = {
+    name: name,
+    fullName: fullName,
+    email: email,
+    description: description
+  }
+  return callApiJsonChecked('/organizations', 'POST', JSON.stringify(body));
+}
 

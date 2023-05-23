@@ -1,6 +1,11 @@
 import React from 'react';
 import profilePic from './profile.png';
 
+import {
+    getOrg,
+    nullOrganization
+} from '../api';
+
 function SimpleMessage({
     message,
     shouldScrollTo
@@ -21,7 +26,9 @@ function SimpleMessage({
         </div>
         <div>
             <label>
-                <div style={{display: 'inline', fontWeight: 'bold'}}>{message.sender.username}</div>  - {time}
+                <div style={{display: 'inline', fontWeight: 'bold'}}>{
+                    (!message.organization || message.organization.id === -1) ? message.sender.username : (message.organization.name + ` (${message.sender.username})`)
+                }</div>  - {time}
             </label>
             <div style={{fontSize: 'x-large'}}>{message.content}</div>
         </div>

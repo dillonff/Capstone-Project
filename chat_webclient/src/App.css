@@ -298,8 +298,8 @@ body {
 
 .workspace__container_fields-content_button button {
   border-radius: 4px;
-  background: #005fff;
-  border: 1px solid #005fff;
+  background: #1868af;
+  border: 1px solid #1868af;
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: 500;
@@ -315,7 +315,7 @@ body {
 
 .workspace__wrapper--workspace {
   box-sizing: border-box;
-  box-shadow: 0 2px 5px rgba(0,0,0,.3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   border-radius: 4px;
   overflow: hidden;
   background: #fff;
@@ -323,18 +323,19 @@ body {
   display: inline-block;
   vertical-align: top;
   margin: 36px 0 0 36px;
-  border-top: 90px solid ;
-  border-image: linear-gradient(to right, #0e3877, #ADD8E6) 22;
+  border-top: 90px solid;
+  border-image: linear-gradient(to right, #0e3877, #add8e6) 22;
   height: 150px;
 }
-.workspace__wrapper--channel{
-  height: 50px;
+.workspace__wrapper--channel {
+  height: 60px;
   display: flex;
   align-items: center;
 }
 
 .workspace__wrapper__selected {
-  height: auto;
+  color: white;
+  height: 60px;
   display: flex;
   align-items: center;
   background: rgba(0, 0, 0, 0.2);
@@ -359,7 +360,7 @@ body {
   background: rgba(0, 0, 0, 0.2);
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
-  font-weight: bold;
+  /* font-weight: bold; */
   cursor: pointer;
 }
 
@@ -423,25 +424,11 @@ body {
   border-bottom-left-radius: 16px; */
 }
 
-.channel-list__sidebar__icon1 {
-  width: 44px;
-  height: 44px;
-  margin: 14px;
-  background: linear-gradient(
-      150.64deg,
-      rgba(0, 0, 0, 0.1) 12.73%,
-      rgba(0, 0, 0, 0) 89.32%
-    ),
-    #ffffff;
-  border-radius: 9999px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.33);
-}
-
 .channel-list__list__wrapper {
   display: flex;
   flex-direction: column;
   background: #1e2b55;
-  width: 240px;
+  width: 350px;
 }
 
 .icon1__inner {
@@ -559,7 +546,7 @@ body {
 }
 
 .sidebar {
-  color: white;
+  color: rgba(255, 255, 255, 0.7);
   background-color: #1e2b55;
   border-top: 1px solid white;
   flex: 0 0 330px;
@@ -570,14 +557,14 @@ body {
 
 .sidebar__header {
   display: flex;
-  border: 1px solid #49274b;
+  border: 1px solid #1e2b55;
   padding: 13px;
   padding-bottom: 10px;
 }
 
 .sidebar__header > .MuiSvgIcon-root {
   padding: 8px;
-  color: #49274b;
+  color: #1e2b55;
   font-size: 18px;
   background-color: white;
   border-radius: 50%;
@@ -638,17 +625,40 @@ body {
   border-radius: 9px;
 }
 
-.sidebar__logout {
-  width: 100%;
-  padding: 10px 0;
-  outline: none;
-  border: none;
-  background-color: #340e36;
+.sidebar__icon {
+  margin-right: 15px;
+}
+
+.dmuser__wrapper {
+  height: 50px;
+  display: flex;
+  align-items: center;
+}
+
+.dmuser__wrapper:focus {
   color: white;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  font-weight: bold;
+  margin-right: 16px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.dmuser__wrapper:hover {
+  background: rgba(0, 0, 0, 0.2);
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  /* font-weight: bold; */
   cursor: pointer;
 }
-.sidebar__icon {
-  padding: 10px;
-  font-size: 15px !important;
-  opacity: 0.6;
+
+.dmuser__avatar {
+  color: white;
+  font-weight: bold;
+  margin-right: 15px;
 }

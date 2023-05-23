@@ -2,6 +2,7 @@ import React from 'react';
 import Workspace from './Workspace';
 import WorkspaceList from './WorkspaceList';
 import Header from './Header';
+import OrganizationSelector from './OrganizationSelector';
 
 import {
   nullWorkspace,
@@ -9,7 +10,16 @@ import {
   addUserToWorkspace,
   createWorkspace,
   auth,
+  nullOrganization
 } from '../api';
+
+import {
+    OrganizationIdContext,
+    OrganizationsContext
+} from '../AppContext';
+import {
+    findById
+  } from '../util';
 
 import Event from '../event';
 import Button from 'react-bootstrap/Button';
@@ -19,6 +29,9 @@ function WorkspaceContainer({}) {
     const [selectedWorkspace, setSelectedWorkspace] =
         React.useState(nullWorkspace);
     const [workspaces, setWorkspaces] = React.useState([]);
+    const [orgs] = React.useContext(OrganizationsContext);
+    const [orgId] = React.useContext(OrganizationIdContext);
+    const org = findById(orgId, orgs, nullOrganization);
 
     const getAndUpdateWorkspaces = async (_) => {
         try {
@@ -105,8 +118,18 @@ function WorkspaceContainer({}) {
                 borderRadius: '10px',
                 boxShadow: '0px 0px 10px 5px rgba(0,0,0,0.2)'
             }}>
+                <div>
+                    <h2>Hi, {auth.user.username}</h2>
+                    <div style={{display: 'flex', flexDirection: 'column'}}>
+                        <h4>Organization Profile</h4>
+                        <OrganizationSelector />
+                    </div>
+                </div>
+
                 <h2 style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '25px'}}>
-                    <span style={{transform: "translateX(40px)"}}>Workspace for {auth.user.username}</span>
+                    <span style={{transform: "translateX(40px)"}}>
+                        Workspace for {orgId > 0 ? org.name : auth.user.username}
+                    </span>
                     <div style={{display: 'flex', justifyContent: 'flex-end', transform: "translateX(-40px)"}}>
                         <Button
                             type="button"
