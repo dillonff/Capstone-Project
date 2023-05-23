@@ -1,6 +1,8 @@
 import React from 'react';
 import profilePic from './profile.png';
 
+import SimpleFileItem from './SimpleFileItem';
+
 import {
     getOrg,
     nullOrganization
@@ -31,7 +33,13 @@ function SimpleMessage({
                 }</div>  - {time}
             </label>
             <div style={{fontSize: 'x-large'}}>{message.content}</div>
+            <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between'}}>
+                {message.files && message.files.map(f => {
+                    return <SimpleFileItem file={f} />
+                })}
+            </div>
         </div>
+        
     </div>
 }
 

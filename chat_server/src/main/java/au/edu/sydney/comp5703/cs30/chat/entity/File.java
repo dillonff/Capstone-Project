@@ -11,7 +11,7 @@ public class File {
     private Instant timeCreated;
     private Long uploaderId;
 
-    public File(String filename, String path, long size) {
+    public File(String filename, String path, long size, long uploaderId) {
         this.filename = filename;
         this.path = path;
         this.size = size;

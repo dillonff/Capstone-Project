@@ -1,6 +1,10 @@
 package au.edu.sydney.comp5703.cs30.chat.entity;
 
+import au.edu.sydney.comp5703.cs30.chat.Repo;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.Instant;
+import java.util.List;
 
 public class Message {
     private Long id;
@@ -16,6 +20,14 @@ public class Message {
         this.channelId = channelId;
         this.senderId = senderId;
         this.organizationId = 0L;
+    }
+
+    @JsonProperty("files")
+    public List<File> getFiles() {
+        System.err.println("getting file for " + id);
+        var res = Repo.fileMapper.filter(null, null, id, null);
+        System.out.println(res);
+        return res;
     }
 
     public long getId() {

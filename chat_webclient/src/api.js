@@ -17,8 +17,9 @@ export class ApiError extends Error {
 
 export const nullOrganization = {
   id: -1,
-  name: "Unknown Org",
-  fullName: "Unknown Organization",
+  name: "Org not loaded",
+  fullName: "Organization not loaded",
+  email: "",
   description: "unknown organization"
 }
 
@@ -85,14 +86,19 @@ export const nullWorkspace = {
 
 const API_ENDPOINT = 'http://127.0.0.1:11451/api/v1';
 export function callApi(path, method, body) {
+  const headers = {
+    authorization: auth.token
+  };
+  if (typeof body === 'string') {
+    headers['content-type'] = 'application/json';
+  } else if (body instanceof FormData) {
+    // nothing to do
+  }
   return fetch(API_ENDPOINT + path, {
     method: method,
     mode: 'cors',
     body: body,
-    headers: {
-      authorization: auth.token,
-      'content-type': 'application/json',
-    },
+    headers: headers
   });
 }
 

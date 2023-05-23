@@ -3,6 +3,7 @@ import { flushSync } from 'react-dom';
 
 import SimpleMessage from './SimpleMessage';
 import EmojiPicker from './EmojiPicker';
+import FileUploadForm from './FileUploadForm';
 
 import Button from '@mui/joy/Button';
 import Input from '@mui/joy/Input';
@@ -32,6 +33,7 @@ import {
 function ChatBox({ channel, messages, scrollTo, organization }) {
   const msgInputRef = React.useRef();
   const msgListRef = React.useRef();
+  const fileInputRef = React.useRef();
   const [scroll, setScroll] = React.useState(-1);
   const [text, setText] = React.useState('');
   const [emojiAnchor, setEmojiAnchor] = React.useState(null);
@@ -70,7 +72,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
     messageElems.push(<SimpleMessage key={message.id} message={message} shouldScrollTo={s} />);
   }
 
-  const sendMessage = (msg) => {
+  const sendMessage = (msg, fileIds) => {
     if (msg === '')
       return;
     let body = {
@@ -79,6 +81,9 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
     };
     if (organization && organization.id > 0) {
       body.organizationId = organization.id;
+    }
+    if (fileIds) {
+      body.fileIds = fileIds;
     }
     body = JSON.stringify(body);
     callApi('/messages/send', 'POST', body).then(
@@ -135,6 +140,12 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
       });
       msgInputRef.current.focus();
     }} onSelect={addEmoji} />
+
+    <div style={{display: 'none'}} >
+      <FileUploadForm inputRef={fileInputRef} onFileUploaded={f => {
+        sendMessage(text, [f.id]);
+      }} />
+    </div>
 
     {/** message input box */}
     <div
@@ -212,6 +223,9 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
                 style={{
                     marginTop:'5px',
                 }}
+                onClick={_ => {
+                  fileInputRef.current.click();
+                }}
             >
                 <UploadFileIcon/>
             </IconButton>
@@ -246,11 +260,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
 
     <div>
       {/**debug section */}
-      {/* <button
-        onClick={_ => {
-          checkScroll();
-        }}
-      >get scroll</button> */}
+      
     </div>
   </div>
   

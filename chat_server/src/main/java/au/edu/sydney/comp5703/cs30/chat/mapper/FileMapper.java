@@ -11,6 +11,11 @@ import java.util.List;
 @Repository
 public interface FileMapper {
     File findById(long id);
-
     Integer insertFile(File file);
+
+    Integer updateFile(File file);
+
+    List<File> filter(Long workspaceId, Long channelId, Long messageId, Long userId);
+
+    Integer addUsage(Integer usageType, Long usageId, Long fileId);
 }

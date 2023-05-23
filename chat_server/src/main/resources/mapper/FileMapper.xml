@@ -8,8 +8,8 @@
         <constructor>
             <arg column="filename" javaType="String" />
             <arg column="path" javaType="String" />
-            <arg column="size" javaType="long" />
-            <arg column="uploader_id" javaType="long" />
+            <arg column="size" javaType="_long" />
+            <arg column="uploader_id" javaType="_long" />
         </constructor>
         <id column="id" property="id"/>
         <result column="filename" property="filename"/>
@@ -33,5 +33,42 @@
     <select id="findById" resultMap="FileMap">
         select * from chat_file where id = #{id} and not is_deleted
     </select>
+
+    <update id="updateFile" >
+        update
+            chat_file
+        set
+            filename = #{filename},
+            path = #{path},
+            size = #{size},
+            uploader_id = #{uploaderId},
+            status = #{status}
+        where
+            id = #{id}
+    </update>
+
+    <select id="filter" resultMap="FileMap">
+        select
+            cf.*
+        from
+            chat_file cf left outer join chat_file_usage cfu on (cf.id = cfu.file_id)
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="userId != null">cf.uploader_id = #{userId}</if>
+            <if test="workspaceId != null">and cfu.usage_type = 1 and cfu.usage_id = #{workspaceId}</if>
+            <if test="channelId != null">and cfu.usage_type = 2 and cfu.usage_id = #{channelId}</if>
+            <if test="messageId != null">and cfu.usage_type = 3 and cfu.usage_id = #{messageId}</if>
+        </trim>
+    </select>
+
+    <insert id="addUsage">
+        insert into chat_file_usage (
+            usage_type, usage_id, file_id
+        ) values (
+            #{usageType},
+            #{usageId},
+            #{fileId}
+        )
+        on duplicate key update id = id
+    </insert>
 
 </mapper>

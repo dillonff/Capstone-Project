@@ -2,9 +2,7 @@ package au.edu.sydney.comp5703.cs30.chat.controller;
 
 import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.entity.Message;
-import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper;
-import au.edu.sydney.comp5703.cs30.chat.mapper.MessageMapper;
-import au.edu.sydney.comp5703.cs30.chat.mapper.UserMapper;
+import au.edu.sydney.comp5703.cs30.chat.mapper.*;
 import au.edu.sydney.comp5703.cs30.chat.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +31,12 @@ public class MessageController {
     @Autowired
     private MessageMapper messageMapper;
 
+    @Autowired
+    private FileMapper fileMapper;
+
+    @Autowired
+    private WorkspaceMapper workspaceMapper;
+
     private static final ObjectMapper om = new ObjectMapper();
     @RequestMapping(
             value = "/api/v1/messages/send", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
@@ -43,12 +47,35 @@ public class MessageController {
         // then figure out the channel by id
         var channelId = req.getChannelId();
         var channel = channelMapper.findById(channelId);
+        var workspace = workspaceMapper.findById(channel.getWorkspaceId());
         // save the message to the memory
         var message = new Message(req.getContent(), channel.getId(), user.getId());
         if (req.getOrganizationId() != null && req.getOrganizationId() > 0) {
             message.setOrganizationId(req.getOrganizationId());
         }
+
+        var fileIds = req.getFileIds();
+        if (fileIds != null) {
+            for (var id : fileIds) {
+                var file = fileMapper.findById(id);
+                if (file == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File of id " + id + " not found");
+                }
+                // TODO: check file access
+            }
+        }
+
         messageMapper.insertMessage(message);
+        // TODO: this should be done in one transaction
+        if (fileIds != null) {
+            for (var id : fileIds) {
+                fileMapper.addUsage(3, message.getId(), id);
+                fileMapper.addUsage(2, channel.getId(), id);
+                fileMapper.addUsage(1, workspace.getId(), id);
+            }
+        }
+
+
 
         // send a new message push to all members in the channel
         var msg = new NewMessagePush(message.getId(), message.getContent(), message.getSenderId(), message.getChannelId());

@@ -3,6 +3,7 @@ package au.edu.sydney.comp5703.cs30.chat;
 import au.edu.sydney.comp5703.cs30.chat.entity.*;
 import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper;
 import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMemberMapper;
+import au.edu.sydney.comp5703.cs30.chat.mapper.FileMapper;
 import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,11 +31,17 @@ public class Repo {
     @Autowired
     public ChannelMemberMapper auChannelMemberMapper;
 
+    @Autowired
+    public FileMapper aufileMapper;
+
+    public static FileMapper fileMapper;
+
     @PostConstruct
     private void init() {
         channelMapper = auChannelMapper;
         workspaceMapper = auWorkspaceMapper;
         channelMemberMapper = auChannelMemberMapper;
+        fileMapper = aufileMapper;
         System.err.println("mappers: " + channelMapper + workspaceMapper + channelMemberMapper);
     }
 
