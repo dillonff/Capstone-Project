@@ -66,6 +66,7 @@ public class MessageController {
         }
 
         messageMapper.insertMessage(message);
+        message = messageMapper.findById(message.getId());
         // TODO: this should be done in one transaction
         if (fileIds != null) {
             for (var id : fileIds) {
@@ -78,8 +79,8 @@ public class MessageController {
 
 
         // send a new message push to all members in the channel
-        var msg = new NewMessagePush(message.getId(), message.getContent(), message.getSenderId(), message.getChannelId());
-        var bcastPayload = makeServerPush("newMessage", msg);
+        // var msg = new NewMessagePush(message.getId(), message.getContent(), message.getSenderId(), message.getChannelId());
+        var bcastPayload = makeServerPush("newMessage", message);
         broadcastMessagesToChannel(bcastPayload, channel);
 
         // build and send the response

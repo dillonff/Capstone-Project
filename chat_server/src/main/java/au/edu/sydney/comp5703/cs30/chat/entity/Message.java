@@ -34,7 +34,7 @@ public class Message {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -63,6 +63,10 @@ public class Message {
 
     public Instant getTimeCreated() {
         return timeCreated;
+    }
+
+    public void setTimeCreated(Instant timeCreated) {
+        this.timeCreated = timeCreated;
     }
 
     public Long getOrganizationId() {

@@ -74,7 +74,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
   }
 
   const sendMessage = (msg, fileIds) => {
-    if (msg === '')
+    if (!msg && (!fileIds || fileIds.length === 0))
       return;
     let body = {
       content: msg,

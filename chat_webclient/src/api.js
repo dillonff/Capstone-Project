@@ -198,8 +198,20 @@ export const addUserToChannel = (cid, uid) => {
   });
 };
 
+export const processServerMessage = async (m) => {
+  let user = await getUser(m.senderId);
+  if (m.organizationId > 0) {
+    let org = await getOrg(m.organizationId);
+    m.organization = org;
+  } else {
+    m.organization = nullOrganization;
+  }
+  m.sender = user;
+  m.time = new Date(m.timeCreated).toLocaleString();
+}
+
 export const getMessages = async (channelId) => {
-  let res = await callApi('/messages?channelId=' + channelId);
+  let res = await callApi('/messages?pageSize=50&channelId=' + channelId);
   if (!res.ok) {
     console.error(res);
     throw new Error('cannot get historical messages');
@@ -207,15 +219,7 @@ export const getMessages = async (channelId) => {
   res = await res.json();
   let newMessages = [];
   for (let m of res.messages.reverse()) {
-    let user = await getUser(m.senderId);
-    if (m.organizationId > 0) {
-      let org = await getOrg(m.organizationId);
-      m.organization = org;
-    } else {
-      m.organization = nullOrganization;
-    }
-    m.sender = user;
-    m.time = new Date(m.timeCreated).toLocaleString();
+    await processServerMessage(m);
     newMessages.push(m);
   }
   return newMessages;

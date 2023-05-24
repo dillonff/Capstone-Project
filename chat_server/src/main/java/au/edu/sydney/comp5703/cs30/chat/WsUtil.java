@@ -4,12 +4,17 @@ import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
 import au.edu.sydney.comp5703.cs30.chat.entity.ClientSession;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 
 public class WsUtil {
-    private static final ObjectMapper om = new ObjectMapper();
+    private static final ObjectMapper om;
+    static {
+        om = Jackson2ObjectMapperBuilder.json().build();
+    }
 
     public static String makeServerPush(String type, Object data) throws JsonProcessingException {
         var objNode = om.createObjectNode();

@@ -59,22 +59,14 @@ function Channel({
       }
       console.log('new message arrived');
       console.log(data);
-      let message = {
-        content: data.preview,
-        sender: await getUser(data.senderId),
-        timeCreated: new Date().toUTCString()
-      }
-      if (organization.id > 0) {
-        message.organization = organization;
-      }
-      let newMessages = [...messages, message];
+      let newMessages = [...messages, data];
       setMessages(newMessages);
     }
     Event.addListener(cb);
     return _ => {
       Event.removeListener(cb);
     }
-  }, [messages, organization]);
+  }, [messages, channel]);
 
   const [dmName, setDmName] = React.useState('');
   React.useEffect(_ => {

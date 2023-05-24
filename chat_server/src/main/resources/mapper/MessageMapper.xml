@@ -17,7 +17,7 @@
         <result column="channel_id" property="channelId"/>
     </resultMap>
 
-    <insert id="insertMessage" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    <insert id="insertMessage" parameterType="au.edu.sydney.comp5703.cs30.chat.entity.Message" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         insert into chat_message (
             content, channel_id, sender_id, organization_id
         ) values (

@@ -1,5 +1,9 @@
 import {
   auth
+} from './cred';
+
+import {
+  processServerMessage
 } from './api';
 
 const WS_URL = 'ws://127.0.0.1:11451/chat-ws';
@@ -63,7 +67,9 @@ function onMessage(event) {
       break;
     case 'newMessage':
       console.log('calling all onNewMessage...');
-      callAllCallback('onNewMessage', res.data);
+      processServerMessage(res.data).then(_ => {
+        callAllCallback('onNewMessage', res.data);
+      });
       break;
     case 'infoChanged':
       callAllCallback('onInfoChanged', res.data);
