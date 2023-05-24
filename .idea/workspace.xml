@@ -1,14 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="f6f02140-5db0-4e33-bebf-6f3e96765f49" name="Changes" comment="" />
+    <list default="true" id="f6f02140-5db0-4e33-bebf-6f3e96765f49" name="Changes" comment="Modified connection">
+      <change afterPath="$PROJECT_DIR$/chat_server/src/main/java/au/edu/sydney/comp5703/cs30/chat/ReceiveFileServer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chat_server/src/main/java/au/edu/sydney/comp5703/cs30/chat/SendFileServer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chat_server/src/main/java/au/edu/sydney/comp5703/cs30/chat/controller/LoginController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chat_server/src/main/java/au/edu/sydney/comp5703/cs30/chat/controller/TokenController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chat_server/src/main/java/au/edu/sydney/comp5703/cs30/chat/dao/AuthenticationRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chat_server/src/main/java/au/edu/sydney/comp5703/cs30/chat/mapper/LoginMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chat_server/src/main/java/au/edu/sydney/comp5703/cs30/chat/security/AuthenticationFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chat_server/src/main/java/au/edu/sydney/comp5703/cs30/chat/security/AuthenticationProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chat_server/src/main/java/au/edu/sydney/comp5703/cs30/chat/security/SecurityConfiguration.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chat_server/src/main/java/au/edu/sydney/comp5703/cs30/chat/service/AuthenticationService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chat_server/src/main/java/au/edu/sydney/comp5703/cs30/chat/service/LoginService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="CodeInsightWorkspaceSettings">
+    <option name="optimizeImportsOnTheFly" value="true" />
+  </component>
+  <component name="CompilerWorkspaceConfiguration">
+    <option name="MAKE_PROJECT_ON_SAVE" value="true" />
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="KotlinCodeInsightWorkspaceSettings">
+    <option name="optimizeImportsOnTheFly" value="true" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -27,10 +52,16 @@
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.ignored.files&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.import&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\10359\Desktop\研究生\研三下\CAP\PROJECT\chat_server\src\main\java\au\edu\sydney\comp5703\cs30\chat\security" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration default="true" type="JetRunConfigurationType">
       <module name="COMP5703-CS30-2" />
@@ -59,6 +90,21 @@
       <workItem from="1680087145500" duration="218000" />
       <workItem from="1680137470252" duration="8000" />
     </task>
+    <task id="LOCAL-00001" summary="Two class for function: Get historical messages">
+      <created>1681811666138</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1681811666138</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Modified connection">
+      <created>1681878411987</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1681878411987</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -74,6 +120,11 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Two class for function: Get historical messages" />
+    <MESSAGE value="Modified connection" />
+    <option name="LAST_COMMIT_MESSAGE" value="Modified connection" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
