@@ -4,11 +4,17 @@ public class CreateChannelRequest {
     private String name;
     private long workspace;
 
+    private Long peerUserId;
+
     public String getName() {
         return name;
     }
 
     public long getWorkspace() {
         return workspace;
+    }
+
+    public Long getPeerUserId() {
+        return peerUserId;
     }
 }

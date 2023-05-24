@@ -13,16 +13,17 @@
         <id column="id" property="id"/>
         <result column="name" property="name"/>
         <result column="gmt_create" property="timeCreated"/>
+        <result column="gmt_modified" property="timeModified"/>
         <result column="workspace_id" property="workspaceId"/>
-        <result column="is_public" property="public_"/>
-        <result column="is_pinned" property="pinned"/>
+        <result column="is_public" property="publicChannel"/>
+        <result column="is_direct_message" property="directMessage"/>
     </resultMap>
 
-    <insert id="insertChannel">
+    <insert id="insertChannel" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         insert into chat_channel(
-            name, workspace_id, is_public, is_pinned
+            name, workspace_id, is_public, is_direct_message
         ) values (
-            #{name}, #{workspaceId}, #{public_}, #{pinned}
+            #{name}, #{workspaceId}, #{publicChannel}, #{directMessage}
         )
     </insert>
 
@@ -34,7 +35,7 @@
         select * from chat_channel where workspace_id = #{workspaceId} and name = #{name} and not is_deleted
     </select>
 
-    <select id="findIdByWorkspaceId">
+    <select id="findIdByWorkspaceId" resultType="long">
         select id from chat_channel where workspace_id = #{workspaceId} and not is_deleted
     </select>
 

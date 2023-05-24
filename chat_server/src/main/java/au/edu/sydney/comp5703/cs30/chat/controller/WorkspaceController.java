@@ -3,12 +3,12 @@ package au.edu.sydney.comp5703.cs30.chat.controller;
 import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.Util;
 import au.edu.sydney.comp5703.cs30.chat.entity.Workspace;
+import au.edu.sydney.comp5703.cs30.chat.mapper.UserMapper;
 import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper;
 import au.edu.sydney.comp5703.cs30.chat.model.CreateWorkspaceRequest;
 import au.edu.sydney.comp5703.cs30.chat.model.GetWorkspacesResponse;
 import au.edu.sydney.comp5703.cs30.chat.model.InfoChangedPush;
 import au.edu.sydney.comp5703.cs30.chat.model.JoinWorkspaceRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,12 +24,14 @@ public class WorkspaceController {
     @Autowired
     private WorkspaceMapper workspaceMapper;
 
+    @Autowired
+    private UserMapper userMapper;
 
     @RequestMapping(
             value = "/api/v1/workspaces", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
     public Workspace createWorkspace(@RequestBody CreateWorkspaceRequest req, @RequestHeader(HttpHeaders.AUTHORIZATION) long auth) throws Exception {
-        var user = Repo.userMap.get(auth);
+        var user = userMapper.findById(auth);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "user not authorized");
         }
@@ -63,14 +65,16 @@ public class WorkspaceController {
     )
     public String joinWorkspace(@RequestBody JoinWorkspaceRequest req) throws Exception {
         var workspace = workspaceMapper.findById(req.getWorkspaceId());
-        var user = Repo.userMap.get(req.getUserId());
+        var user = userMapper.findById(req.getUserId());
         if (workspace == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "workspace not found");
         }
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found");
         }
-        //TODO: avoid duplicate member
+        if (workspaceMapper.isMember(workspace.getId(), user.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already a member");
+        }
         Repo.addMemberToWorkspace(workspace.getId(), user.getId());
         var p = makeServerPush("infoChanged", new InfoChangedPush("workspace"));
         broadcastMessages(p);

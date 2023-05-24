@@ -3,28 +3,54 @@ package au.edu.sydney.comp5703.cs30.chat;
 import au.edu.sydney.comp5703.cs30.chat.entity.*;
 import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper;
 import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMemberMapper;
+import au.edu.sydney.comp5703.cs30.chat.mapper.FileMapper;
 import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.ibatis.binding.MapperProxy;
+
+@Component
 public class Repo {
-    @Autowired
     public static WorkspaceMapper workspaceMapper;
 
-    @Autowired
     public static ChannelMemberMapper channelMemberMapper;
 
-    @Autowired
     public static ChannelMapper channelMapper;
+
+    @Autowired
+    public ChannelMapper auChannelMapper;
+
+    @Autowired
+    public WorkspaceMapper auWorkspaceMapper;
+
+    @Autowired
+    public ChannelMemberMapper auChannelMemberMapper;
+
+    @Autowired
+    public FileMapper aufileMapper;
+
+    public static FileMapper fileMapper;
+
+    @PostConstruct
+    private void init() {
+        channelMapper = auChannelMapper;
+        workspaceMapper = auWorkspaceMapper;
+        channelMemberMapper = auChannelMemberMapper;
+        fileMapper = aufileMapper;
+        System.err.println("mappers: " + channelMapper + workspaceMapper + channelMemberMapper);
+    }
 
     // This is the in-memory repositories
     // public static Map<Long, Channel> channelMap0 = new ConcurrentHashMap<>();
 
     public static Map<Long, Message> messageMap = new ConcurrentHashMap<>();
 
-    public static Map<Long, User> userMap = new ConcurrentHashMap<>();
+    // public static Map<Long, User> userMap = new ConcurrentHashMap<>();
 
     // public static Map<Long, Workspace> workspaceMap = new ConcurrentHashMap<>();
 

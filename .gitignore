@@ -1,2 +1,7 @@
 __MACOSX
 .DS_Store
+.idea
+.vscode/
+*.iws
+*.iml
+*.ipr

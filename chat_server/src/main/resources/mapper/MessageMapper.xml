@@ -4,22 +4,50 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="au.edu.sydney.comp5703.cs30.chat.mapper.MessageMapper">
     <resultMap id="MessageMap" type="au.edu.sydney.comp5703.cs30.chat.entity.Message">
-        <id column="message_id" property="id"/>
+        <constructor>
+            <arg column="content" javaType="String" />
+            <arg column="channel_id" javaType="long" />
+            <arg column="sender_id" javaType="long" />
+        </constructor>
+        <id column="id" property="id"/>
         <result column="sender_id" property="senderId"/>
-        <result column="gmt_create" property="time"/>
+        <result column="gmt_create" property="timeCreated"/>
         <result column="content" property="content"/>
+        <result column="organization_id" property="organizationId"/>
         <result column="channel_id" property="channelId"/>
     </resultMap>
 
-    <insert id="insertMessage">
-        insert into message(
-            sender_id,channel_id,gmt_create,content
+    <insert id="insertMessage" parameterType="au.edu.sydney.comp5703.cs30.chat.entity.Message" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into chat_message (
+            content, channel_id, sender_id, organization_id
         ) values (
-                     #{id},#{senderId},#{channelId},#{time},#{content}
-                 )
+            #{content}, #{channelId}, #{senderId}, #{organizationId}
+        )
     </insert>
 
     <select id="findByChannel" resultMap="MessageMap">
-        select * from message where channel_id=#{channelId}
+        select * from chat_message where channel_id=#{channelId}
+    </select>
+
+    <select id="findById" resultMap="MessageMap">
+        select * from chat_message where id=#{messageId}
+    </select>
+
+    <select id="filterMessages" resultMap="MessageMap">
+        select
+            id, content, channel_id, sender_id, gmt_create, organization_id
+        from
+            chat_message
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="id != null">id = #{id}</if>
+            <if test="channelId != null">and channel_id = #{channelId}</if>
+            <if test="afterTime != null"> and gmt_create > #{afterTime}</if>
+            <if test="beforeTime != null"> and gmt_create &lt; #{beforeTime}</if>
+            <if test="notAfterTime != null">and gmt_create &lt;= #{notAfterTime}</if>
+            <if test="notBeforeTime != null">and gmt_create >= #{notBeforeTime}</if>
+            and not is_deleted
+        </trim>
+        order by gmt_create <if test="isDesc">desc</if>
+        limit #{offset}, #{count}
     </select>
 </mapper>

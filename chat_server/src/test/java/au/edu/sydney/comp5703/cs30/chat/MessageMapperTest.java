@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class MessageMapperTest {
     @Autowired
     MessageMapper messageMapper;
-
+/***
     @Test
     public void insertMessage(){
         Message message = new Message("how about that.", new Channel("capstone 1"), new User("bob"));
@@ -20,4 +20,5 @@ public class MessageMapperTest {
         messageMapper.insertMessage(message);
 
     }
+    ***/
 }

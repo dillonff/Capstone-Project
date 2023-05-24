@@ -16,8 +16,8 @@ public class Workspace {
     public long id;
     public String name;
 
-    // default workspace where everyone will be joined automatically
-    public static Workspace def;
+//    // removed, please look for 'default' workspace in the database
+//    public static Workspace def;
     @PostConstruct
     private void init() {
 
@@ -33,12 +33,16 @@ public class Workspace {
 
     @JsonProperty("memberIds")
     public List<Long> getMemberIds() {
-        return Repo.workspaceMapper.getMemberIds(id);
+        var ids = Repo.workspaceMapper.getMemberIds(id);
+        System.err.println(ids);
+        return ids;
     }
 
     @JsonProperty("channelIds")
     public List<Long> getChannelIds() {
-        return Repo.channelMapper.findIdByWorkspaceId(id);
+        var ids = Repo.channelMapper.findIdByWorkspaceId(id);
+        System.err.println(ids);
+        return ids;
     }
 
     public long getId() {

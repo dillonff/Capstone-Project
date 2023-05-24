@@ -1,37 +1,40 @@
 package au.edu.sydney.comp5703.cs30.chat.entity;
 
-import java.util.Date;
+import au.edu.sydney.comp5703.cs30.chat.Repo;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.time.Instant;
+import java.util.List;
 
 public class Message {
-    private long id;
+    private Long id;
     private String content;
-    private Date time;
-    private Channel channel;
+    private Long channelId;
+    private Long senderId;
+    private Long organizationId;
 
-    private long channelId;
-    private User sender;
-    private long senderId;
+    private Instant timeCreated;
 
-    private static SeqIdGen idGen = new SeqIdGen();
-    public long getNextId() {
-        return idGen.getNextId();
+    public Message(String content, Long channelId, Long senderId) {
+        this.content = content;
+        this.channelId = channelId;
+        this.senderId = senderId;
+        this.organizationId = 0L;
     }
 
-    public Message(String content, Channel channel, User sender) {
-        this.id = getNextId();
-        this.content = content;
-        this.channel = channel;
-        this.channelId = channel.getId();
-        this.sender = sender;
-        this.senderId = sender.getId();
-        this.time = new Date();
+    @JsonProperty("files")
+    public List<File> getFiles() {
+        System.err.println("getting file for " + id);
+        var res = Repo.fileMapper.filter(null, null, id, null);
+        System.out.println(res);
+        return res;
     }
 
     public long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -43,29 +46,6 @@ public class Message {
         this.content = content;
     }
 
-    public Date getTime() {
-        return time;
-    }
-
-    public void setTime(Date time) {
-        this.time = time;
-    }
-
-    public Channel getChannel() {
-        return channel;
-    }
-
-    public void setChannel(Channel channel) {
-        this.channel = channel;
-    }
-
-    public User getSender() {
-        return sender;
-    }
-
-    public void setSender(User sender) {
-        this.sender = sender;
-    }
     public long getSenderId(){
         return senderId;
     }
@@ -79,5 +59,21 @@ public class Message {
 
     public void setChannelId(long channelId) {
         this.channelId = channelId;
+    }
+
+    public Instant getTimeCreated() {
+        return timeCreated;
+    }
+
+    public void setTimeCreated(Instant timeCreated) {
+        this.timeCreated = timeCreated;
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 }
