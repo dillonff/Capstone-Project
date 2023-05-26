@@ -342,7 +342,7 @@ body {
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
   font-weight: bold;
-  margin-right: 16px;
+  /*margin-right: 16px;*/
   cursor: pointer;
   z-index: 2;
 }
@@ -445,7 +445,7 @@ body {
   display: flex;
   flex-direction: column;
   background: #1e2b55;
-  width: 350px;
+  width: 300px;
 }
 
 .icon1__inner {

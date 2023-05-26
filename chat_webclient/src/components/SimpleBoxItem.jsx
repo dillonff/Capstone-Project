@@ -7,7 +7,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 function SimpleBoxItem(props) {
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -30,20 +30,32 @@ function SimpleBoxItem(props) {
           key={props.key}
           onClick={props.onClick}
       >
-        <div>
-          <div>
+        <div style={{width:"110px"}}>
+          <div style={{width:"110px"}}>
             <TagIcon className="sidebar__icon" />
             {props.title}
           </div>
-          <div>
+          <div style={{width:"110px"}}>
             <GroupIcon className="sidebar__icon" />
             {props.text}
           </div>
         </div>
+          <IconButton
+              className="workspace__icon-button workspace__wrapper__selected"
+              onClick={handleClick}
+              style={{ color: 'grey',marginLeft:'15px',marginBottom:'25px', height:'60px'}}
+          >
+              <PushPinIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+          <div style={{width:"60px"}}>
+              <div style={{width:"60px", color:'grey', marginLeft:'120px', marginBottom:'38px'}}>
+                  <FiberManualRecordIcon sx={{ fontSize: 14 }}/>
+              </div>
+          </div>
         <IconButton
             className="workspace__icon-button workspace__wrapper__selected"
             onClick={handleClick}
-            style={{ color: 'white', marginLeft: '155px', marginBottom: '8px' }}
+            style={{ color: 'white', marginLeft:'auto' , height:'60px'}}
         >
           <MoreHorizIcon />
         </IconButton>
