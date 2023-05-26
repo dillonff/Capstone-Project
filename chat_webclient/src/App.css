@@ -408,23 +408,6 @@ body {
   text-overflow: ellipsis;
 }
 
-.workspace__icon-button {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.workspace__wrapper--channel:hover .workspace__icon-button {
-  opacity: 1;
-}
-
-.workspace__wrapper__selected .workspace__icon-button {
-  opacity: 1;
-}
-
 .channel-list__container {
   display: flex;
   /* height: 800px; */
