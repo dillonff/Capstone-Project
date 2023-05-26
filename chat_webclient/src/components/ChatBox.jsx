@@ -230,24 +230,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
             >
                 <UploadFileIcon/>
             </IconButton>
-            <IconButton
-                color="neutral"
-                variant="outlined"
-                style={{
-                    marginTop:'5px',
-                }}
-            >
-                <HistoryIcon/>
-            </IconButton>
-            <IconButton
-                color="neutral"
-                variant="outlined"
-                style={{
-                    marginTop:'5px',
-                }}
-            >
-                <AddTaskOutlinedIcon/>
-            </IconButton>
+            
 
             <Button
                 color="neutral"
