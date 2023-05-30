@@ -12,8 +12,9 @@ import SendIcon from '@mui/icons-material/Send';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import HistoryIcon from '@mui/icons-material/History';
-import AddTaskOutlinedIcon from '@mui/icons-material/AddTaskOutlined';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+
 
 import { callApi } from '../api';
 
@@ -31,8 +32,18 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
   const [scroll, setScroll] = React.useState(-1);
   const [text, setText] = React.useState('');
   const [emojiAnchor, setEmojiAnchor] = React.useState(null);
+  const [alternateEmailAnchor, setAlternateEmailAnchor] = React.useState(null);
 
-  const checkScroll = (_) => {
+    const handleAlternateEmailClick = (event) => {
+        setAlternateEmailAnchor(event.currentTarget);
+    };
+
+    const handleAlternateEmailClose = () => {
+        setAlternateEmailAnchor(null);
+    };
+
+
+    const checkScroll = (_) => {
     // check if we are at the bottom of the message list
     // if that's true, then we scroll down to the newest message
     const elem = msgListRef.current;
@@ -221,6 +232,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
               style={{
                 marginTop: '5px',
               }}
+              onClick={handleAlternateEmailClick}
             >
               <AlternateEmailIcon />
             </IconButton>
@@ -250,6 +262,25 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
             >
               <SendIcon />
             </Button>
+              <Menu
+                  anchorEl={alternateEmailAnchor}
+                  open={Boolean(alternateEmailAnchor)}
+                  onClose={handleAlternateEmailClose}
+                  anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'left',
+                  }}
+              >
+                  <MenuItem  onClick={handleAlternateEmailClose}> 111 </MenuItem>
+                  <MenuItem  onClick={handleAlternateEmailClose}> 22222 </MenuItem>
+                  <MenuItem  onClick={handleAlternateEmailClose}> 3333 </MenuItem>
+                  <MenuItem  onClick={handleAlternateEmailClose}> 4 </MenuItem>
+              </Menu>
+
           </div>
         </div>
       </div>
