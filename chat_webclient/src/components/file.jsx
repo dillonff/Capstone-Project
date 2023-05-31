@@ -282,7 +282,8 @@ async function getUser(id, auth, refresh = false) {
         <td>{file.timeCreated}</td>
         <td>
         {new Date(file.timeCreated).getTime()+(90*24*60*60*1000) > new Date().getTime()?
-        <button  href={"http://127.0.0.1:11451/api/v1/files/" + file.id + "/" + encodeURIComponent(file.filename)}>Download</button>:
+       // <button  href={"http://127.0.0.1:11451/api/v1/files/" + file.id + "/" + encodeURIComponent(file.filename)}>Download</button>
+       <a target="_blank" href={"http://127.0.0.1:11451/api/v1/files/" + file.id + "/" + encodeURIComponent(file.filename)}>Download</a>:
         <span></span>}
         </td>
       </tr>

@@ -13,6 +13,7 @@
         <result column="phone" property="phone"></result>
         <result column="email" property="email"></result>
         <result column="password" property="password"></result>
+        <result column="phone" property="phone"></result>
     </resultMap>
 
     <insert id="insertUser" useGeneratedKeys="true" keyProperty="id" keyColumn="id">

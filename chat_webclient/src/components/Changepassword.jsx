@@ -8,7 +8,7 @@ import CardContent from '@mui/material/CardContent';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import md5 from 'js-md5';
-
+import {updateUser} from '../api'
 
 // Redux Imports
 // import { useSelector, useDispatch } from 'react-redux'
@@ -36,12 +36,14 @@ export default function Edit() {
   const updatePassword = (e) => {
   prohibitRefresh(e)
   const data = new FormData(e.currentTarget);
+  
     const id = Number(data.get('id'));
     const newpassword = data.get('newpassword').toString();
     const newpassword2 = data.get('newpassword2').toString();
-    const useroldpassword=user.password;
+    const userInfo = JSON.parse(localStorage.getItem("userInfo")); //登录的账号
+    const useroldpassword=userInfo.password.toString().replace(/\s*/g,"");
     const encryptedPassword=md5(data.get('oldpassword').toString());
-    if(useroldpassword!==encryptedPassword){
+    if(useroldpassword !== encryptedPassword){
         alert("Old password is wrong!")
         return
     }
@@ -51,27 +53,36 @@ export default function Edit() {
       }
       else{
         const password=md5(newpassword);
-        fetch('http://localhost:8080/updatePassword', {
-            method: "POST",
-            headers: {
-              "Content-type": "application/json"
-            },
-            body: JSON.stringify({
-              "id": id,
-              "Name": null,
-              "email": null,
-              "password": password,
-              "birthday": null,
-              "mobileNumber": null
-            })
-          })
-            .then(response => response.json())
-            .then(data => {
-                alert("Change success!");
-          window.location = "/profile?id=" + id
-              // window.location.href()
-            }
-            )
+console.log(password);
+        const obj={
+id :userInfo.id,
+username:userInfo.username,
+oldPassword:userInfo.password,
+newPassword:password
+        };
+        updateUser(obj)
+
+      //   fetch('http://localhost:8080/updatePassword', {
+      //       method: "POST",
+      //       headers: {
+      //         "Content-type": "application/json"
+      //       },
+      //       body: JSON.stringify({
+      //         "id": id,
+      //         "Name": null,
+      //         "email": null,
+      //         "password": password,
+      //         "birthday": null,
+      //         "mobileNumber": null
+      //       })
+      //     })
+      //       .then(response => response.json())
+      //       .then(data => {
+      //           alert("Change success!");
+      //     window.location = "/profile?id=" + id
+      //         // window.location.href()
+      //       }
+      //       )
         }
     }
 

@@ -10,6 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Objects;
+
 @Service
 public class UserServiceImpl implements IUserService {
     private UserMapper userMapper;
@@ -56,11 +58,11 @@ public class UserServiceImpl implements IUserService {
         }
 
 
-        if (!encoder.matches(oldPassword, result.getPassword())) {
+        if (!Objects.equals(oldPassword, result.getPassword())) {
             throw new PasswordErrorException("Wrong password.");
         }
-        newHashedPass = encoder.encode(newPassword);
-        Integer rows = userMapper.updatePassById(id, newHashedPass);
+//        newHashedPass = encoder.encode(newPassword);
+        Integer rows = userMapper.updatePassById(id, newPassword);
 
         if (rows != 1) {
             throw new UpdateException("Unknown exception for information updating.");
