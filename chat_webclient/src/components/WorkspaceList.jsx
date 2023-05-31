@@ -1,4 +1,3 @@
-import SimpleBoxItem from './SimpleBoxItem';
 
 import {
   nullWorkspace,
@@ -6,6 +5,7 @@ import {
   createWorkspace, auth
 } from '../api.js';
 import React from "react";
+import WorkspaceListItem from './WorkspaceListItem.jsx';
 
 const WorkspaceList = ({ workspaces, selectedWorkspace, onWorkspaceClick, organization }) => {
   //return <div></div>
@@ -27,7 +27,7 @@ const WorkspaceList = ({ workspaces, selectedWorkspace, onWorkspaceClick, organi
     const clickCb = () => {
       onWorkspaceClick(workspace);
     };
-    let elem = <SimpleBoxItem classNamePrefix="workspace"
+    let elem = <WorkspaceListItem classNamePrefix="workspace"
       title={workspace.name}
       text={workspace.members.length + ' people'}
       key={i}

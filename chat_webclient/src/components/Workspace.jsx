@@ -116,6 +116,7 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
       if (workspace.id === -1) return;
       let cb = Event.getDefaultCallback();
       cb.onInfoChanged = (data) => {
+        console.error("workspace: check channel change", data);
         if (data.infoType.startsWith('channel')) {
           getAndUpdateChannels();
         }

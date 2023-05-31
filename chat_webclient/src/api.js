@@ -182,6 +182,15 @@ export const createChannel = (wid, name, publicChannel, peerMemberType, peerMemb
   return callApiJsonChecked('/channels', 'POST', req);
 }
 
+export const handleChannelPin = (channel, pin) => {
+  if (pin) {
+    pin = 'pin';
+  } else {
+    pin = 'unpin';
+  }
+  return callApiJsonChecked(`/channels/${channel.id}/${pin}`, 'PUT');
+}
+
 export const createWorkspace = (name) => {
   let req = {
     name: name,
