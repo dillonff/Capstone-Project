@@ -31,20 +31,6 @@ public class Workspace {
         this.name = name;
     }
 
-    @JsonProperty("memberIds")
-    public List<Long> getMemberIds() {
-        var ids = Repo.workspaceMapper.getMemberIds(id);
-        System.err.println(ids);
-        return ids;
-    }
-
-    @JsonProperty("channelIds")
-    public List<Long> getChannelIds() {
-        var ids = Repo.channelMapper.findIdByWorkspaceId(id);
-        System.err.println(ids);
-        return ids;
-    }
-
     public long getId() {
         return id;
     }

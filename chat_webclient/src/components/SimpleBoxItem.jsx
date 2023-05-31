@@ -13,7 +13,7 @@ function SimpleBoxItem(props) {
       key={props.key}
       onClick={props.onClick}
     >
-      <div>
+      <div style={{}}>
         <div>
           <TagIcon className="sidebar__icon" />
           {props.title}

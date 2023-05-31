@@ -50,16 +50,36 @@
         where id=#{id}
     </update>
 
-    <update id="updateInfoByUid">
-        update user
-        set
-        <if test="email!=null">email = #{email},</if>
-        <if test="phobe!=null">phone = #{phone},</if>
-        <if test="username!=null">username = #{username},</if>
-        where id=#{id}
-    </update>
+    <select id="findByEmail" resultMap="UserEntityMap">
+        SELECT
+            *
+        FROM
+            chat_user
+        WHERE
+            email = #{email} and not is_deleted
+    </select>
 
-
+    <select id="filter" resultMap="UserEntityMap">
+        select
+            cu.*
+        from
+            chat_user cu
+        <if test="workspaceId != null">
+            join chat_workspace_member cwm on (cwm.type = 0 and cwm.member_id = cu.id)
+        </if>
+        <if test="channelId != null">
+            join chat_channel_member ccm on (ccm.user_id = cu.id)
+        </if>
+        <if test="organizationId != null">
+            join chat_organization_member com on (com.user_id = cu.id)
+        </if>
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="workspaceId != null">cwm.workspace_id = #{workspaceId}</if>
+            <if test="channelId != null">and ccm.channel_id = #{channelId}</if>
+            <if test="organizationId != null">and com.organization_id = #{organizationId}</if>
+            and not cu.is_deleted
+        </trim>
+    </select>
 
 
 </mapper>

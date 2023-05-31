@@ -35,18 +35,36 @@
         select * from chat_channel where workspace_id = #{workspaceId} and name = #{name} and not is_deleted
     </select>
 
-    <select id="findIdByWorkspaceId" resultType="long">
-        select id from chat_channel where workspace_id = #{workspaceId} and not is_deleted
+    <select id="findPublicByWorkspaceId" resultMap="ChannelMap">
+        select * from chat_channel where workspace_id = #{workspaceId} and is_public and not is_deleted
     </select>
 
-    <select id="findByWorkspaceAndMember" resultMap="ChannelMap">
+    <select id="findPrivateByWorkspaceAndMember" resultMap="ChannelMap">
         select
-            *
+            cc.*
         from
-            chat_channel
+            chat_channel cc join chat_channel_member ccm on (ccm.channel_id = cc.id and not ccm.is_deleted)
         where
-            workspace_id = #{workspaceId} and
-            (select count(*) from chat_channel_member where channel_id = chat_channel.id and user_id = #{userId}) and
-            not is_deleted
+            workspace_id = #{workspaceId}
+            and ccm.user_id = #{userId}
+            and not cc.is_public
+            and not cc.is_deleted
+    </select>
+
+    <select id="findDirectMessageChannels" resultMap="ChannelMap">
+        select
+            cc.*
+        from
+            chat_channel cc join
+            <choose>
+                <when test="type == 0">
+                    chat_channel_member ccm on (cc.id = ccm.channel_id and not ccm.is_deleted)
+                    where ccm.user_id = #{memberId} and cc.is_direct_message and not cc.is_deleted
+                </when>
+                <when test="type = 1">
+                    chat_channel_organization cco on (cc.id = cco.channel_id and not cco.is_deleted)
+                    where cco.organization_id = #{memberId} and cc.is_direct_message and not cc.is_deleted
+                </when>
+            </choose>
     </select>
 </mapper>

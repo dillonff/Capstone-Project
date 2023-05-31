@@ -1,14 +1,24 @@
 package au.edu.sydney.comp5703.cs30.chat.model;
 
 public class JoinWorkspaceRequest {
-    private long workspaceId = -1;
-    private long userId = -1;
+    private Long workspaceId;
+    private Long memberId;
+    private int type;
+    private String email;
 
-    public long getWorkspaceId() {
+    public Long getWorkspaceId() {
         return workspaceId;
     }
 
-    public long getUserId() {
-        return userId;
+    public Long getMemberId() {
+        return memberId;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }

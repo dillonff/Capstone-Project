@@ -22,7 +22,13 @@ import {
   nullWorkspace,
   getOrg,
   getOrgs,
-  nullOrganization
+  nullOrganization,
+  getUser,
+  getMembersInfo,
+  getWorkspaceMembers,
+  processWorkspaceMembers,
+  getChannelMembers,
+  processChannelMembers
 } from '../api.js';
 
 import ChannelList from './ChannelList.jsx';
@@ -30,6 +36,8 @@ import Channel from './Channel';
 import CreateOrganization from './CreateOrganization';
 import Event from '../event';
 import UserAvatar from './UserAvatar';
+import { useMountedEffect } from '../util.js';
+import { DirectMessageList } from './DirectMessageList.jsx';
 
 const WorkspaceDropdown = ({ workspace }) => {
   return;
@@ -39,8 +47,6 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
   const workspace = initialWorkspace;
   let [channels, setChannels] = React.useState([]);
   const [currentChannelId, setCurrentChannelId] = React.useState(-1);
-  let [members, setMembers] = React.useState([]);
-  let addUserIdToWorkspaceRef = React.useRef();
 
   let currentChannel = nullChannel;
   if (currentChannelId !== -1) {
@@ -56,22 +62,6 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
     getAndUpdateChannels();
   }, []);
 
-  const getMembersInfo = async (memberIds) => {
-    const members = [];
-    for (const id of memberIds) {
-      let res = await callApi('/users/' + id, 'GET');
-      if (res.ok) {
-        res = await res.json();
-        members.push(res);
-      } else {
-        console.error(res);
-        alert('Cannot get member info');
-        break;
-      }
-    }
-    return members;
-  };
-
   const getAndUpdateChannels = async (_) => {
     let newChannels = channels;
     try {
@@ -81,15 +71,44 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
       alert(e);
     }
     for (const channel of newChannels) {
-      if (channel.id === currentChannel.id) {
-        setCurrentChannelId(channel.id);
-      }
       if (currentChannel.id === -1 && channel.name === 'general') {
         setCurrentChannelId(channel.id);
       }
     }
     setChannels(newChannels);
   };
+
+  React.useEffect(_ => {
+    let channelToGetMember = null;
+    for (const c of channels) {
+      if (!c.members) {
+        channelToGetMember = c;
+        break;
+      }
+    }
+    if (channelToGetMember) {
+      (async () => {
+        let members = await getChannelMembers(channelToGetMember.id);
+        await processChannelMembers(members);
+        setChannels(oldChannels => {
+          let newChannels = [];
+          let changed = false;
+          for (const c of oldChannels) {
+            if (c === channelToGetMember) {
+              newChannels.push({...c, members: members});
+              changed = true;
+            } else {
+              newChannels.push(c);
+            }
+          }
+          if (changed) {
+            return newChannels;
+          }
+          return oldChannels;
+        });
+      }) ();
+    }
+  }, [channels]);
 
   React.useEffect(
     (_) => {
@@ -106,16 +125,6 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
       };
     },
     [workspace, currentChannel]
-  );
-
-  React.useEffect(
-    (_) => {
-      if (workspace.id === -1) return;
-      getMembersInfo(workspace.memberIds).then((ms) => {
-        setMembers(ms);
-      });
-    },
-    [workspace]
   );
 
   const onAddUserClick = (_) => {
@@ -137,42 +146,12 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
   const onCreateChannelClick = (_) => {
     let name = prompt('channel name');
     if (name) {
-      createChannel(workspace.id, name).catch((e) => {
+      createChannel(workspace.id, name, false).catch((e) => {
         console.error(e);
         alert(e);
       });
     }
   };
-
-  const switchToDm = (peerUser) => {
-    for (const channel of channels) {
-      if (!channel.directMessage) continue;
-      const ids = channel.memberIds;
-      if (ids.indexOf(auth.user.id) != -1 && ids.indexOf(peerUser.id) != -1) {
-        setCurrentChannelId(channel.id);
-        return;
-      }
-    }
-    // create DM channel
-    createChannel(
-      workspace.id,
-      `DM-${auth.user.id}-${peerUser.id}`,
-      peerUser.id
-    ).then((res) => {
-      return callApi('/channels/' + res.channelId)
-        .then((res) => {
-          if (res.ok) {
-            return res.json();
-          }
-          throw new Error('Cannot get channel for DM');
-        })
-        .then((res) => {
-          setCurrentChannelId(res.id);
-        });
-    });
-  };
-
-  const [openCreateOrganization, setOpenCreateOrganization] = React.useState(false);
 
   return (
     <div style={{ display: 'flex', height: '100%', flexShrink: '0' }}>
@@ -203,7 +182,6 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
             </Dropdown.Item>
             <Dropdown.Item
               onClick={(_) => {
-                console.log('TODO: Select Workspace');
                 setSelectedWorkspace(nullWorkspace);
               }}
             >
@@ -237,8 +215,7 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
         </div>
         <hr />
 
-        <h4>Channels</h4>
-        <hr />
+        <h5>Channels</h5>
         <ChannelList
           channels={channels}
           selectedChannel={currentChannel}
@@ -248,24 +225,14 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
         <hr />
 
         {/**workspace members */}
-        <h4>Direct Messages</h4>
+        <DirectMessageList
+          channels={channels}
+          onDmSelected={c => setCurrentChannelId(c.id)}
+          currentChannelId={currentChannelId}
+          workspace={workspace}
+        />
         <hr />
-        <div>
-          {members.map((m) => {
-            return (
-              <div
-                tabIndex="0"
-                className="dmuser__wrapper"
-                onClick={(_) => {
-                  switchToDm(m);
-                }}
-              >
-                <UserAvatar username={m.username} />
-                {m.username}
-              </div>
-            );
-          })}
-        </div>
+        
       </div>
 
       {/** channel component */}

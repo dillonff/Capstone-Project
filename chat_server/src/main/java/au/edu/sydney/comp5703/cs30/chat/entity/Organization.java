@@ -1,5 +1,12 @@
 package au.edu.sydney.comp5703.cs30.chat.entity;
 
+import au.edu.sydney.comp5703.cs30.chat.Repo;
+import au.edu.sydney.comp5703.cs30.chat.mapper.OrganizationMemberMapper;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.web.context.ContextLoader;
+
+import java.util.List;
+
 public class Organization {
     private Long id;
     private String name;
@@ -12,6 +19,12 @@ public class Organization {
         this.fullName = fullName;
         this.description = description;
         this.email = email;
+    }
+
+    @JsonProperty("members")
+    public List<OrganizationMember> getMembers() {
+        var mapper = Repo.organizationMemberMapper;
+        return mapper.findByOrgId(id);
     }
 
     public Long getId() {

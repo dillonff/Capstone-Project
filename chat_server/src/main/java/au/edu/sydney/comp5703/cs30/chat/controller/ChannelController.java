@@ -4,8 +4,10 @@ import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.Util;
 import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
 import au.edu.sydney.comp5703.cs30.chat.entity.ChannelMember;
+import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import au.edu.sydney.comp5703.cs30.chat.mapper.*;
 import au.edu.sydney.comp5703.cs30.chat.model.*;
+import au.edu.sydney.comp5703.cs30.chat.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,8 +16,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.LinkedList;
-import java.util.Objects;
+import java.util.*;
 
 import static au.edu.sydney.comp5703.cs30.chat.Repo.*;
 import static au.edu.sydney.comp5703.cs30.chat.WsUtil.broadcastMessages;
@@ -31,11 +32,13 @@ public class ChannelController {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private ChannelService channelService;
 
     @RequestMapping(
             value = "/api/v1/channels", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
-    public CreateChannelResponse handleCreateChannel(@RequestBody CreateChannelRequest req, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
+    public Channel handleCreateChannel(@RequestBody CreateChannelRequest req, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
         // this is a simple workaround to know the calling user
         var user = userMapper.findById(auth);
         if (user == null) {
@@ -46,25 +49,26 @@ public class ChannelController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "workspace not found");
         }
         Channel channel;
-        if (req.getPeerUserId() == null) {
-            channel = Util.createChannel(workspace.getId(), req.getName());
+        if (req.getPeerMemberId() == null) {
+            channel = channelService.createChannel(workspace.getId(), req.getName(), req.isPublicChannel());
+            channelService.addMemberToChannel(channel.getId(), user.getId());
         } else {
-            var peerUser = userMapper.findById(req.getPeerUserId());
-            if (peerUser == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "peer user " + req.getPeerUserId() + " not found");
+            if (req.getPeerMemberType() != 0 && req.getPeerMemberType() != 1) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "peerMemberType must be 0 (user) or 1 (org)");
             }
-            channel = Util.createChannel(workspace.getId(), req.getName(), req.getPeerUserId());
-        }
-        if (user.getId() != req.getPeerUserId()) {
-            addMemberToChannel(channel.getId(), user.getId());
+            try {
+                channel = channelService.createDirectMessageChannel(workspace.getId(), user, req.getName(), req.getPeerMemberType(), req.getPeerMemberId());
+            } catch (ChannelService.ChannelServiceException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+            }
         }
 
         // tell all the clients that the channel info has changed
         var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
         broadcastMessages(p);
 
-        var result = new CreateChannelResponse(channel.getId());
-        return result;
+        channel = channelMapper.findById(channel.getId());
+        return channel;
     }
 
     @RequestMapping(
@@ -78,7 +82,7 @@ public class ChannelController {
         if (member != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already a member");
         }
-        addMemberToChannel(channel.getId(), user.getId());
+        channelService.addMemberToChannel(channel.getId(), user.getId());
 
         var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
         broadcastMessages(p);
@@ -89,15 +93,19 @@ public class ChannelController {
     @RequestMapping(
             value = "/api/v1/channels", produces = "application/json", method = RequestMethod.GET
     )
-    public GetChannelsResponse handleGetChannels(@RequestParam Long workspaceId, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
+    public List<Channel> handleGetChannels(@RequestParam Long workspaceId, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
         var user = userMapper.findById(auth);
-        var channelIds = new LinkedList<Long>();
-        var channels = channelMapper.findByWorkspaceAndMember(workspaceId, user.getId());
+        var privateChannels = channelMapper.findPrivateByWorkspaceAndMember(workspaceId, user.getId());
+        var publicChannels = channelMapper.findPublicByWorkspaceId(workspaceId);
+        // TODO: include channels that the user's org is a member of
+        var channels = new LinkedList<Channel>();
+        var idSet = new HashSet<Long>();
+        addChannelUnique(channels, idSet, privateChannels);
+        addChannelUnique(channels, idSet, publicChannels);
         channels.forEach(channel -> {
-            channelIds.add(channel.getId());
+            channelPostProcess(channel, user);
         });
-        var result = new GetChannelsResponse(channelIds);
-        return result;
+        return channels;
     }
 
     @RequestMapping(
@@ -113,6 +121,7 @@ public class ChannelController {
         if (channel == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "");
         }
+        channelPostProcess(channel, user);
         return  channel;
     }
 
@@ -133,6 +142,29 @@ public class ChannelController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "channel member not found");
         }
         return  channelMember;
+    }
+
+    // This returns both ChannelMember and ChannelOrganization
+    @RequestMapping(
+            value = "/api/v1/channels/{channelId}/members", produces = "application/json", method = RequestMethod.GET
+    )
+    public List<Object> handleGetChannelMembers(@PathVariable long channelId,
+                                                       @CurrentSecurityContext SecurityContext sc,
+                                                       @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
+        var user = userMapper.findById(auth);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "user not authenticated");
+        }
+        var channel = channelMapper.findById(channelId);
+        if (channel == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "channel not found");
+        }
+        var members = new LinkedList<>();
+        var channelMembers = channelMemberMapper.getChannelMembers(channelId, null);
+        members.addAll(channelMembers);
+        var channelOrganizations = channelOrganizationMapper.findByChannelId(channelId);
+        members.addAll(channelOrganizations);
+        return members;
     }
 
 
@@ -194,8 +226,25 @@ public class ChannelController {
 
     }
 
+    // set some derived attrs of channels, such as callerIsMember and dmPeerMembers
+    private void channelPostProcess(Channel channel, User callingUser) {
+        if (callingUser != null) {
+            var isMember = channelService.userIsMember(channel, callingUser.getId());;
+            channel.setCallerIsMember(isMember);
+        }
+        if (channel.isDirectMessage()) {
+            channel.setDmPeerMembers(channelService.getDirectMessagePeerMembers(channel, callingUser));
+        }
+    }
 
-
+    private void addChannelUnique(List<Channel> channels, Set<Long> idSet, List<Channel> target) {
+        for (var c : target) {
+            if (!idSet.contains(c.getId())) {
+                idSet.add(c.getId());
+                channels.add(c);
+            }
+        }
+    }
 }
 
 

@@ -18,12 +18,15 @@ import {
   getUser,
   auth,
   nullOrganization,
-  getOrg
+  getOrg,
+  getChannelMembers,
+  processChannelMembers
 } from '../api.js';
 import Event from '../event.js';
 import {
-  findById
+  findById, getDmName, useMountedEffect
 } from '../util';
+import UserAvatar from './UserAvatar';
 
 function Channel({
   workspace,
@@ -36,15 +39,18 @@ function Channel({
   const [organizationId] = React.useContext(OrganizationIdContext);
   const [organizations] = React.useContext(OrganizationsContext);
   const organization = findById(organizationId, organizations, nullOrganization);
+  const [members, setMembers] = React.useState([]);
+  const membersVersion = React.useRef(0);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   // get messages when the component is mounted
-  React.useEffect(_ => {
+  useMountedEffect(getMounted => {
+    setMessages([]);
     if (channel.id === -1)
       return;
     getMessages(channel.id).then(res => {
-      setMessages(res);
+      getMounted && setMessages(res);
     }).catch(e => {
       console.error(e);
       alert(e);
@@ -59,46 +65,40 @@ function Channel({
       }
       console.log('new message arrived');
       console.log(data);
-      let newMessages = [...messages, data];
-      setMessages(newMessages);
+      setMessages(messages => [...messages, data]);
     }
     Event.addListener(cb);
     return _ => {
       Event.removeListener(cb);
     }
-  }, [messages, channel]);
+  }, [channel]);
 
-  const [dmName, setDmName] = React.useState('');
-  React.useEffect(_ => {
-    let mounted = true;
-    const peerIds = channel.memberIds.filter(i => i !== auth.user.id);
-    if (peerIds.length === 0) {
-      peerIds.push(auth.user.id);
+  const updateMembers = async getMounted => {
+    membersVersion.current++;
+    const expectedVersion = membersVersion.current;
+    let res = await getChannelMembers(channel.id);
+    await processChannelMembers(res);
+    if (expectedVersion === membersVersion.current && getMounted()) {
+      setMembers(res);
     }
-    (async _ => {
-      const names = [];
-      for (const i of peerIds) {
-        let u = await getUser(i);
-        names.push(u.username);
-        if (names.length > 3) {
-          names.push('...');
-          break;
-        }
-      }
-      if (mounted) {
-        setDmName(names.join(', '));
-      }
-    }) ();
-    return _ => {mounted = false;}
+  }
+
+  useMountedEffect(getMounted => {
+    setMembers([]);
+    if (channel.id === -1)
+      return;
+    updateMembers(getMounted);
   }, [channel])
+
   let name = channel.name;
   if (channel.directMessage) {
-    name = dmName ? dmName : "Direct Message";
+    name = getDmName(channel);
   }
 
   return <div style={{display: 'flex', flexDirection: 'column', height: '100%', width: '100%', padding: '10px', boxSizing: 'border-box', backgroundColor: 'white', color: 'black'}}>
     {/* title */}
-    <h3>#{channel.id} {name}</h3>
+    {!channel.directMessage && <h3>#{channel.id} {name}</h3>}
+    {channel.directMessage && <h3 style={{display: 'flex'}}><UserAvatar username={name} />({channel.id}) {name}</h3>}
 
     <div style={{ display: 'flex' }}>
       {/* <input
@@ -133,8 +133,8 @@ function Channel({
         <Modal.Body>
           <ChannelMember
             channel={channel}
-            workspaceMemberIds={workspace.memberIds}
-            channelMemberIds={channel.memberIds}
+            workspaceMembers={workspace.members || []}
+            channelMembers={members}
           />
         </Modal.Body>
         <Modal.Footer>

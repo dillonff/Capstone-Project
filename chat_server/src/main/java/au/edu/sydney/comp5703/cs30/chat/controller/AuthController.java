@@ -48,7 +48,7 @@ public class AuthController {
             user = new User(req.getUserName());
             userMapper.insertUser(user);
             // add the user to default workspace and general channel
-            Repo.addMemberToWorkspace(defaultWorkspace.getId(), user.getId());
+            Repo.addMemberToWorkspace(defaultWorkspace.getId(), 0, user.getId());
             var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
             broadcastMessages(p);
             p = makeServerPush("infoChanged", new InfoChangedPush("workspace"));

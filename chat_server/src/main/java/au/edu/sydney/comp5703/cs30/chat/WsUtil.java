@@ -29,7 +29,7 @@ public class WsUtil {
     }
 
     public static void broadcastMessagesToChannel(String payload, Channel channel) throws Exception {
-        var members = Repo.channelMemberMapper.getChannelMembers(channel.getId());
+        var members = Repo.channelMemberMapper.getChannelMembers(channel.getId(), null);
         for (var m : members) {
             var sessions = ClientSession.getByUserId(m.getUserId());
             if (sessions == null) {

@@ -23,5 +23,17 @@
         )
     </insert>
 
+    <select id="filter" resultMap="WorkspaceOrganizationMap">
+        select
+            *
+        from
+            chat_workspace_organization
+        <trim prefix="where" prefixOverrides="and">
+            <if test="organizationId != null">organization_id = #{organizationId}</if>
+            <if test="workspaceId != null">and workspace_id = #{workspaceId} </if>
+            and not is_deleted
+        </trim>
+    </select>
+
 
 </mapper>

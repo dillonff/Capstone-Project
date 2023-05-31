@@ -1,6 +1,7 @@
 package au.edu.sydney.comp5703.cs30.chat;
 
 import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
+import au.edu.sydney.comp5703.cs30.chat.entity.ChannelOrganization;
 import au.edu.sydney.comp5703.cs30.chat.entity.Workspace;
 import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper;
 import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper;
@@ -36,23 +37,11 @@ public class Util {
     public static Workspace createWorkspace(String name) {
         var workspace = new Workspace(name);
         workspaceMapper.insertWorkspace(workspace);
-        var defaultChannel = createChannel(workspace.getId(), "general");
+        var general = new Channel("general", workspace.getId(), true);
+        channelMapper.insertChannel(general);
         return workspace;
     }
 
-    public static Channel createChannel(long workspaceId, String name) {
-        var channel = new Channel(name, workspaceId, false);
-        channelMapper.insertChannel(channel);
-        return channelMapper.findById(channel.getId());
-    }
-
-    public static Channel createChannel(long workspaceId, String name, long peerUserId) {
-        var channel = new Channel(name, workspaceId, false);
-        channel.setDirectMessage(true);
-        channelMapper.insertChannel(channel);
-        addMemberToChannel(channel.getId(), peerUserId);
-        return channelMapper.findById(channel.getId());
-    }
 
     public static Channel getChannelForName(long workspaceId, String channelName) {
         var channels = channelMapper.findByWorkspaceAndName(workspaceId, channelName);

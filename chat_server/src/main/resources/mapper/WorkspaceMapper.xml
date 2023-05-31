@@ -24,7 +24,7 @@
     </select>
 
     <select id="findByMemberId" resultMap="WorkspaceMap">
-        select * from chat_workspace where id in (select workspace_id from chat_workspace_member where user_id = #{memberId}) and not is_deleted
+        select * from chat_workspace where id in (select workspace_id from chat_workspace_member where type = #{type} and member_id = #{memberId} and not is_deleted) and not is_deleted
     </select>
 
     <insert id="addMember">
@@ -40,7 +40,7 @@
     </select>
 
     <select id="findByName" resultMap="WorkspaceMap">
-        select * from chat_workspace where name=#{#id} and not is_deleted order by id desc limit 1
+        select * from chat_workspace where name=#{#name} and not is_deleted;
     </select>
 
     <select id="isMember" resultType="boolean">
