@@ -1,20 +1,35 @@
 package au.edu.sydney.comp5703.cs30.chat.model;
 
+import org.apache.ibatis.ognl.BooleanExpression;
+
 public class CreateChannelRequest {
     private String name;
-    private long workspace;
+    private Long workspace;
 
-    private Long peerUserId;
+    private Long peerMemberId;
+
+    private int peerMemberType;
+
+    private boolean publicChannel;
 
     public String getName() {
         return name;
     }
 
-    public long getWorkspace() {
+    public Long getWorkspace() {
         return workspace;
     }
 
-    public Long getPeerUserId() {
-        return peerUserId;
+
+    public Long getPeerMemberId() {
+        return peerMemberId;
+    }
+
+    public int getPeerMemberType() {
+        return peerMemberType;
+    }
+
+    public boolean isPublicChannel() {
+        return publicChannel;
     }
 }

@@ -1,6 +1,7 @@
 package au.edu.sydney.comp5703.cs30.chat.entity;
 
 import au.edu.sydney.comp5703.cs30.chat.Repo;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;
@@ -18,21 +19,18 @@ public class Channel {
 
     private Boolean directMessage;
 
+    // members of the direct message (excluding calling user and organization users)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<ChannelMemberMixin> dmPeerMembers;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Boolean callerIsMember;
+
     public Channel(String name, long workspaceId, boolean isPublic) {
         this.name = name;
         this.workspaceId = workspaceId;
         this.publicChannel = isPublic;
         this.directMessage = false;
-    }
-
-    @JsonProperty("memberIds")
-    public List<Long> getMemberIds() {
-        var ids = new LinkedList<Long>();
-        var ms = Repo.channelMemberMapper.getChannelMembers(id);
-        ms.forEach(m -> {
-            ids.add(m.getUserId());
-        });
-        return ids;
     }
 
     public long getId() {
@@ -97,5 +95,21 @@ public class Channel {
 
     public void setDirectMessage(Boolean directMessage) {
         this.directMessage = directMessage;
+    }
+
+    public List<ChannelMemberMixin> getDmPeerMembers() {
+        return dmPeerMembers;
+    }
+
+    public void setDmPeerMembers(List<ChannelMemberMixin> dmPeerMembers) {
+        this.dmPeerMembers = dmPeerMembers;
+    }
+
+    public Boolean getCallerIsMember() {
+        return callerIsMember;
+    }
+
+    public void setCallerIsMember(Boolean callerIsMember) {
+        this.callerIsMember = callerIsMember;
     }
 }

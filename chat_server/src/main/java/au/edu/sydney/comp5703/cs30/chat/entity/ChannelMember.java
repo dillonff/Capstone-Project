@@ -1,6 +1,11 @@
 package au.edu.sydney.comp5703.cs30.chat.entity;
 
-public class ChannelMember {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+// channel's members (user only, excluding orgs)
+public class ChannelMember implements ChannelMemberMixin {
+    @JsonIgnore
     private long id;
     private long channelId;
     private long userId;
@@ -13,6 +18,17 @@ public class ChannelMember {
     public ChannelMember(long channelId, long userId) {
         this.channelId = channelId;
         this.userId = userId;
+    }
+
+    @JsonProperty("type")
+    // 0 for user, 1 for org
+    public Integer getType() {
+        return 0;
+    }
+
+    @JsonProperty("memberId")
+    public Long getMemberId() {
+        return userId;
     }
 
     public long getId() {

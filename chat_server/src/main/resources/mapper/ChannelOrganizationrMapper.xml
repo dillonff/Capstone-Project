@@ -23,5 +23,13 @@
         )
     </insert>
 
+    <select id="findByChannelId" resultMap="ChannelOrganizationMap">
+        select
+            *
+        from
+            chat_channel_organization
+        where channel_id = #{channelId} and not is_deleted
+    </select>
+
 
 </mapper>

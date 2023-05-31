@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMemberMapper">
+    <resultMap id="WorkspaceMemberMap" type="au.edu.sydney.comp5703.cs30.chat.entity.WorkspaceMember">
+        <constructor>
+            <arg column="workspace_id" javaType="long" />
+            <arg column="type" javaType="int" />
+            <arg column="member_id" javaType="long" />
+        </constructor>
+        <id column="id" property="id"/>
+        <result column="workspace_id" property="workspaceId"/>
+        <result column="member_id" property="memberId"/>
+        <result column="type" property="type"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into chat_workspace_member (
+            workspace_id,
+            member_id,
+            type
+        ) values (
+            #{workspaceId},
+            #{memberId},
+            #{type}
+        )
+    </insert>
+
+    <select id="findById" resultMap="WorkspaceMemberMap">
+        select * from chat_workspace_member where id=#{id} and not is_deleted
+    </select>
+
+    <select id="findByType" resultMap="WorkspaceMemberMap">
+        select * from chat_workspace_member where type = #{type} and member_id = #{memberId} and not is_deleted
+    </select>
+
+    <select id="findByWorkspace" resultMap="WorkspaceMemberMap">
+        select * from chat_workspace_member where workspace_id = #{workspaceId} and not is_deleted
+    </select>
+
+    <select id="isMember" resultType="boolean">
+        select count(*) from chat_workspace_member where type = #{type} and member_id = #{memberId} and workspace_id = #{workspaceId} and not is_deleted limit 1
+    </select>
+</mapper>

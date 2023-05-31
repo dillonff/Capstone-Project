@@ -106,7 +106,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     private void broadcastMessagesToChannel(String payload, Channel channel) throws Exception {
-        var members = channelMemberMapper.getChannelMembers(channel.getId());
+        var members = channelMemberMapper.getChannelMembers(channel.getId(), null);
         for (var m : members) {
             var user = userMapper.findById(m.getUserId());
             var sessions = ClientSession.getByUserId(user.getId());

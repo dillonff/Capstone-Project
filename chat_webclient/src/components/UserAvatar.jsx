@@ -25,14 +25,14 @@ function stringToColor(string) {
 function stringAvatar(name) {
   return {
     sx: {
-      bgcolor: stringToColor(name.username),
+      bgcolor: stringToColor(name),
     },
-    children: `${name.username[0]}`,
+    children: `${name[0]}`,
     // children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
   };
 }
 
-function UserAvatar(username) {
+function UserAvatar({username}) {
   return <Avatar {...stringAvatar(username)}></Avatar>;
 }
 

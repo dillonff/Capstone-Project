@@ -3,6 +3,7 @@ import {
   auth,
   nullUser
 } from './cred';
+import { encodeUrlParams } from './util';
 
 export {
   auth,
@@ -77,6 +78,15 @@ export const updateUser = (date) => {
 }
 
 
+export const getUsers = async (filters, refresh = true) => {
+  filters = encodeUrlParams(filters);
+  let res = await callApiJsonChecked('/users?' + filters, 'GET');
+  for (const user of res) {
+    userCache[user.id] = user;
+  }
+  return res;
+}
+
 export const nullChannel = {
   id: -1,
   name: '(not loaded)',
@@ -86,9 +96,17 @@ export const nullChannel = {
 export const nullWorkspace = {
   id: -1,
   name: '(not loaded)',
-  memberIds: [],
+  members: [],
   channelIds: [],
 };
+
+export const nullOrganizationMember = {
+  id: -1,
+  userId: -1,
+  organizationId: -1,
+  displayName: '(member not loaded)',
+  autoJoinChannel: false
+}
 
 const API_ENDPOINT = 'http://127.0.0.1:11451/api/v1';
 export function callApi(path, method, body) {
@@ -128,38 +146,45 @@ export async function callApiJsonChecked(path, method, body) {
 }
 
 export const getAllChannels = async (workspaceId) => {
-  let res = await callApi(
+  let res = await callApiJsonChecked(
     '/channels?workspaceId=' + workspaceId,
     'GET'
   );
-  if (!res.ok) throw new Error('api failed');
-  res = await res.json();
-  let newChannels = [];
-  for (let channelId of res.channelIds) {
-    res = await callApi('/channels/' + channelId, 'GET');
-    if (!res.ok) throw new Error('api failed');
-    res = await res.json();
-    newChannels.push(res);
-  }
-  return newChannels;
+  return res;
 };
 
-export const createChannel = (wid, name, peerUserId) => {
+export const getChannelMembers = async (channelId) => {
+  let res = await callApiJsonChecked(`/channels/${channelId}/members`, 'GET');
+  return res;
+}
+
+export const processChannelMembers = async (members) => {
+  for (let m of members) {
+    switch (m.type) {
+      case 0:
+        m.user = await getUser(m.userId);
+        break;
+      case 1:
+        m.organization = await getOrg(m.organizationId);
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+export const createChannel = (wid, name, publicChannel, peerMemberType, peerMemberId) => {
   let req = {
     name: name,
-    workspace: wid
+    workspace: wid,
+    publicChannel: publicChannel
   };
-  if (peerUserId) {
-    req.peerUserId = parseInt(peerUserId);
+  if (peerMemberId) {
+    req.peerMemberId = parseInt(peerMemberId);
+    req.peerMemberType = parseInt(peerMemberType);
   }
   req = JSON.stringify(req);
-  return callApi('/channels', 'POST', req).then((res) => {
-    if (!res.ok) {
-      console.error(res);
-      throw new Error('Failed to create channel');
-    }
-    return res.json();
-  });
+  return callApiJsonChecked('/channels', 'POST', req);
 }
 
 export const createWorkspace = (name) => {
@@ -176,18 +201,13 @@ export const createWorkspace = (name) => {
     });
 }
 
-export const getAllWorkspaces = async () => {
-  let res = await callApi('/workspaces', 'GET');
-  if (!res.ok) throw new Error('cannot get workspaces');
-  res = await res.json();
-  let newWorkspaces = [];
-  for (let workspaceId of res.workspaceIds) {
-    res = await callApi('/workspaces/' + workspaceId, 'GET');
-    if (!res.ok) throw new Error('cannot get workspace ' + workspaceId);
-    res = await res.json();
-    newWorkspaces.push(res);
+export const getAllWorkspaces = async (orgId) => {
+  let query = '';
+  if (orgId && orgId > 0) {
+    query = '?organizationId=' + orgId
   }
-  return newWorkspaces;
+  let res = await callApiJsonChecked('/workspaces' + query, 'GET');
+  return res;
 };
 
 export const addUserToChannel = (cid, uid) => {
@@ -214,6 +234,29 @@ export const processServerMessage = async (m) => {
   }
   m.sender = user;
   m.time = new Date(m.timeCreated).toLocaleString();
+}
+
+export const getWorkspaceMembers = async (workspaceId) => {
+  let members = await callApiJsonChecked(`/workspaces/${workspaceId}/members`);
+  // get all users info in one request and save them to cache
+  // await getUsers({workspaceId: workspaceId});
+
+  return members;
+}
+
+export const processWorkspaceMembers = async (members) => {
+  for (let m of members) {
+    switch (m.type) {
+      case 0:
+        m.user = await getUser(m.memberId);
+        break;
+      case 1:
+        m.organization = await getOrg(m.memberId);
+        break;
+      default:
+        break;
+    }
+  }
 }
 
 export const getMessages = async (channelId) => {
@@ -286,6 +329,39 @@ export const createOrg = (name, fullName, email, description) => {
   }
   return callApiJsonChecked('/organizations', 'POST', JSON.stringify(body));
 }
+
+export const joinOrg = (orgId, userId, userEmail) => {
+  const body = {};
+  if (userId) {
+    body.userId = userId;
+  }
+  if (userEmail) {
+    body.userEmail = userEmail;
+  }
+  return callApiJsonChecked('/organizations/' + orgId + '/members', 'POST', body);
+}
+
+export const getMembersInfo = async (rawMembers) => {
+  const members = [];
+  for (let m of rawMembers) {
+    switch (m.type) {
+      case 0:
+        const user = await getUser(m.memberId);
+        m = {...m, user: user};
+        members.push(m);
+        break;
+      case 1:
+        const org = await getOrg(m.memberId);
+        m = {...m, organization: org};
+        members.push(m);
+        break;
+      default:
+        break;
+    }
+  }
+  return members;
+};
+
 export const getFile = async (id, workspace,sortOptions) => {
   const date={
     id:id,

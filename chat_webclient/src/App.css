@@ -606,6 +606,19 @@ body {
   margin-right: 15px;
 }
 
+.flex-scroll-parent {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 100%;
+}
+
+.flex-scroll {
+  flex: 1 1 auto;
+  min-height: 100%;
+  overflow-y: auto;
+}
+
 .channel-empty__container {
   display: flex;
   height: 100%;

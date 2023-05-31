@@ -1,82 +1,85 @@
+import { List, ListItem, ListItemText } from '@mui/material';
 import React from 'react';
 
 import Button from 'react-bootstrap/Button';
 
 import {
   addUserToChannel,
+  getOrg,
   getUser
 } from '../api';
+import { useMountedEffect } from '../util';
 
 function ChannelMember({
   channel,
-  workspaceMemberIds,
-  channelMemberIds
+  workspaceMembers,
+  channelMembers
 }) {
-  const [channelMembers, setChannelMembers] = React.useState([]);
-  const [workspaceMembers, setWorkspaceMembers] = React.useState([]);
-
-  React.useEffect(_ => {
-    let wm = [];
-    let cm = [];
-    console.log(workspaceMemberIds);
-    (async _ => {
-      for (let mid of workspaceMemberIds) {
-        const user = await getUser(mid);
-        wm.push(user);
-      }
-      for (let mid of channelMemberIds) {
-        const user = await getUser(mid);
-        cm.push(user);
-      }
-      setChannelMembers(cm);
-      setWorkspaceMembers(wm);
-    })();
-
-  }, [channel]);
+  console.log(channel);
 
   let membersNotJoinned = [];
+  let userMembersIdSet = new Set(channelMembers.map(m => m.userId));
   for (let m of workspaceMembers) {
-    let hasMember = false;
-    for (let m2 of channelMembers) {
-      if (m.id === m2.id) {
-        hasMember = true;
+    switch (m.type) {
+      case 0: // user
+        if (!userMembersIdSet.has(m.memberId)) {
+          membersNotJoinned.push({
+            displayName: m.user.username,
+            otherText: 'Workspace user',
+            onAdd: _ => {
+              // TODO:
+            }
+          });
+        }
         break;
-      }
-    }
-    if (!hasMember) {
-      membersNotJoinned.push(m);
+      case 1:
+        if (!channelMembers.some(cm => cm.type === 1 && cm.organizationId === m.memberId)) {
+          membersNotJoinned.push({
+            displayName: m.organization.name, 
+            otherText: m.organization.fullName,
+            onAdd: _ => {
+              // TODO:
+            }
+          });
+        }
+        break;
+      default:
+        console.warn("Unknown type:", m.type);
+        break;
     }
   }
-  console.log(channelMembers);
   
   return <div>
-    <h4>Joined members</h4>
+    <h5>Joined members</h5>
     <ul>
       {channelMembers.map(m => {
-        return <li>{m.username}</li>;
+        if (m.user) {
+          return <li>{m.user.username}</li>;
+        } else if (m.organization) {
+          return <li>{m.organization.name}</li>;
+        } else {
+          return <li>(unknown member {`${m.type}-${m.id}`})</li>
+        }
       })}
     </ul>
     <hr />
-    <h4>Other workspace members</h4>
-    <ul>
+    <h5>Other workspace members</h5>
+    <List>
       {membersNotJoinned.map(m => {
-        return <li style={{marginBottom: '2px'}}>
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-            <div style={{display: 'inline'}}>{m.username}</div>
-            <Button
-              type='button'
-              variant='outline-primary'
-              onClick={_ => {
-                addUserToChannel(channel.id, m.id).catch(e => {
-                  console.error(e);
-                  alert(e);
-                })
-              }}
-            >Add</Button>
-          </div>
-        </li>;
+        return <ListItem secondaryAction={
+          <Button
+            type='button'
+            variant='outline-primary'
+            onClick={m.onAdd}
+          >Add</Button>
+        }>
+          <ListItemText
+            primary={m.displayName}
+            secondary={m.otherText}
+          />
+        </ListItem>;
       })}
-    </ul>
+    </List>
   </div>
 }
 

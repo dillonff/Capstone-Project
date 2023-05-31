@@ -1,10 +1,7 @@
 package au.edu.sydney.comp5703.cs30.chat;
 
 import au.edu.sydney.comp5703.cs30.chat.entity.*;
-import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMapper;
-import au.edu.sydney.comp5703.cs30.chat.mapper.ChannelMemberMapper;
-import au.edu.sydney.comp5703.cs30.chat.mapper.FileMapper;
-import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper;
+import au.edu.sydney.comp5703.cs30.chat.mapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,12 +33,42 @@ public class Repo {
 
     public static FileMapper fileMapper;
 
+    @Autowired
+    public OrganizationMemberMapper auOrganizationMemberMapper;
+
+    public static OrganizationMemberMapper organizationMemberMapper;
+
+    @Autowired
+    public WorkspaceOrganizationMapper auWorkspaceOrganizationMapper;
+
+    public static WorkspaceOrganizationMapper workspaceOrganizationMapper;
+
+    @Autowired
+    public WorkspaceMemberMapper auWorkspaceMemberMapper;
+
+    public static WorkspaceMemberMapper workspaceMemberMapper;
+
+    @Autowired
+    public ChannelOrganizationMapper auChannelOrganizationMapper;
+
+    public static ChannelOrganizationMapper channelOrganizationMapper;
+
+    @Autowired
+    public OrganizationMapper auOrganizationMapper;
+
+    public static OrganizationMapper organizationMapper;
+
     @PostConstruct
     private void init() {
         channelMapper = auChannelMapper;
         workspaceMapper = auWorkspaceMapper;
         channelMemberMapper = auChannelMemberMapper;
         fileMapper = aufileMapper;
+        organizationMemberMapper = auOrganizationMemberMapper;
+        workspaceOrganizationMapper = auWorkspaceOrganizationMapper;
+        workspaceMemberMapper = auWorkspaceMemberMapper;
+        channelOrganizationMapper = auChannelOrganizationMapper;
+        organizationMapper = auOrganizationMapper;
         System.err.println("mappers: " + channelMapper + workspaceMapper + channelMemberMapper);
     }
 
@@ -58,15 +85,22 @@ public class Repo {
     // public static Map<Long, ChannelMember> channelMemberMap = new ConcurrentHashMap<>();
 
 
-    public static void addMemberToChannel(long channelId, long userId) {
-        var m = new ChannelMember(channelId, userId);
-        channelMemberMapper.insertChannelMember(m);
-    }
 
-    public static void addMemberToWorkspace(long workspaceId, long userId) {
-        workspaceMapper.addMember(workspaceId, userId);
+
+    public static void addMemberToWorkspace(long workspaceId, int type, long memberId) {
+        //TODO: join all public channels
+        workspaceMemberMapper.insert(new WorkspaceMember(workspaceId, type, memberId));
         var general = Util.getChannelForName(workspaceId, "general");
-        addMemberToChannel(general.getId(), userId);
+        switch (type) {
+            case 0:
+                //addMemberToChannel(general.getId(), memberId);
+                break;
+            case 1:
+                channelOrganizationMapper.insert(new ChannelOrganization(general.getId(), memberId));
+                break;
+            default:
+                throw new RuntimeException("Invalid type: " + type);
+        }
     }
 
 }

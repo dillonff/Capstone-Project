@@ -1,11 +1,15 @@
 package au.edu.sydney.comp5703.cs30.chat.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.Instant;
 
 public class User {
     // Note: temporarily use this before integrating the database
     private long id;
     private String username;
+
+    @JsonIgnore
     private String password;
 
     private String phone;

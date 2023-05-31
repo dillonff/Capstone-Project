@@ -4,16 +4,27 @@ import SimpleBoxItem from './SimpleBoxItem';
 import ValeIcon from '../assets/ValeIcon.png';
 import LogoutIcon from '../assets/logout.png';
 import TagIcon from '@mui/icons-material/Tag';
+import { OrganizationIdContext, OrganizationsContext } from '../AppContext';
+import { nullOrganization } from '../api';
+import { findById, orgIsChannelMember } from '../util';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import IconButton from '@mui/material/IconButton';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
 const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
+  const [organizationId] = React.useContext(OrganizationIdContext);
+  const [organizations] = React.useContext(OrganizationsContext);
+  const organization = findById(organizationId, organizations, nullOrganization);
+
   let channelElems = [];
   for (let i = 0; i < channels.length; i++) {
     const channel = channels[i];
+    const members = channel.members || [];
     console.log(channel);
     if (channel.directMessage) {
+      continue;
+    }
+    if (organization.id > 0 && !orgIsChannelMember(organization, members)) {
       continue;
     }
     const clickCb = () => {
@@ -25,7 +36,7 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
       <SimpleBoxItem
         classNamePrefix="channel"
         title={channel.name}
-        text={channel.memberIds.length + ' people'}
+        text={members.length + ' people'}
         key={i}
         onClick={clickCb}
         selected={channel.id === selectedChannel.id}

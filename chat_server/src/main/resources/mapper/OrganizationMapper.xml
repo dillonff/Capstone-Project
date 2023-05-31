@@ -34,6 +34,10 @@
         select * from chat_organization where id=#{id} and not is_deleted
     </select>
 
+    <select id="findByEmail" resultMap="OrganizationMap">
+        select * from chat_organization where email=#{email} and not is_deleted
+    </select>
+
     <insert id="addMember" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         insert into chat_organization_member (
             user_id,
@@ -55,6 +59,15 @@
             chat_organization
         where
             id in (select organization_id from chat_organization_member where user_id = #{userId}) and not is_deleted
+    </select>
+
+    <select id="findIdByChannelId" resultType="long">
+        select
+            organization_id
+        from
+            chat_channel_organization
+        where
+            channel_id = #{channelId} and not is_deleted
     </select>
 
 </mapper>

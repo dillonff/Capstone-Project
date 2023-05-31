@@ -1,6 +1,11 @@
 package au.edu.sydney.comp5703.cs30.chat.entity;
 
-public class ChannelOrganization {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class ChannelOrganization implements ChannelMemberMixin {
+
+    @JsonIgnore
     private Long id;
     private Long channelId;
     private Long organizationId;
@@ -8,6 +13,17 @@ public class ChannelOrganization {
     public ChannelOrganization(Long channelId, Long organizationId) {
         this.channelId = channelId;
         this.organizationId = organizationId;
+    }
+
+    @JsonProperty("type")
+    // 0 for user, 1 for org
+    public Integer getType() {
+        return 1;
+    }
+
+    @JsonProperty("memberId")
+    public Long getMemberId() {
+        return organizationId;
     }
 
     public Long getId() {

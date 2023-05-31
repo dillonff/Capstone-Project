@@ -12,4 +12,6 @@ public interface OrganizationMapper {
     Organization findById(Long id);
     Integer addMember(OrganizationMember member);
     List<Organization> findByUserId(Long userId);
+    Organization findByEmail(String email);
+    List<Long> findIdByChannelId(Long channelId);
 }

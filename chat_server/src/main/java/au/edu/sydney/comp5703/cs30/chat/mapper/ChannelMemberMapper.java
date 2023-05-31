@@ -22,8 +22,24 @@ public interface ChannelMemberMapper {
             @Arg(column = "channel_id", javaType = long.class),
             @Arg(column = "user_id", javaType = long.class)
     })
-    @Select("select id, channel_id, user_id, last_read_message_id, is_mentioned, is_pinned, is_deleted from chat_channel_member where channel_id = #{channelId} and not is_deleted")
-    List<ChannelMember> getChannelMembers(@Param("channelId") long channelId);
+    @Select("""
+            <script>
+            select
+                id,
+                channel_id,
+                user_id,
+                last_read_message_id,
+                is_mentioned,
+                is_pinned,
+                is_deleted
+            from
+                chat_channel_member
+            where
+                channel_id = #{channelId}
+                and not is_deleted
+            <if test="limit != null">limit #{limit}</if>
+            </script>""")
+    List<ChannelMember> getChannelMembers(@Param("channelId") long channelId, Integer limit);
 
     @Insert("insert into chat_channel_member (channel_id, user_id, last_read_message_id, is_mentioned) values (#{channelId}, #{userId}, #{lastReadMessageId}, #{mentioned})")
     Integer insertChannelMember(ChannelMember member);
@@ -40,5 +56,21 @@ public interface ChannelMemberMapper {
 
     @Update("update chat_channel_member set last_read_message_id = #{messageId} where id = #{channelMemberId}")
     Long setLastReadMessageId(long messageId, long channelMemberId);
+
+    @Select("""
+            <script>
+            select
+                count(*)
+            from
+                <choose>
+                    <when test="type == 0">
+                        chat_channel_member where channel_id = #{channelId} and user_id = #{memberId} and not is_deleted
+                    </when>
+                    <when test="type == 1">
+                        chat_channel_organization where channel_id = #{channelId} and organization_id = #{memberId} and not is_deleted
+                    </when>
+                </choose>
+            </script>""")
+    boolean isMember(long channelId, int type, long memberId);
 
 }

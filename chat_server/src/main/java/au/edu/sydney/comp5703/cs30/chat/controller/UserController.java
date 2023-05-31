@@ -12,6 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @RestController
 public class UserController extends BaseController {
 
@@ -51,6 +55,19 @@ public class UserController extends BaseController {
             userService.updateInfoByUid(req.getUsername(), req.getPhone(), req.getEmail(), (int) user.getId());
         }
         return new JsonResult<>(OK);
+    }
+
+    @RequestMapping(value = "/api/v1/users", produces = "application/json", method = RequestMethod.GET)
+    public List<User> handleGetUsers(
+            @RequestParam(value = "workspaceId", required = false) Long workspaceId,
+            @RequestParam(value = "channelId", required = false) Long channelId,
+            @RequestParam(value = "organizationId", required = false) Long organizationId
+    ) {
+        if (Arrays.stream(new Long[]{workspaceId, channelId, organizationId}).allMatch(v -> v == null)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one filter must be specified.");
+        }
+        // TODO: check access
+        return userMapper.filter(workspaceId, channelId, organizationId);
     }
 
 }

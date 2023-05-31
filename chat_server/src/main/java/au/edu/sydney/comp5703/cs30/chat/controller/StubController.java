@@ -45,10 +45,9 @@ public class StubController {
 //        var res = userMapper.insertUser(user);
 //
 //        System.err.println("user id: " + user.getId());
-        var ids = Repo.workspaceMapper.getMemberIds(10);
-        System.err.println(ids);
 
-        var ms = Repo.channelMemberMapper.getChannelMembers(12);
+
+        var ms = Repo.channelMemberMapper.getChannelMembers(12, null);
         System.err.println(ms);
 
         var encoder =  Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();// Argon2PasswordEncoder.defaultsForSpringSecurity_v5_2(); // PasswordEncoderFactories.createDelegatingPasswordEncoder();

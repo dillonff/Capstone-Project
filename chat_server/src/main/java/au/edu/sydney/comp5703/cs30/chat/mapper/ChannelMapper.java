@@ -16,7 +16,9 @@ public interface ChannelMapper {
 
     List<Channel> findByWorkspaceAndName(long workspaceId, String name);
 
-    List<Long> findIdByWorkspaceId(long workspaceId);
+    List<Channel> findPublicByWorkspaceId(long workspaceId);
 
-    List<Channel> findByWorkspaceAndMember(long workspaceId, long userId);
+    List<Channel> findPrivateByWorkspaceAndMember(long workspaceId, long userId);
+
+    List<Channel> findDirectMessageChannels(long workspaceId, int type, long memberId);
 }

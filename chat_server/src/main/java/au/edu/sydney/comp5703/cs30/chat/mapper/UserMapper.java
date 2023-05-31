@@ -4,6 +4,8 @@ import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Mapper
 @Repository
 public interface UserMapper {
@@ -15,5 +17,11 @@ public interface UserMapper {
                            String password);
 
     Integer updateInfoById(String username, String phone, String email, Integer id);
+
+    // There was no unique index on the email field
+    // check if there are duplicate emails
+    List<User> findByEmail(String email);
+
+    List<User> filter(Long workspaceId, Long channelId, Long organizationId);
 
 }

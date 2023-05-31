@@ -75,6 +75,7 @@ public class OrganizationController {
         organizationMapper.insertOrganization(org);
         var member = new OrganizationMember(user.getId(), org.getId());
         member.setDisplayName(user.getUsername());
+        member.setAutoJoinChannel(true);
         organizationMapper.addMember(member);
 
         // tell all the clients that the channel info has changed
@@ -144,6 +145,8 @@ public class OrganizationController {
         }
         user = userMapper.findById(userId);
         var member = new OrganizationMember(user.getId(), org.getId());
+        member.setDisplayName(user.getUsername());
+        member.setAutoJoinChannel(true);
         organizationMapper.addMember(member);
         return "{}";
     }

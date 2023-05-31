@@ -8,7 +8,10 @@ import MuiButton from '@mui/material/Button';
 import EditIcon from '@mui/icons-material/Edit';
 import ChannelMember from './ChannelMember';
 
-import { OrganizationIdContext, OrganizationsContext } from '../AppContext';
+import {
+  OrganizationIdContext,
+  OrganizationsContext
+} from '../AppContext';
 
 import {
   getMessages,
@@ -18,92 +21,80 @@ import {
   auth,
   nullOrganization,
   getOrg,
+  getChannelMembers,
+  processChannelMembers
 } from '../api.js';
 import Event from '../event.js';
-import { findById } from '../util';
+import {
+  findById, getDmName, useMountedEffect
+} from '../util';
+import UserAvatar from './UserAvatar';
 
-function Channel({ workspace, channel }) {
+function Channel({
+  workspace,
+  channel
+}) {
   const [messages, setMessages] = React.useState([]);
   const addUserIdRef = React.useRef();
-
+  
   const [show, setShow] = React.useState(false);
   const [organizationId] = React.useContext(OrganizationIdContext);
   const [organizations] = React.useContext(OrganizationsContext);
-  const organization = findById(
-    organizationId,
-    organizations,
-    nullOrganization
-  );
+  const organization = findById(organizationId, organizations, nullOrganization);
+  const [members, setMembers] = React.useState([]);
+  const membersVersion = React.useRef(0);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   // get messages when the component is mounted
-  React.useEffect(
-    (_) => {
-      if (channel.id === -1) return;
-      getMessages(channel.id)
-        .then((res) => {
-          setMessages(res);
-        })
-        .catch((e) => {
-          console.error(e);
-          alert(e);
-        });
-    },
-    [channel]
-  );
+  useMountedEffect(getMounted => {
+    setMessages([]);
+    if (channel.id === -1)
+      return;
+    getMessages(channel.id).then(res => {
+      getMounted && setMessages(res);
+    }).catch(e => {
+      console.error(e);
+      alert(e);
+    });
+  }, [channel]);
 
-  React.useEffect(
-    (_) => {
-      const cb = Event.getDefaultCallback();
-      cb.onNewMessage = async (data) => {
-        if (data.channelId !== channel.id) {
-          return;
-        }
-        console.log('new message arrived');
-        console.log(data);
-        let newMessages = [...messages, data];
-        setMessages(newMessages);
-      };
-      Event.addListener(cb);
-      return (_) => {
-        Event.removeListener(cb);
-      };
-    },
-    [messages, channel]
-  );
-
-  const [dmName, setDmName] = React.useState('');
-  React.useEffect(
-    (_) => {
-      let mounted = true;
-      const peerIds = channel.memberIds.filter((i) => i !== auth.user.id);
-      if (peerIds.length === 0) {
-        peerIds.push(auth.user.id);
+  React.useEffect(_ => {
+    const cb = Event.getDefaultCallback();
+    cb.onNewMessage = async (data) => {
+      if (data.channelId !== channel.id) {
+        return;
       }
-      (async (_) => {
-        const names = [];
-        for (const i of peerIds) {
-          let u = await getUser(i);
-          names.push(u.username);
-          if (names.length > 3) {
-            names.push('...');
-            break;
-          }
-        }
-        if (mounted) {
-          setDmName(names.join(', '));
-        }
-      })();
-      return (_) => {
-        mounted = false;
-      };
-    },
-    [channel]
-  );
+      console.log('new message arrived');
+      console.log(data);
+      setMessages(messages => [...messages, data]);
+    }
+    Event.addListener(cb);
+    return _ => {
+      Event.removeListener(cb);
+    }
+  }, [channel]);
+
+  const updateMembers = async getMounted => {
+    membersVersion.current++;
+    const expectedVersion = membersVersion.current;
+    let res = await getChannelMembers(channel.id);
+    await processChannelMembers(res);
+    if (expectedVersion === membersVersion.current && getMounted()) {
+      setMembers(res);
+    }
+  }
+
+  useMountedEffect(getMounted => {
+    setMembers([]);
+    if (channel.id === -1)
+      return;
+    updateMembers(getMounted);
+  }, [channel])
+
   let name = channel.name;
   if (channel.directMessage) {
-    name = dmName ? dmName : 'Direct Message';
+    name = getDmName(channel);
   }
 
   return (
@@ -157,8 +148,8 @@ function Channel({ workspace, channel }) {
           <Modal.Body>
             <ChannelMember
               channel={channel}
-              workspaceMemberIds={workspace.memberIds}
-              channelMemberIds={channel.memberIds}
+              workspaceMembers={workspace.members || []}
+              channelMembers={members}
             />
           </Modal.Body>
           <Modal.Footer>

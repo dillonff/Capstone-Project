@@ -3,6 +3,8 @@ import Workspace from './Workspace';
 import WorkspaceList from './WorkspaceList';
 import Header from './Header';
 import OrganizationSelector from './OrganizationSelector';
+import ManageOrganization from './ManageOrganization';
+import SimpleDetailDialog from './SimpleDetailDialog';
 
 import {
   nullWorkspace,
@@ -10,7 +12,9 @@ import {
   addUserToWorkspace,
   createWorkspace,
   auth,
-  nullOrganization
+  nullOrganization,
+  getWorkspaceMembers,
+  processWorkspaceMembers
 } from '../api';
 
 import {
@@ -18,7 +22,7 @@ import {
     OrganizationsContext
 } from '../AppContext';
 import {
-    findById
+    findById, useMountedEffect
   } from '../util';
 
 import Event from '../event';
@@ -29,22 +33,38 @@ function WorkspaceContainer({}) {
     const [selectedWorkspace, setSelectedWorkspace] =
         React.useState(nullWorkspace);
     const [workspaces, setWorkspaces] = React.useState([]);
+    const [openOrgDialog, setOpenOrgDialog] = React.useState(false);
     const [orgs] = React.useContext(OrganizationsContext);
     const [orgId] = React.useContext(OrganizationIdContext);
     const org = findById(orgId, orgs, nullOrganization);
 
-    const getAndUpdateWorkspaces = async (_) => {
+    const getAndUpdateWorkspaces = async (getMounted) => {
+        if (!getMounted())
+            return;
+        setWorkspaces([]);
         try {
-            let newWorkspaces = await getAllWorkspaces();
+            let oid = null;
+            if (orgId > 0)
+                oid = orgId;
+            let newWorkspaces = await getAllWorkspaces(oid);
             for (let w of newWorkspaces) {
+                w.members = await getWorkspaceMembers(w.id);
+                console.error(w);
+                await processWorkspaceMembers(w.members);
+                if (!getMounted())
+                    return;
                 if (selectedWorkspace.id === w.id) {
                     setSelectedWorkspace(w);
                 }
             }
-            setWorkspaces(newWorkspaces);
+            if (getMounted()) {
+                setWorkspaces(newWorkspaces);
+            }
         } catch (e) {
             console.error(e);
             alert(e);
+        } finally {
+            
         }
     };
 
@@ -60,19 +80,19 @@ function WorkspaceContainer({}) {
         [workspaces]
     );
 
-    React.useEffect((_) => {
-        getAndUpdateWorkspaces();
+    useMountedEffect(getMounted => {
+        getAndUpdateWorkspaces(getMounted);
         let cb = Event.getDefaultCallback();
         cb.onInfoChanged = (data) => {
             if (data.infoType.startsWith('workspace')) {
-                getAndUpdateWorkspaces();
+                getAndUpdateWorkspaces(getMounted);
             }
         };
         Event.addListener(cb);
         return (_) => {
             Event.removeListener(cb);
         };
-    }, []);
+    }, [orgId]);
 
     if (selectedWorkspace.id !== -1) {
         return (
@@ -118,13 +138,22 @@ function WorkspaceContainer({}) {
                 borderRadius: '10px',
                 boxShadow: '0px 0px 10px 5px rgba(0,0,0,0.2)'
             }}>
-                <div>
+                <div style={{padding: '5px 40px'}}>
                     <h2>Hi, {auth.user.username}</h2>
                     <div style={{display: 'flex', flexDirection: 'column'}}>
-                        <h4>Organization Profile</h4>
+                        <h4>Active Organization Profile</h4>
                         <OrganizationSelector />
+                        {org.id > 0 && <a href="" onClick={e => {
+                            e.preventDefault();
+                            setOpenOrgDialog(true);
+                        }}>Manage {org.name}</a>}
                     </div>
+                    <SimpleDetailDialog title={`Manage ${org.name}`} open={openOrgDialog} onClose={_ => setOpenOrgDialog(false)}>
+                        <ManageOrganization org={org}/>
+                    </SimpleDetailDialog>
                 </div>
+
+                <hr />
 
                 <h2 style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '25px'}}>
                     <span style={{transform: "translateX(40px)"}}>
@@ -165,6 +194,7 @@ function WorkspaceContainer({}) {
                     onWorkspaceClick={(w) => {
                         setSelectedWorkspace(w)
                     }}
+                    organization={org}
                 />
 
             </div>
