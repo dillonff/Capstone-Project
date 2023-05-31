@@ -473,6 +473,14 @@ body {
   margin: 0 20px;
 }
 
+.header__icons {
+  display: flex;
+}
+
+.header__file-icon {
+  margin-right: 10px;
+}
+
 .header__right .MuiAvatar-root {
   border-radius: 20%;
   width: 30px;

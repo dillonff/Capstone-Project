@@ -20,6 +20,9 @@ function SimpleLogin({ defaultUsername, onLoggedin }) {
     event.preventDefault();
     login(usernameInputRef.current.value, '')
       .then((_) => {
+        localStorage.setItem("userID", _.id);
+        localStorage.setItem("userInfo", JSON.stringify(_));
+        console.log(localStorage.getItem("userID"));
         if (onLoggedin) {
           onLoggedin();
         }

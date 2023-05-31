@@ -37,6 +37,7 @@ export async function login(username, password) {
   auth.token = res.userId;
   Event.start();
   console.error(auth);
+  return auth.user
 }
 
 export async function signup(username, password, confirmPassword) {
@@ -280,4 +281,15 @@ export const createOrg = (name, fullName, email, description) => {
   }
   return callApiJsonChecked('/organizations', 'POST', JSON.stringify(body));
 }
-
+export const getFile = async (id, workspace) => {
+  console.log(workspace, 'worp');
+  let res = await callApi(`/files/${id}?workspace=${workspace}`, 'GET');
+  if (res.ok) {
+    res = await res.json();
+    return res;
+  }
+  throw new Error('Cannot get File');
+}
+export const updateUser = (userId, date) => {
+  return callApi('/workspaces/join', 'POST', JSON.stringify(date));
+}

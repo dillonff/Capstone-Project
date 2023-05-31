@@ -17,45 +17,31 @@ const routes = [
     ],
   },
   {
-    path: "/WorkspaceContainer",
-    component: React.lazy(() => import("../components/WorkspaceContainer.jsx")),
-    children: [
-      
-    ]
-  },
-  {
     path: "/Workspace",
     component: React.lazy(() => import("../components/Workspace.jsx")),
     children: [
       
     ]
   },
-  {
-    path: "/profile",
-    component: React.lazy(() => import("../components/profile.jsx")),
-    children: [
+   {
+     path: "/file",
+     component: React.lazy(() => import("../components/file.jsx")),
+     children: [
       
-    ]
-  },
-  {
+     ]
+   },
+   {
     path: "/editprofile",
     component: React.lazy(() => import("../components/editprofile.jsx")),
     children: [
-      
+     
     ]
   },
-//   {
-//     path: "/filemanagement",
-//     component: React.lazy(() => import("../components/ChatBox.jsx")),
-//     children: [
-      
-//     ]
-//   },
   {
     path: "/changepassword",
     component: React.lazy(() => import("../components/Changepassword.jsx")),
     children: [
-      
+     
     ]
   },
 ];
