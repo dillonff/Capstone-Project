@@ -35,7 +35,7 @@ public class UserController extends BaseController {
         // return new GetUserResponse(user.getId(), user.getName(), user.getName());
     }
 
-    @RequestMapping(value ="/api/v1/users", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/v1/users", method = RequestMethod.POST)
     public JsonResult<Void> reg(@RequestBody SignupRequest req) {
         if (Strings.isEmpty(req.getUsername()) || Strings.isEmpty(req.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "missing username or password");
@@ -45,12 +45,9 @@ public class UserController extends BaseController {
         return new JsonResult<Void>(OK);
     }
 
-    @RequestMapping(value ="/api/v1/users/{userId}", consumes = "application/json", produces = "application/json", method = RequestMethod.PUT)
-    public JsonResult<Void> updateInfo(@PathVariable String userId, @RequestBody UpdateUserInfoRequest req, @RequestHeader("authorization") Long auth) {
-        if (!"current".equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Update info of user other than you is not allowed");
-        }
-        var user = userMapper.findById(auth);
+    @PostMapping("/api/v1/userUpdate")
+    public JsonResult<Void> updateInfo(@RequestBody UpdateUserInfoRequest req) {
+        var user = userMapper.findById(req.getId());
         if (req.getNewPassword() != null) {
             userService.changePassword((int) user.getId(), user.getUsername(), req.getOldPassword(), req.getNewPassword());
         }

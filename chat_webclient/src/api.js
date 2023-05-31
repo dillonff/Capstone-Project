@@ -73,6 +73,11 @@ export async function getUser(id, refresh = false) {
   return user;
 }
 
+export const updateUser = (date) => {
+  return callApi('/userUpdate', 'POST',JSON.stringify(date));
+}
+
+
 export const getUsers = async (filters, refresh = true) => {
   filters = encodeUrlParams(filters);
   let res = await callApiJsonChecked('/users?' + filters, 'GET');
@@ -378,7 +383,4 @@ export const getFile = async (id, workspace,sortOptions) => {
     return res;
   }
   throw new Error('Cannot get File');
-}
-export const updateUser = (userId, date) => {
-  return callApi('/workspaces/join', 'POST', JSON.stringify(date));
 }
