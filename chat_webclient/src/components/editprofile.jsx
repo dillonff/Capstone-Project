@@ -16,12 +16,13 @@ import {updateUser,getUser} from "../api" //修改接口，获取用户信息接
 
 export default function Edit() {
 
-  
+  const [user, setUser] = useState({});
+
   useEffect(() => {
     const userID = localStorage.getItem("userID"); //登录的账号
-    // getUser(userID).then((e)=>{
-    //     console.log(e);//绑定一下数据
-    // })
+     getUser(userID).then((e)=>{
+        console.log(e);
+     })
   }, [])
   const setValue = (e)=>{
     let value = e.target.value;

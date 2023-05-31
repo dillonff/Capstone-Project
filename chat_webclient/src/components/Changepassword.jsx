@@ -22,18 +22,6 @@ export default function Edit() {
   const [inputValue, setInputValue] = useState('');
   
 
-
-  // useEffect(() => {
-  //   const params = new URLSearchParams(window.location.search)
-  //   fetch('http://localhost:8080/user/' + params.get('id'))
-  //     .then(response => response.json())
-  //     .then(data => {
-  //       setUser(data['data']['user']);
-  //       // setComments(data['data']['comments']);
-  //       // console.log(user.birthday);
-  //     })
-
-  // }, []);
   const setValue = (e)=>{
     let value = e.target.value;
     let name = e.target.name;

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -55,13 +56,15 @@ public class FileController {
 //                .collect(Collectors.toList());
 //    }
 
-    @GetMapping(value = "/api/v1/files/{id}", produces = "application/json")
-    public File getFileInfo(@PathVariable Long id) {
-        var file = fileMapper.findById(id);
-        if (file == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found: " + id);
+    @PostMapping(value = "/api/v1/files/list", produces = "application/json")
+    public List<Map<String, Object>> getFileInfo(@RequestBody File file) {
+//        File file = new File();
+//        file.setId(id);
+        List<Map<String,Object>> fileList = fileMapper.findByIdList(file);
+        if (fileList.size() == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found: " + file);
         }
-        return file;
+        return fileList;
     }
 
     @GetMapping("/api/v1/files/{id}/{fileNameHint}")

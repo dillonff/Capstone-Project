@@ -33,7 +33,40 @@
     <select id="findById" resultMap="FileMap">
         select * from chat_file where id = #{id} and not is_deleted
     </select>
-
+    <select id="findByIdList" resultType="java.util.Map">
+        select
+        cf.id as id,
+        cf.filename as filename,
+        cf.path as path,
+        cf.size as size,
+        cf.status as status,
+        cf.gmt_create as timeCreated,
+        cu.username as uploaderName
+            from chat_file cf
+            left join chat_user cu on cu.id = cf.uploader_id
+            <where>
+                1=1
+                <if test="id != null and id != -1">
+                    and cf.id = #{id}
+                </if>
+                <if test="workspace != null and workspace!= ''">
+                    and cf.workspace = #{workspace}
+                </if>
+                and not cf.is_deleted
+            </where>
+        <if test="sortOptions.sortField != null">
+            order by
+            <if test="sortOptions.sortField == 'name'">
+                cf.filename ${sortOptions.sortOrder}
+            </if>
+            <if test="sortOptions.sortField == 'uploadedBy'">
+                cu.username ${sortOptions.sortOrder}
+            </if>
+            <if test="sortOptions.sortField == 'uploadedAt'">
+                cf.gmt_create ${sortOptions.sortOrder}
+            </if>
+        </if>
+    </select>
     <update id="updateFile" >
         update
             chat_file

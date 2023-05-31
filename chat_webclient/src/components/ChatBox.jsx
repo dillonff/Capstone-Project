@@ -95,8 +95,14 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
   };
 
   const sendMessage = (msg, fileIds) => {
+
     if (!msg && (!fileIds || fileIds.length === 0)) return;
-    let body = {
+
+    console.log(fileIds, 'fie');
+    if (!msg && (!fileIds || fileIds.length === 0))
+      return;
+
+      let body = {
       content: msg,
       channelId: channel.id,
     };

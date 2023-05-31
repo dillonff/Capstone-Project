@@ -6,11 +6,14 @@ import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
 public interface FileMapper {
     File findById(long id);
+    @MapKey("id")
+    List<Map<String,Object>> findByIdList(File file);
     Integer insertFile(File file);
 
     Integer updateFile(File file);

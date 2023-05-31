@@ -281,9 +281,13 @@ export const createOrg = (name, fullName, email, description) => {
   }
   return callApiJsonChecked('/organizations', 'POST', JSON.stringify(body));
 }
-export const getFile = async (id, workspace) => {
-  console.log(workspace, 'worp');
-  let res = await callApi(`/files/${id}?workspace=${workspace}`, 'GET');
+export const getFile = async (id, workspace,sortOptions) => {
+  const date={
+    id:id,
+    workspace:workspace,
+    sortOptions:sortOptions
+  }
+  let res = await callApi(`/files/list`, 'POST',JSON.stringify(date));
   if (res.ok) {
     res = await res.json();
     return res;

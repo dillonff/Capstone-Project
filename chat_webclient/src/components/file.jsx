@@ -44,14 +44,12 @@ const App = () => {
   const userID = localStorage.getItem("userID"); 
   const [fileList,setFileList] = useState([]);
   const [fileId,setFileid] = useState(-1);
+
   const userCache = {};
-  useEffect(()=>{
-    getFileList()
-  },[])
 
 
-function getFileList() {
-  getFile(fileId, selectedFolder).then((e)=>{
+  function getFileList() {
+  getFile(fileId, selectedFolder,sortOptions).then((e)=>{
     setFileList(e)
   })
 }
@@ -139,21 +137,18 @@ async function getUser(id, auth, refresh = false) {
       });
   };
 
-  const [sortOptions, setSortOptions] = useState({
-    uploadedBy: null,
-    uploadedAt: null,
-    name:null
-  });
+  const [sortOptions, setSortOptions] = useState({});
   useEffect(()=>{
-
+    getFileList()
   },[sortOptions])
 
   const handleSort = (field) => {
+
     setSortOptions((prevState) => ({
-      ...prevState,
-      [field]: prevState[field] === "asc" ? "desc" : "asc"
+      [field]: prevState[field] === "asc" ? "desc" : "asc",
+      sortField:field,
+      sortOrder:prevState[field] === "asc" ? "desc" : "asc"
     }));
-    // console.log(sortOptions);
   };
 
   const sortFiles = (files, field) => {
@@ -278,7 +273,7 @@ async function getUser(id, auth, refresh = false) {
         className="file"
         onMouseEnter={(e) => e.target.classList.add("highlight")}
         onMouseLeave={(e) => e.target.classList.remove("highlight")}
-      >{console.log(file)}
+      >
        <td className="file-name" onClick={() => handleFileClick(file.id)}>
   {file.filename}
 </td>

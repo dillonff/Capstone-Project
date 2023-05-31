@@ -1,6 +1,7 @@
 package au.edu.sydney.comp5703.cs30.chat;
 
-import au.edu.sydney.comp5703.cs30.chat.property.FileStorageProperties;
+//import au.edu.sydney.comp5703.cs30.chat.property.FileStorageProperties;
+import au.edu.sydney.comp5703.cs30.chat.property.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
