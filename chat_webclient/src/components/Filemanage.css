@@ -1,0 +1,114 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar {
+  background-color: #1c2331;
+  color: #fff;
+  padding: 20px;
+  width: 300px;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: auto;
+}
+
+.file-name:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
+.sidebar-user {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.sidebar-folders ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.sidebar-folders li {
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.sidebar-folders li:hover {
+  color: #ccc;
+}
+
+.sidebar-search {
+  margin-top: 20px;
+}
+
+.sidebar-search input[type="text"] {
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  width: 200px;
+  margin-right: 10px;
+}
+
+.sidebar-search button {
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+
+
+/* 设置主体部分样式 */
+.main {
+  margin-left: 350px;
+  padding: 20px;
+}
+
+
+.header {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.files table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.files th,
+.files td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.files th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.files tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.files tr:hover {
+  background-color: #ddd;
+}
+
+.files td button {
+  padding: 5px 10px;
+  background-color: #1c2331;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.files tr:not(:last-child) {
+  border-bottom: 1px solid #ddd;
+}
