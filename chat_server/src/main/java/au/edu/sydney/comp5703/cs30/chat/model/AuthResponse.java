@@ -3,6 +3,7 @@ package au.edu.sydney.comp5703.cs30.chat.model;
 public class AuthResponse {
     private long userId;
     private String clientId;
+    private String token;
 
 
     public AuthResponse(long userId, String clientId) {
@@ -24,5 +25,13 @@ public class AuthResponse {
 
     public void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
