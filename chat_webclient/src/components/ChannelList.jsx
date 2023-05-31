@@ -7,6 +7,9 @@ import TagIcon from '@mui/icons-material/Tag';
 import { OrganizationIdContext, OrganizationsContext } from '../AppContext';
 import { nullOrganization } from '../api';
 import { findById, orgIsChannelMember } from '../util';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import IconButton from '@mui/material/IconButton';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
 const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
   const [organizationId] = React.useContext(OrganizationIdContext);
@@ -37,7 +40,11 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
         key={i}
         onClick={clickCb}
         selected={channel.id === selectedChannel.id}
-      />
+      >
+        <IconButton>
+          <MoreHorizIcon />
+        </IconButton>
+      </SimpleBoxItem>
     );
     channelElems.push(elem);
   }
@@ -48,7 +55,7 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
   return (
     <>
       {/* <SideBar /> */}
-      <div className="channel-list__list__wrapper" style={{ padding: '5px' }}>
+      <div className="channel-list__list__wrapper">
         {/* <CompanyHeader /> */}
         <div>{channelElems}</div>
       </div>

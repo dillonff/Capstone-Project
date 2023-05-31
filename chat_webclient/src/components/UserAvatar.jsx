@@ -33,9 +33,7 @@ function stringAvatar(name) {
 }
 
 function UserAvatar({username}) {
-  return (
-    <Avatar {...stringAvatar(username)} className="dmuser__avatar"></Avatar>
-  );
+  return <Avatar {...stringAvatar(username)}></Avatar>;
 }
 
 export default UserAvatar;

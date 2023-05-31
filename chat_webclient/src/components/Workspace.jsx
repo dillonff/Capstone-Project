@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
 
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -159,7 +160,6 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
       <div className="sidebar">
         {/* workspace info */}
         <div>{/* <h3>Workspace ({workspace.id}): {workspace.name}</h3> */}</div>
-
         <div>
           <DropdownButton
             id="workspace-dropdown"
@@ -189,9 +189,7 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
             </Dropdown.Item>
           </DropdownButton>
         </div>
-
         {/* some buttons */}
-
         <div style={{ marginBottom: '10px', display: 'none' }}>
           <Button
             style={{ margin: '5px' }}
@@ -221,9 +219,15 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
           selectedChannel={currentChannel}
           onChannelClick={(c) => setCurrentChannelId(c.id)}
         />
-
+        <div
+          tabIndex="0"
+          className="dmuser__wrapper"
+          onClick={onCreateChannelClick}
+        >
+          <AddCircleOutlineIcon />
+          Create Channel
+        </div>
         <hr />
-
         {/**workspace members */}
         <DirectMessageList
           channels={channels}
@@ -243,7 +247,6 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
       <hr />
     </div>
   );
-  
 };
 
 export default Workspace;

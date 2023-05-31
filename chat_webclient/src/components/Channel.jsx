@@ -4,6 +4,8 @@ import ChatBox from './ChatBox';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
+import MuiButton from '@mui/material/Button';
+import EditIcon from '@mui/icons-material/Edit';
 import ChannelMember from './ChannelMember';
 
 import {
@@ -95,13 +97,26 @@ function Channel({
     name = getDmName(channel);
   }
 
-  return <div style={{display: 'flex', flexDirection: 'column', height: '100%', width: '100%', padding: '10px', boxSizing: 'border-box', backgroundColor: 'white', color: 'black'}}>
-    {/* title */}
-    {!channel.directMessage && <h3>#{channel.id} {name}</h3>}
-    {channel.directMessage && <h3 style={{display: 'flex'}}><UserAvatar username={name} />({channel.id}) {name}</h3>}
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        width: '100%',
+        padding: '10px',
+        boxSizing: 'border-box',
+        backgroundColor: 'white',
+        color: 'black',
+      }}
+    >
+      {/* title */}
+      <h3>
+        #{channel.id} {name}
+      </h3>
 
-    <div style={{ display: 'flex' }}>
-      {/* <input
+      <div style={{ display: 'flex' }}>
+        {/* <input
         type="button"
         value="Add user (id)"
         style={{ marginRight: '5px' }} 
@@ -121,39 +136,41 @@ function Channel({
         }}
       ></input>
       <input type="text" ref={addUserIdRef}></input> */}
-      
-      <Button variant="link" onClick={handleShow}>
-        Edit members
-      </Button>
 
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Channel members</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <ChannelMember
-            channel={channel}
-            workspaceMembers={workspace.members || []}
-            channelMembers={members}
-          />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        <MuiButton variant="link" startIcon={<EditIcon />} onClick={handleShow}>
+          Edit members
+        </MuiButton>
 
+        <Modal show={show} onHide={handleClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Channel members</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <ChannelMember
+              channel={channel}
+              workspaceMembers={workspace.members || []}
+              channelMembers={members}
+            />
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
 
+      <hr />
+
+      <div className="chatbox__container">
+        <ChatBox
+          channel={channel}
+          messages={messages}
+          organization={organization}
+        />
+      </div>
     </div>
-
-    <hr />
-    
-    <div style={{flexGrow: '1', overflow: 'hidden'}}>
-      <ChatBox channel={channel} messages={messages} organization={organization} />
-    </div>
-  </div>
-  
+  );
 }
 
 export default Channel;
