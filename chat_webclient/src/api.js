@@ -176,11 +176,12 @@ export const processChannelMembers = async (members) => {
   }
 }
 
-export const createChannel = (wid, name, publicChannel, peerMemberType, peerMemberId) => {
+export const createChannel = (wid, name, publicChannel, autoJoin, peerMemberType, peerMemberId) => {
   let req = {
     name: name,
     workspace: wid,
-    publicChannel: publicChannel
+    publicChannel: publicChannel,
+    autoJoin: autoJoin
   };
   if (peerMemberId) {
     req.peerMemberId = parseInt(peerMemberId);

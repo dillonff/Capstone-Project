@@ -17,6 +17,7 @@
         <result column="workspace_id" property="workspaceId"/>
         <result column="is_public" property="publicChannel"/>
         <result column="is_direct_message" property="directMessage"/>
+        <result column="is_auto_join" property="autoJoin"/>
     </resultMap>
 
     <insert id="insertChannel" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
@@ -67,4 +68,15 @@
                 </when>
             </choose>
     </select>
+
+    <update id="updateChannel">
+        update
+            chat_channel
+        <trim prefix="set" prefixOverrides=",">
+            <if test="name != null">set name = #{name}</if>
+            <if test="autoJoin != null">, is_auto_join = #{autoJoin}</if>
+        </trim>
+        where
+            id = #{id}
+    </update>
 </mapper>

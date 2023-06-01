@@ -12,6 +12,8 @@ public class CreateChannelRequest {
 
     private boolean publicChannel;
 
+    private boolean autoJoin;
+
     public String getName() {
         return name;
     }
@@ -31,5 +33,9 @@ public class CreateChannelRequest {
 
     public boolean isPublicChannel() {
         return publicChannel;
+    }
+
+    public boolean shouldAutoJoin() {
+        return autoJoin;
     }
 }

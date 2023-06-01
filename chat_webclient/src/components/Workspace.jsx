@@ -42,6 +42,7 @@ import { DirectMessageList } from './DirectMessageList.jsx';
 import { AddGlobalModalsContext } from '../AppContext.js';
 import SimpleDetailDialog from './SimpleDetailDialog.jsx';
 import { InviteMemberForm } from './InviteMemberForm.jsx';
+import { CreateChannelForm } from './CreateChannelForm.jsx';
 
 const WorkspaceDropdown = ({ workspace }) => {
   return;
@@ -51,6 +52,7 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
   const workspace = initialWorkspace;
   let [channels, setChannels] = React.useState([]);
   const [currentChannelId, setCurrentChannelId] = React.useState(-1);
+  const [showCreateChannel, setShowCreateChannel] = React.useState(false);
   const addGlobalModal = React.useContext(AddGlobalModalsContext);
   const updateChannelCtx = React.useRef({ongoing: false, next: null});
   const workspaceRef = React.useRef(null);
@@ -154,12 +156,7 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
   };
 
   const onCreateChannelClick = (_) => {
-    let name = prompt('channel name');
-    if (name) {
-      createChannel(workspace.id, name, false).catch((e) => {
-        showError(addGlobalModal, e);
-      });
-    }
+    setShowCreateChannel(true);
   };
 
   return (
@@ -197,28 +194,17 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
             </Dropdown.Item>
           </DropdownButton>
         </div>
-        {/* some buttons */}
-        <div style={{ marginBottom: '10px', display: 'none' }}>
-          <Button
-            style={{ margin: '5px' }}
-            type="button"
-            value=""
-            variant="success"
-            onClick={null}
-          >
-            create channel
-          </Button>
-          <Button
-            type="button"
-            value="refresh channel"
-            variant="secondary"
-            onClick={(_) => {
-              updateChannels();
-            }}
-          >
-            refresh channels
-          </Button>
-        </div>
+
+        {/** create channel form */}
+        <SimpleDetailDialog
+          open={showCreateChannel}
+          onClose={() => setShowCreateChannel(false)}
+          fullWidth={false}
+          title="Create Channel"
+        >
+          <CreateChannelForm workspace={workspace} onClose={() => setShowCreateChannel(false)} />
+        </SimpleDetailDialog>
+
         <hr />
 
         <h5>Channels</h5>

@@ -28,6 +28,7 @@ export default function NewDirectMessage({
         workspace.id,
         `DM_${auth.user.id}_${m.type}-${m.memberId}`,
         false,
+        false,
         m.type,
         m.memberId
       ).catch(e => {

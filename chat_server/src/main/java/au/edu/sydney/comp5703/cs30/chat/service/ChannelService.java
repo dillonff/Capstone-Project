@@ -42,8 +42,9 @@ public class ChannelService {
         this.userMapper = userMapper;
     }
 
-    public Channel createChannel(long workspaceId, String name, boolean isPublic) {
+    public Channel createChannel(long workspaceId, String name, boolean isPublic, boolean autoJoin) {
         var channel = new Channel(name, workspaceId, isPublic);
+        channel.setAutoJoin(autoJoin);
         channelMapper.insertChannel(channel);
         return channelMapper.findById(channel.getId());
     }
