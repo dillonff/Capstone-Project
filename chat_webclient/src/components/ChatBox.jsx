@@ -16,8 +16,12 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
 
-import { callApi, callApiJsonChecked } from '../api';
-import { AddGlobalModalsContext } from '../AppContext';
+import { addOrgToChannel, addUserToChannel, auth, callApi, callApiJsonChecked, nullOrganization, nullOrganizationMember } from '../api';
+import {
+  AddGlobalModalsContext,
+  OrganizationIdContext,
+  OrganizationsContext
+} from '../AppContext';
 import { showError } from '../util';
 
 // if (
@@ -44,6 +48,36 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
     const handleAlternateEmailClose = () => {
         setAlternateEmailAnchor(null);
     };
+    const checkOrgIsMember = () => {
+      for (const m of (channel.members || [])) {
+        if (m.type === 1 && m.memberId === organization.id) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    const isMember = () => {
+      let userIsMember = channel.callerIsMember;
+      let orgIsMember = true;
+      if (organization.id > 0) {
+        orgIsMember = checkOrgIsMember();
+      }
+      return userIsMember && orgIsMember;
+    }
+
+    const handleJoin = () => {
+      if (!channel.callerIsMember) {
+        addUserToChannel(channel.id, auth.user.id).catch(e => {
+          showError(addGlobalModal, e);
+        });
+      }
+      if (organization.id > 0 && !checkOrgIsMember()) {
+        addOrgToChannel(channel.id, organization.id).catch(e => {
+          showError(addGlobalModal, e);
+        });
+      }
+    }
 
 
     const checkScroll = (_) => {
@@ -187,6 +221,16 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
         />
       </div>
 
+      <div className="d-flex justify-content-center align-items-center" style={{width: '100%', padding: '5px 0 0 0'}}>
+        {!isMember() && <>
+          <span style={{marginRight: '10px'}}>You're not a member of this workspace.</span>
+          <Button
+            variant="outlined"
+            onClick={handleJoin}
+          >Join this channel</Button>
+        </>}
+      </div>
+
       {/** message input box */}
       <div className="chatbox__container__input">
         <div className="chatbox__container__input__box">
@@ -212,15 +256,6 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
             />
           </div>
 
-          {/*<input*/}
-          {/*    type="button"*/}
-          {/*    value="Send"*/}
-          {/*    onClick={_ => sendMessage(text)}*/}
-          {/*    style={{*/}
-          {/*      marginLeft: 'auto', */}
-          {/*      width: '100px', */}
-          {/*    }}*/}
-          {/*/>*/}
           <div style={{ display: 'flex', width: '100%' }}>
             <IconButton
               color="neutral"

@@ -25,7 +25,7 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
     if (channel.directMessage) {
       continue;
     }
-    if (organization.id > 0 && !orgIsChannelMember(organization, members)) {
+    if (!channel.publicChannel && organization.id > 0 && !orgIsChannelMember(organization, members)) {
       continue;
     }
     const clickCb = () => {

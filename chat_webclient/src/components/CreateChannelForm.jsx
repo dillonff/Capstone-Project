@@ -16,7 +16,9 @@ export function CreateChannelForm({
   const handleSubmit = (e) => {
     e.preventDefault();
     const d = new FormData(formRef.current);
-    createChannel(workspace.id, d.get('name'), false, d.get('autoJoin')).then(_ => {
+    const publicChannel = formRef.current.publicChannel.checked;
+    const autoJoin = formRef.current.autoJoin.checked
+    createChannel(workspace.id, d.get('name'), publicChannel, autoJoin).then(_ => {
       if (onClose) {
         onClose();
       }

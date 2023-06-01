@@ -2,16 +2,15 @@ package au.edu.sydney.comp5703.cs30.chat.controller;
 
 import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.Util;
+import au.edu.sydney.comp5703.cs30.chat.entity.ChannelOrganization;
 import au.edu.sydney.comp5703.cs30.chat.entity.Workspace;
 import au.edu.sydney.comp5703.cs30.chat.entity.WorkspaceMember;
-import au.edu.sydney.comp5703.cs30.chat.mapper.OrganizationMapper;
-import au.edu.sydney.comp5703.cs30.chat.mapper.UserMapper;
-import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMapper;
-import au.edu.sydney.comp5703.cs30.chat.mapper.WorkspaceMemberMapper;
+import au.edu.sydney.comp5703.cs30.chat.mapper.*;
 import au.edu.sydney.comp5703.cs30.chat.model.CreateWorkspaceRequest;
 import au.edu.sydney.comp5703.cs30.chat.model.GetWorkspacesResponse;
 import au.edu.sydney.comp5703.cs30.chat.model.InfoChangedPush;
 import au.edu.sydney.comp5703.cs30.chat.model.JoinWorkspaceRequest;
+import au.edu.sydney.comp5703.cs30.chat.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,6 +36,15 @@ public class WorkspaceController {
 
     @Autowired
     private OrganizationMapper organizationMapper;
+
+    @Autowired
+    private ChannelMapper channelMapper;
+
+    @Autowired
+    private ChannelService channelService;
+
+    @Autowired
+    private ChannelOrganizationMapper channelOrganizationMapper;
 
     @RequestMapping(
             value = "/api/v1/workspaces", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
@@ -115,6 +123,17 @@ public class WorkspaceController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already a member");
         }
         Repo.addMemberToWorkspace(workspace.getId(), req.getType(), memberId);
+        var channels = channelMapper.findPublicByWorkspaceId(workspace.getId());
+        for (var c : channels) {
+            if (c.shouldAutoJoin()) {
+                if (req.getType() == 0) {
+                    channelService.addMemberToChannel(c.getId(), memberId);
+                } else {
+                    channelOrganizationMapper.insert(new ChannelOrganization(c.getId(), memberId));
+                }
+
+            }
+        }
         var p = makeServerPush("infoChanged", new InfoChangedPush("workspace"));
         broadcastMessages(p);
         return "{}";

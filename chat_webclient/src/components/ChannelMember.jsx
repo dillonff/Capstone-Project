@@ -4,17 +4,20 @@ import React from 'react';
 import Button from 'react-bootstrap/Button';
 
 import {
+  addOrgToChannel,
   addUserToChannel,
   getOrg,
   getUser
 } from '../api';
-import { useMountedEffect } from '../util';
+import { AddGlobalModalsContext } from '../AppContext';
+import { showError, useMountedEffect } from '../util';
 
 function ChannelMember({
   channel,
   workspaceMembers,
   channelMembers
 }) {
+  const addGlobalModal = React.useContext(AddGlobalModalsContext);
   let membersNotJoinned = [];
   let userMembersIdSet = new Set(channelMembers.map(m => m.userId));
   for (let m of workspaceMembers) {
@@ -26,9 +29,8 @@ function ChannelMember({
             otherText: 'Workspace user',
             onAdd: _ => {
               addUserToChannel(channel.id, m.user.id).catch(e => {
-                console.error(e);
-                alert(e);
-              })
+                showError(addGlobalModal, e);
+              });
             }
           });
         }
@@ -39,7 +41,9 @@ function ChannelMember({
             displayName: m.organization.name, 
             otherText: m.organization.fullName,
             onAdd: _ => {
-              
+              addOrgToChannel(channel.id, m.organization.id).catch(e => {
+                showError(addGlobalModal, e);
+              });
             }
           });
         }

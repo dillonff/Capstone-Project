@@ -10,4 +10,6 @@ public interface ChannelOrganizationMapper {
     Integer insert(ChannelOrganization channelOrganization);
 
     List<ChannelOrganization> findByChannelId(Long channelId);
+
+    boolean isMember(Long channelId, Long organizationId);
 }

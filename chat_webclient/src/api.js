@@ -225,17 +225,23 @@ export const getAllWorkspaces = async (orgId) => {
 
 export const addUserToChannel = (cid, uid) => {
   let req = {
-    userId: parseInt(uid),
+    memberId: parseInt(uid),
     channelId: parseInt(cid),
+    type: 0  // user
   };
   req = JSON.stringify(req);
-  return callApi('/channels/join', 'POST', req).then(res => {
-    if (!res.ok) {
-      console.error(res);
-      throw Error('Api call failed');
-    }
-  });
+  return callApiJsonChecked('/channels/join', 'POST', req);
 };
+
+export const addOrgToChannel = (cid, oid) => {
+  let req = {
+    memberId: parseInt(oid),
+    channelId: parseInt(cid),
+    type: 1  // org
+  };
+  req = JSON.stringify(req);
+  return callApiJsonChecked('/channels/join', 'POST', req);
+}
 
 export const processServerMessage = async (m) => {
   let user = await getUser(m.senderId);

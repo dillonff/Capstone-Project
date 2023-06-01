@@ -4,6 +4,7 @@ import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.Util;
 import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
 import au.edu.sydney.comp5703.cs30.chat.entity.ChannelMember;
+import au.edu.sydney.comp5703.cs30.chat.entity.ChannelOrganization;
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import au.edu.sydney.comp5703.cs30.chat.mapper.*;
 import au.edu.sydney.comp5703.cs30.chat.model.*;
@@ -83,14 +84,36 @@ public class ChannelController {
             value = "/api/v1/channels/join", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
     public String handleJoinChannel(@RequestBody JoinChannelRequest req, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
-        // for existing client, first figure out the clientSession that was created in auth
-        var user = userMapper.findById(req.getUserId());
         var channel = channelMapper.findById(req.getChannelId());
-        var member = channelMemberMapper.findByUserAndChannelId(user.getId(), channel.getId());
-        if (member != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already a member");
+        if (channel == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "channel not found");
         }
-        channelService.addMemberToChannel(channel.getId(), user.getId());
+        switch (req.getType()) {
+            case 0:
+                var user = userMapper.findById(req.getMemberId());
+                if (user == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found");
+                }
+                var member = channelMemberMapper.findByUserAndChannelId(user.getId(), channel.getId());
+                if (member != null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already a member");
+                }
+                channelService.addMemberToChannel(channel.getId(), user.getId());
+                break;
+            case 1:
+                var org = organizationMapper.findById(req.getMemberId());
+                if (org == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "organization not found");
+                }
+                if (channelOrganizationMapper.isMember(channel.getId(), org.getId())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already a member");
+                }
+                channelOrganizationMapper.insert(new ChannelOrganization(channel.getId(), org.getId()));
+                break;
+            default:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid member type");
+        }
+
 
         var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
         broadcastMessages(p);
