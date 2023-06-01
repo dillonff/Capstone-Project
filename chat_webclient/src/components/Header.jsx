@@ -10,6 +10,8 @@ import Grid from '@mui/material/Unstable_Grid2';
 import EmailIcon from '@mui/icons-material/Email';
 import Typography from '@mui/material/Typography';
 import { Button } from "@mui/material";
+import BadgeIcon from '@mui/icons-material/Badge';
+import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import { Link } from "react-router-dom";
 import {getUser} from "../api" 
 
@@ -28,13 +30,15 @@ function Header() {
   //   }, []);
 
     const [anchorEl, setAnchorEl] = useState(null);
+
     const [userInfo, setUserInfo] = useState({});
+
     const tabAnchorEl = (el, status) => {
       console.log(el, 'eee');
       setAnchorEl(el)
     }
     useEffect(() => {
-      const userInfo = localStorage.getItem("userInfo"); // 用户信息
+      const userInfo = localStorage.getItem("userInfo"); 
       if (userInfo) {
         setUserInfo(JSON.parse(userInfo))
       }
@@ -84,9 +88,21 @@ function Header() {
             }}
           >
             <div className="popover-content">
-              <p>Name: {userInfo.username}</p>
-              <p>Phone: {userInfo.phone}</p>
-                {
+              <Grid>
+                    <BadgeIcon sx={{ size: 100 }}/>
+
+            Name: {userInfo.username}
+            </Grid>
+            <Grid>
+            <LocalPhoneIcon sx={{ size: 100 }}/>
+              Phone: {userInfo.phone}
+              </Grid>
+              <Grid>
+                  <EmailIcon sx={{ size: 100 }} />
+
+                    Email:{userInfo.email}
+              </Grid>
+              {
                   // userId.toString() === profileUserId ? 
                   <Button 
                       // component={Link} to={ '/editprofile'}
@@ -99,17 +115,6 @@ function Header() {
                 }
               <Box width="100%" /> {/* basically adds a new row */}
 
-              <Grid>
-                  <EmailIcon sx={{ size: 100 }} />
-              </Grid>
-              <Grid>
-                  <Typography style={{
-                      fontSize: 20
-                  }}
-                  >
-                    {userInfo.email}
-                  </Typography>
-              </Grid>
             </div>
           </Popover>
 

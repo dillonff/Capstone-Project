@@ -56,14 +56,14 @@ export default function Edit() {
  //       const password=md5(newpassword);
         const password=newpassword;
 
-console.log(password);
         const obj={
 id :userInfo.id,
 username:userInfo.username,
 oldPassword:encryptedPassword,
 newPassword:password
         };
-        updateUser(obj)
+        updateUser(obj);
+        alert("Success!");
         }
     }
 

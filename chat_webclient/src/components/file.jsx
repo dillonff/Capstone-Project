@@ -182,7 +182,7 @@ async function getUser(id, auth, refresh = false) {
   return (
     <div className="App">
       <div className="sidebar">
-        <div className="sidebar-user">{User.id}</div>
+        <div className="sidebar-user">{User.name}</div>
         <div className="sidebar-folders">
           <ul>
             {folderData.map((folder) => (
