@@ -28,7 +28,7 @@ function Header() {
   //   }, []);
 
     const [anchorEl, setAnchorEl] = useState(null);
-    const [userInfo, setUserInfo] = useState({ name: 'John Doe', email: 'johndoe@example.com' });
+    const [userInfo, setUserInfo] = useState;
     // ...
     const tabAnchorEl = (el, status) => {
       console.log(el, 'eee');
@@ -40,6 +40,16 @@ function Header() {
         setUserInfo(JSON.parse(userInfo))
       }
     }, [])
+
+    const handleprofile=()=>{
+      const w=window.open('about:blank');
+      w.location.href='/editprofile';
+    }
+
+    const handlefile=()=>{
+      const w=window.open('about:blank');
+      w.location.href='/file';
+    }
 
   return (
     <div className="header">
@@ -54,9 +64,8 @@ function Header() {
         <HelpOutlineIcon />
         <div className="header__icons">
           <div className="header__file-icon" >
-            <Link to="/file">
-              <FolderOpenIcon></FolderOpenIcon>
-            </Link>
+              <FolderOpenIcon           onClick={handlefile}>
+              </FolderOpenIcon>
           </div>
           <Avatar
             className="header__avatar"
@@ -82,8 +91,10 @@ function Header() {
                   // userId.toString() === profileUserId ? 
                   <Button 
                       // component={Link} to={ '/editprofile'}
-                      href='/editprofile'
+                    //  href='/editprofile'
+                    onClick={handleprofile}
                       >
+    
                       Edit Profile
                   </Button>//: ''
                 }

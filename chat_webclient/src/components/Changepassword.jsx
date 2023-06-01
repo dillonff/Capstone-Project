@@ -42,7 +42,9 @@ export default function Edit() {
     const newpassword2 = data.get('newpassword2').toString();
     const userInfo = JSON.parse(localStorage.getItem("userInfo")); //登录的账号
     const useroldpassword=userInfo.password.toString().replace(/\s*/g,"");
-    const encryptedPassword=md5(data.get('oldpassword').toString());
+//    const encryptedPassword=md5(data.get('oldpassword').toString());
+    const encryptedPassword=data.get('oldpassword').toString();
+
     if(useroldpassword !== encryptedPassword){
         alert("Old password is wrong!")
         return
@@ -52,7 +54,9 @@ export default function Edit() {
         return
       }
       else{
-        const password=md5(newpassword);
+ //       const password=md5(newpassword);
+        const password=newpassword;
+
 console.log(password);
         const obj={
 id :userInfo.id,
@@ -61,28 +65,6 @@ oldPassword:userInfo.password,
 newPassword:password
         };
         updateUser(obj)
-
-      //   fetch('http://localhost:8080/updatePassword', {
-      //       method: "POST",
-      //       headers: {
-      //         "Content-type": "application/json"
-      //       },
-      //       body: JSON.stringify({
-      //         "id": id,
-      //         "Name": null,
-      //         "email": null,
-      //         "password": password,
-      //         "birthday": null,
-      //         "mobileNumber": null
-      //       })
-      //     })
-      //       .then(response => response.json())
-      //       .then(data => {
-      //           alert("Change success!");
-      //     window.location = "/profile?id=" + id
-      //         // window.location.href()
-      //       }
-      //       )
         }
     }
 

@@ -16,13 +16,7 @@ const routes = [
 
     ],
   },
-  {
-    path: "/Workspace",
-    component: React.lazy(() => import("../components/Workspace.jsx")),
-    children: [
-      
-    ]
-  },
+
    {
      path: "/file",
      component: React.lazy(() => import("../components/file.jsx")),
