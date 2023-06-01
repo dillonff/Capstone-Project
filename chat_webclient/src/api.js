@@ -106,7 +106,7 @@ export const nullOrganizationMember = {
   autoJoinChannel: false
 }
 
-const API_ENDPOINT = 'http://127.0.0.1:11451/api/v1';
+export const API_ENDPOINT = 'http://127.0.0.1:11451/api/v1';
 export function callApi(path, method, body) {
   const headers = {
     authorization: auth.token

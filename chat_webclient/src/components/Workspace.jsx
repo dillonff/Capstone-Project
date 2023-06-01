@@ -168,9 +168,10 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
         <div>
           <DropdownButton
             id="workspace-dropdown"
-            variant="primary"
+            variant="outline-light"
+            menuVariant="dark"
             size="md"
-            title={`${workspace.name} (${workspace.id})`}
+            title={<span >{workspace.name}</span>}
           >
             <Dropdown.Item onClick={onAddUserClick}>
               Invite user

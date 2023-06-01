@@ -393,7 +393,7 @@ body {
   display: flex;
   flex-direction: column;
   background: #1e2b55;
-  width: 300px;
+  /* width: 300px; */
   padding: '5px';
 }
 
@@ -493,7 +493,7 @@ body {
   background-color: #1e2b55;
   border-top: 1px solid white;
   flex: 0 0 330px;
-  padding: 20px;
+  padding: 15px;
   overflow: auto;
   height: 100%;
 }
@@ -686,7 +686,6 @@ body {
 }
 .message {
   display: flex;
-  align-items: center;
   margin: 10px 0;
   padding: 5px 0;
 }
