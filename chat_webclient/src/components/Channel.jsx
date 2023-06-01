@@ -1,9 +1,10 @@
 import React from 'react';
 import ChatBox from './ChatBox';
 
-import Button from 'react-bootstrap/Button';
+import Button from '@mui/material/Button';
 import Modal from 'react-bootstrap/Modal';
 
+import TagIcon from '@mui/icons-material/Tag';
 import MuiButton from '@mui/material/Button';
 import EditIcon from '@mui/icons-material/Edit';
 import ChannelMember from './ChannelMember';
@@ -111,56 +112,36 @@ function Channel({
       }}
     >
       {/* title */}
-      <h3>
-        #{channel.id} {name}
-      </h3>
+      <h4 className="d-flex align-items-center">
+        <div><TagIcon /></div>
+        <div>{name}</div>
 
-      <div style={{ display: 'flex' }}>
-        {/* <input
-        type="button"
-        value="Add user (id)"
-        style={{ marginRight: '5px' }} 
-        onClick={(_) => {
-          addUserToChannel(
-            channel.id,
-            addUserIdRef.current.value
-          ).then((res) => {
-            if (!res.ok) {
-              console.error(res);
-              alert('cannot add user');
-            } else {
-              alert('Added!');
-            }
-          });
-          addUserIdRef.current.value = '';
-        }}
-      ></input>
-      <input type="text" ref={addUserIdRef}></input> */}
+        <div style={{marginLeft:'10px'}}>
+          <Button variant="text" size="small" sx={{color: 'black'}} startIcon={<EditIcon />} onClick={handleShow}>
+            Edit members
+          </Button>
 
-        <MuiButton variant="link" startIcon={<EditIcon />} onClick={handleShow}>
-          Edit members
-        </MuiButton>
+          <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Channel members</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <ChannelMember
+                channel={channel}
+                workspaceMembers={workspace.members || []}
+                channelMembers={members}
+              />
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </div>
+      </h4>
 
-        <Modal show={show} onHide={handleClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>Channel members</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <ChannelMember
-              channel={channel}
-              workspaceMembers={workspace.members || []}
-              channelMembers={members}
-            />
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleClose}>
-              Close
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </div>
-
-      <hr />
+      <hr style={{margin: '3px 0'}} />
 
       <div className="chatbox__container">
         <ChatBox
