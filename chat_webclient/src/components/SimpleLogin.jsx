@@ -18,7 +18,7 @@ function SimpleLogin({ defaultUsername, onLoggedin }) {
   }
   const doLogin = (event) => {
     event.preventDefault();
-    login(usernameInputRef.current.value, '')
+    login(usernameInputRef.current.value, passwordInputRef.current.value)
       .then((_) => {
         localStorage.setItem("userID", _.id);
         localStorage.setItem("userInfo", JSON.stringify(_));
