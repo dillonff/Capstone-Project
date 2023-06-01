@@ -39,6 +39,9 @@ import Event from '../event';
 import UserAvatar from './UserAvatar';
 import { useMountedEffect } from '../util.js';
 import { DirectMessageList } from './DirectMessageList.jsx';
+import { AddGlobalModalsContext } from '../AppContext.js';
+import SimpleDetailDialog from './SimpleDetailDialog.jsx';
+import { InviteMemberForm } from './InviteMemberForm.jsx';
 
 const WorkspaceDropdown = ({ workspace }) => {
   return;
@@ -48,6 +51,7 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
   const workspace = initialWorkspace;
   let [channels, setChannels] = React.useState([]);
   const [currentChannelId, setCurrentChannelId] = React.useState(-1);
+  const addGlobalModal = React.useContext(AddGlobalModalsContext);
 
   let currentChannel = nullChannel;
   if (currentChannelId !== -1) {
@@ -130,18 +134,19 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
   );
 
   const onAddUserClick = (_) => {
-    let res = prompt('User id to join');
-    if (!res) {
-      return;
-    }
-    addUserToWorkspace(workspace.id, res).then((res) => {
-      if (!res.ok) {
-        console.error(res);
-        alert('cannot add user');
-      } else {
-        // addUserIdToWorkspaceRef.current.value = '';
-        alert('Added!');
-      }
+    const elem = <InviteMemberForm
+      onInvite={(email) => {
+        addUserToWorkspace(workspace.id, email).then(res => {
+          alert('Added!');
+        }).catch(e => {
+          console.error(e);
+          alert(e);
+        });
+      }}
+    />;
+    addGlobalModal(SimpleDetailDialog, {
+      title: 'Invite user to workspace',
+      children: elem
     });
   };
 
@@ -165,11 +170,11 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
           <DropdownButton
             id="workspace-dropdown"
             variant="primary"
-            size="lg"
+            size="md"
             title={`${workspace.name} (${workspace.id})`}
           >
             <Dropdown.Item onClick={onAddUserClick}>
-              Add user (id)
+              Invite user
             </Dropdown.Item>
             <Dropdown.Item onClick={onCreateChannelClick}>
               Create channel

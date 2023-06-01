@@ -297,13 +297,18 @@ export const getMessageById = async (id) => {
 }
 
 
-export const addUserToWorkspace = (wid, uid) => {
+export const addUserToWorkspace = (wid, email) => {
   let req = {
-    userId: parseInt(uid),
-    workspaceId: parseInt(wid)
+    workspaceId: parseInt(wid),
+    type: 0
   };
+  if (!isNaN(parseInt(email))) {
+    req.memberId = parseInt(email);
+  } else {
+    req.email = email;
+  }
   req = JSON.stringify(req);
-  return callApi('/workspaces/join', 'POST', req);
+  return callApiJsonChecked('/workspaces/join', 'POST', req);
 }
 
 const orgCache = {};

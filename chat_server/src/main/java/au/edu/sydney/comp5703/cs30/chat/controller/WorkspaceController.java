@@ -79,10 +79,11 @@ public class WorkspaceController {
         if (workspace == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "workspace not found");
         }
+        long providedMemberId = req.getMemberId() == null ? -1L : req.getMemberId();
         long memberId;
         switch (req.getType()) {
             case 0:
-                var user = userMapper.findById(req.getMemberId());
+                var user = userMapper.findById(providedMemberId);
                 if (user == null && StringUtils.hasLength(req.getEmail())) {
                     var users = userMapper.findByEmail(req.getEmail());
                     if (users.size() == 1) {
@@ -96,7 +97,7 @@ public class WorkspaceController {
                 }
                 break;
             case 1:
-                var org = organizationMapper.findById(req.getMemberId());
+                var org = organizationMapper.findById(providedMemberId);
                 if (org == null && StringUtils.hasLength(req.getEmail()))  {
                     org = organizationMapper.findByEmail(req.getEmail());
                 }
