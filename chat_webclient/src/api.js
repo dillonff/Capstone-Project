@@ -393,3 +393,12 @@ export const getFile = async (id, workspace,sortOptions) => {
   }
   throw new Error('Cannot get File');
 }
+
+export const getWorkspaceAll = async () => {
+  let res = await callApi(`/workspaces/-1`, 'GET');
+  if (res.ok) {
+    res = await res.json();
+    return res;
+  }
+  throw new Error('Cannot get File');
+}

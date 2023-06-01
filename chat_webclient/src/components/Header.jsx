@@ -99,7 +99,6 @@ function Header() {
               </Grid>
               <Grid>
                   <EmailIcon sx={{ size: 100 }} />
-
                     Email:{userInfo.email}
               </Grid>
               {

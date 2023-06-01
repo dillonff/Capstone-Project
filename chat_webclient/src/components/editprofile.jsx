@@ -8,10 +8,6 @@ import CardContent from '@mui/material/CardContent';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-
-// Redux Imports
-import { Navigate, useNavigate } from "react-router-dom";
-// import { useSelector, useDispatch } from 'react-redux'
 import {updateUser,getUser} from "../api" 
 
 export default function Edit() {
@@ -49,7 +45,9 @@ export default function Edit() {
       email:user.email,
       phone:user.phone
     }
-    updateUser(job).then((e)=>{alert("Success!");})
+    updateUser(job).then((e)=>{alert("Success!");
+    window.close();
+  });
   };
   
   return (
