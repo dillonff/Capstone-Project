@@ -30,14 +30,14 @@ public class UserMapperTest {
 
     @Test
     public void insert() {
-        User user = new User("Yuzhe");
-        user.setId(6);
-        user.setPassword("wyz123456");
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
-        String hashedPass = encoder.encode(user.getPassword());
-        System.out.println(hashedPass);
-        user.setPassword(hashedPass);
-        userMapper.insertUser(user);
+//        User user = new User("Yuzhe", "");
+//        user.setId(6);
+//        user.setPassword("wyz123456");
+//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
+//        String hashedPass = encoder.encode(user.getPassword());
+//        System.out.println(hashedPass);
+//        user.setPassword(hashedPass);
+//        userMapper.insertUser(user);
     }
     @Test
     public void findByUsername(){
@@ -49,11 +49,8 @@ public class UserMapperTest {
     @Test
     public void reg(){
         try {
-            User user = new User("MWYZ");
-            user.setPassword("nsmyibc");
-            user.setPhone("1785880");
-            user.setEmail("merritt@gmail.com");
-            iUserService.reg(user.getUsername(), user.getPassword());
+            User user = new User("MWYZ", "nsmyibc", "1785880", "merritt@gmail.com", "MWYZ");
+            iUserService.reg(user.getUsername(), user.getPassword(), user.getPhone(), user.getEmail(), "MWYZ");
             System.out.println("Successfully registered！");
         } catch (ServiceException e) {
             System.out.println("Register fail！" + e.getClass().getSimpleName());
@@ -63,11 +60,12 @@ public class UserMapperTest {
 
     @Test
     public void updateInfoByUid(){
-        int id = 3;
+        long id = 3;
         String username = "merr";
         String phone = "223311";
         String email = "1234@123.com";
-        iUserService.updateInfoByUid(username, phone, email, id);
+        String displayName = "Merr";
+        iUserService.updateInfoByUid(id, username, phone, email, displayName);
     }
 
     @Test

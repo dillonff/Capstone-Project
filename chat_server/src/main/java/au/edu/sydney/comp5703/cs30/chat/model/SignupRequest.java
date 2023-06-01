@@ -6,6 +6,8 @@ public class SignupRequest {
     private String email;
     private String phone;
 
+    private String displayName;
+
     public String getUsername() {
         return username;
     }
@@ -36,5 +38,13 @@ public class SignupRequest {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 }

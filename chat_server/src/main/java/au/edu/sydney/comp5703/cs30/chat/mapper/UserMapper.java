@@ -16,7 +16,7 @@ public interface UserMapper {
     Integer updatePassById(Integer id,
                            String password);
 
-    Integer updateInfoById(String username, String phone, String email, Integer id);
+    Integer updateInfoById(Long id, String username, String phone, String email, String displayName);
 
     // There was no unique index on the email field
     // check if there are duplicate emails

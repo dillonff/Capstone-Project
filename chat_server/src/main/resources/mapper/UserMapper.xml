@@ -7,20 +7,24 @@
     <resultMap id="UserEntityMap" type="au.edu.sydney.comp5703.cs30.chat.entity.User">
         <constructor>
             <arg column="username" javaType="String" />
+            <arg column="password" javaType="String" />
+            <arg column="phone" javaType="String" />
+            <arg column="email" javaType="String" />
+            <arg column="displayName" javaType="String" />
         </constructor>
         <id column="id" property="id"></id>
         <result column="username" property="username"></result>
         <result column="phone" property="phone"></result>
         <result column="email" property="email"></result>
         <result column="password" property="password"></result>
-        <result column="phone" property="phone"></result>
+        <result column="display_name" property="displayName"></result>
     </resultMap>
 
     <insert id="insertUser" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         insert into chat_user (
-            username, password
+            username, password, email, phone, display_name
         ) values (
-            #{username}, #{password}
+            #{username}, #{password}, #{email}, #{phone}, #{displayName}
         )
     </insert>
 
@@ -47,7 +51,8 @@
         update chat_user set
                              username=#{username},
                              email=#{email},
-                             phone=#{phone}
+                             phone=#{phone},
+                             display_name=#{displayName}
         where id=#{id}
     </update>
 

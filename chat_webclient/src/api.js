@@ -38,17 +38,18 @@ export async function login(username, password) {
   return auth.user
 }
 
-export async function signup(username, password, confirmPassword) {
+export async function signup(username, password, confirmPassword, phone, email, displayName) {
   if (password !== confirmPassword) {
     throw new Error('Passwords mismatch.');
   }
-  let res = await callApi('/users', 'POST', JSON.stringify({
+  let res = await callApiJsonChecked('/users', 'POST', JSON.stringify({
     username: username,
-    password: password
+    password: password,
+    phone: phone,
+    email: email,
+    displayName: displayName
   }));
-  if (!res.ok) {
-    throw new Error('Cannot signup');
-  }
+  return res;
 }
 
 const userCache = {};

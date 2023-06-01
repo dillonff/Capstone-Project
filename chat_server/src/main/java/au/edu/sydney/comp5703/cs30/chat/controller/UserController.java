@@ -9,6 +9,7 @@ import au.edu.sydney.comp5703.cs30.chat.util.JsonResult;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -40,7 +41,24 @@ public class UserController extends BaseController {
         if (Strings.isEmpty(req.getUsername()) || Strings.isEmpty(req.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "missing username or password");
         }
-        userService.reg(req.getUsername(), req.getPassword());
+        if (!req.getUsername().matches("^[A-Za-z0-9_\\-]+$")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username can only contain letters, digits, _, -");
+        }
+        if (!StringUtils.hasLength(req.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "missing email");
+        } else {
+            var u = userMapper.findByEmail(req.getEmail());
+            if (u.size() > 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email was already used");
+            }
+        }
+        if (!StringUtils.hasLength(req.getDisplayName()))  {
+            req.setDisplayName(req.getUsername());
+        }
+        if (req.getPhone() == null) {
+            req.setPhone("");
+        }
+        userService.reg(req.getUsername(), req.getPassword(), req.getPhone(), req.getEmail(), req.getDisplayName());
 
         return new JsonResult<Void>(OK);
     }
@@ -51,8 +69,8 @@ public class UserController extends BaseController {
         if (req.getNewPassword() != null) {
             userService.changePassword((int) user.getId(), user.getUsername(), req.getOldPassword(), req.getNewPassword());
         }
-        if (req.getUsername() != null && req.getEmail() != null && req.getPhone() != null) {
-            userService.updateInfoByUid(req.getUsername(), req.getPhone(), req.getEmail(), (int) user.getId());
+        if (req.getUsername() != null && req.getEmail() != null && req.getPhone() != null &&req.getDisplayName() != null) {
+            userService.updateInfoByUid(user.getId(), req.getUsername(), req.getPhone(), req.getEmail(), req.getDisplayName());
         }
         return new JsonResult<>(OK);
     }
