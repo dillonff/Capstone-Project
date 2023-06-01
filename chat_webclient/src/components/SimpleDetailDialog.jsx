@@ -52,7 +52,7 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function SimpleDetailDialog({open, onClose, title, children}) {
+export default function SimpleDetailDialog({open, onClose, title, fullWidth=true, children}) {
   if (!title) {
     title = 'Dialog';
   }
@@ -63,7 +63,7 @@ export default function SimpleDetailDialog({open, onClose, title, children}) {
         onClose={onClose}
         open={open}
         maxWidth="sm"
-        fullWidth="true"
+        fullWidth={fullWidth}
         sx={{top: '0em'}}
       >
         <BootstrapDialogTitle onClose={onClose}>

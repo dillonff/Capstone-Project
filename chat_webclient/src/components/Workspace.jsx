@@ -37,7 +37,7 @@ import Channel from './Channel';
 import CreateOrganization from './CreateOrganization';
 import Event from '../event';
 import UserAvatar from './UserAvatar';
-import { useMountedEffect } from '../util.js';
+import { showError, showInfo, useMountedEffect } from '../util.js';
 import { DirectMessageList } from './DirectMessageList.jsx';
 import { AddGlobalModalsContext } from '../AppContext.js';
 import SimpleDetailDialog from './SimpleDetailDialog.jsx';
@@ -52,6 +52,8 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
   let [channels, setChannels] = React.useState([]);
   const [currentChannelId, setCurrentChannelId] = React.useState(-1);
   const addGlobalModal = React.useContext(AddGlobalModalsContext);
+  const updateChannelCtx = React.useRef({ongoing: false, next: null});
+  const workspaceRef = React.useRef(null);
 
   let currentChannel = nullChannel;
   if (currentChannelId !== -1) {
@@ -63,57 +65,59 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
     }
   }
 
-  React.useEffect((_) => {
-    getAndUpdateChannels();
-  }, []);
-
-  const getAndUpdateChannels = async (_) => {
-    let newChannels = channels;
+  const getAndUpdateChannels = React.useCallback(async () => {
+    let newChannels = [];
     try {
       newChannels = await getAllChannels(workspace.id);
+      for (const c of newChannels) {
+        const members = await getChannelMembers(c.id);
+        await processChannelMembers(members);
+        c.members = members;
+      }
     } catch (e) {
-      console.error(e);
-      alert(e);
+      showError(addGlobalModal, e);
+      return;
     }
     for (const channel of newChannels) {
       if (currentChannel.id === -1 && channel.name === 'general') {
         setCurrentChannelId(channel.id);
       }
     }
-    setChannels(newChannels);
-  };
+    if (workspaceRef.current === workspace) {
+      // set channels only when current workspace does not change
+      setChannels(newChannels);
+    }
+  }, [currentChannel, workspace]);
 
-  React.useEffect(_ => {
-    let channelToGetMember = null;
-    for (const c of channels) {
-      if (!c.members) {
-        channelToGetMember = c;
-        break;
+  const updateLoop = React.useCallback(async () => {
+    while (updateChannelCtx.current.next) {
+      try {
+        const func = updateChannelCtx.current.next;
+        updateChannelCtx.current.next = null;
+        await func();
+      } finally {
+
       }
     }
-    if (channelToGetMember) {
-      (async () => {
-        let members = await getChannelMembers(channelToGetMember.id);
-        await processChannelMembers(members);
-        setChannels(oldChannels => {
-          let newChannels = [];
-          let changed = false;
-          for (const c of oldChannels) {
-            if (c === channelToGetMember) {
-              newChannels.push({...c, members: members});
-              changed = true;
-            } else {
-              newChannels.push(c);
-            }
-          }
-          if (changed) {
-            return newChannels;
-          }
-          return oldChannels;
-        });
-      }) ();
+    updateChannelCtx.current.ongoing = false;
+  }, []);
+
+  const updateChannels = React.useCallback(() => {
+    const ctx = updateChannelCtx.current;
+    ctx.next = getAndUpdateChannels;
+    if (!ctx.ongoing) {
+      ctx.ongoing = true;
+      updateLoop();
     }
-  }, [channels]);
+  }, [getAndUpdateChannels]);
+
+  React.useEffect((_) => {
+    workspaceRef.current = workspace;
+    updateChannels();
+    return () => {
+      workspaceRef.current = null;
+    }
+  }, [workspace]);
 
   React.useEffect(
     (_) => {
@@ -122,7 +126,7 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
       cb.onInfoChanged = (data) => {
         console.error("workspace: check channel change", data);
         if (data.infoType.startsWith('channel')) {
-          getAndUpdateChannels();
+          updateChannels();
         }
       };
       Event.addListener(cb);
@@ -130,17 +134,16 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
         Event.removeListener(cb);
       };
     },
-    [workspace, currentChannel]
+    [workspace, currentChannel, updateChannels]
   );
 
   const onAddUserClick = (_) => {
     const elem = <InviteMemberForm
       onInvite={(email) => {
         addUserToWorkspace(workspace.id, email).then(res => {
-          alert('Added!');
+          showInfo(addGlobalModal, "Member added!");
         }).catch(e => {
-          console.error(e);
-          alert(e);
+          showError(addGlobalModal, e);
         });
       }}
     />;
@@ -154,8 +157,7 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
     let name = prompt('channel name');
     if (name) {
       createChannel(workspace.id, name, false).catch((e) => {
-        console.error(e);
-        alert(e);
+        showError(addGlobalModal, e);
       });
     }
   };
@@ -181,7 +183,7 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
             </Dropdown.Item>
             <Dropdown.Item
               onClick={(_) => {
-                getAndUpdateChannels();
+                updateChannels();
               }}
             >
               Refresh channel
@@ -211,7 +213,7 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
             value="refresh channel"
             variant="secondary"
             onClick={(_) => {
-              getAndUpdateChannels();
+              updateChannels();
             }}
           >
             refresh channels

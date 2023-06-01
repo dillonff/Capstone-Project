@@ -1,4 +1,5 @@
 import React from 'react';
+import SimpleDetailDialog from './components/SimpleDetailDialog';
 
 
 export function useMountedEffect(func, deps) {
@@ -91,4 +92,19 @@ export function orgIsChannelMember(org, channelMembers) {
         }
     }
     return false;
+}
+
+export function showError(addGlobalModal, e) {
+    let message = e;
+    if (e instanceof Error) {
+        console.error(e);
+        message = e.message;
+    }
+    let elem = <div style={{padding: '10px 0', fontSize: 'large'}}>{message}</div>;
+    addGlobalModal(SimpleDetailDialog, {title: 'Error', children: elem, fullWidth: false});
+}
+
+export function showInfo(addGlobalModal, message) {
+    let elem = <div style={{padding: '10px 0', fontSize: 'large'}}>{message}</div>;
+    addGlobalModal(SimpleDetailDialog, {title: 'Information', children: elem, fullWidth: false});
 }
