@@ -60,7 +60,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
     const isMember = () => {
       let userIsMember = channel.callerIsMember;
       let orgIsMember = true;
-      if (organization.id > 0) {
+      if (organization.id > 0 && !channel.directMessage) {
         orgIsMember = checkOrgIsMember();
       }
       return userIsMember && orgIsMember;
@@ -240,7 +240,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
 
       <div className="d-flex justify-content-center align-items-center" style={{width: '100%', padding: '5px 0 0 0'}}>
         {!isMember() && <>
-          <span style={{marginRight: '10px'}}>You're not a member of this workspace.</span>
+          <span style={{marginRight: '10px'}}>You're not a member of this channel.</span>
           <Button
             variant="outlined"
             onClick={handleJoin}

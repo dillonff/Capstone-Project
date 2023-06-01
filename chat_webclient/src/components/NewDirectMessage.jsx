@@ -1,7 +1,8 @@
 import { List, ListItem, ListItemButton } from '@mui/material';
 import React from 'react';
 import { auth, createChannel } from '../api';
-import { getChannelMemberKey, getWorkspaceMemberKey } from '../util';
+import { AddGlobalModalsContext } from '../AppContext';
+import { getChannelMemberKey, getWorkspaceMemberKey, showError } from '../util';
 import UserAvatar from './UserAvatar';
 
 export default function NewDirectMessage({
@@ -9,6 +10,8 @@ export default function NewDirectMessage({
   channels,
   onSelected
 }) {
+  const addGlobalModal = React.useContext(AddGlobalModalsContext);
+  
   const membersNoDm = [];
   for (const m of workspace.members) {
     if (!hasDm(m, channels)) {
@@ -32,8 +35,7 @@ export default function NewDirectMessage({
         m.type,
         m.memberId
       ).catch(e => {
-        console.error(e);
-        alert(e);
+        showError(addGlobalModal, e);
       });
       if (onSelected) {
         onSelected();
@@ -42,7 +44,8 @@ export default function NewDirectMessage({
     elems.push(
       <ListItem disablePadding key={elems.length}>
         <ListItemButton onClick={createDm}>
-          <UserAvatar username={name} />{name}
+          <UserAvatar username={name} />
+          <span style={{marginLeft: '10px'}}>{name}</span>
         </ListItemButton>
       </ListItem>
     );
@@ -62,22 +65,13 @@ function hasDm(workspaceMember, channels) {
     if (!c.directMessage) {
       continue;
     }
-    if (c.dmPeerMembers.length === 1 && c.dmPeerMembers[0].userId === auth.user.id) {
-      // self dm
-      return true;
-    } else if (c.dmPeerMembers.length === 2) {
+    if (c.dmPeerMembers.length === 1) {
       let workspaceMemberInChannel = false;
-      let selfInChannel = false;
-      for (const dmm of c.dmPeerMembers) {
-        const dmmKey = getChannelMemberKey(dmm);
-        const wmKey = getWorkspaceMemberKey(workspaceMember);
-        const selfKey = `0-${auth.user.id}`;
-        if (dmmKey === wmKey) {
-          workspaceMemberInChannel = true;
-        }
-        if (dmmKey === selfKey) {
-          selfInChannel = true;
-        }
+      let selfInChannel = c.callerIsMember;
+      const dmmKey = getChannelMemberKey(c.dmPeerMembers[0]);
+      const wmKey = getWorkspaceMemberKey(workspaceMember);
+      if (dmmKey === wmKey) {
+        workspaceMemberInChannel = true;
       }
       if (workspaceMemberInChannel && selfInChannel) {
         return true;
