@@ -47,7 +47,7 @@
             <if test="notBeforeTime != null">and gmt_create >= #{notBeforeTime}</if>
             and not is_deleted
         </trim>
-        order by gmt_create <if test="isDesc">desc</if>
+        order by gmt_create <if test="isDesc">desc</if>, id <if test="isDesc">desc</if>
         limit #{offset}, #{count}
     </select>
 </mapper>

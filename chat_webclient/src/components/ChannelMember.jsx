@@ -15,8 +15,6 @@ function ChannelMember({
   workspaceMembers,
   channelMembers
 }) {
-  console.log(channel);
-
   let membersNotJoinned = [];
   let userMembersIdSet = new Set(channelMembers.map(m => m.userId));
   for (let m of workspaceMembers) {
@@ -55,13 +53,13 @@ function ChannelMember({
   return <div>
     <h5>Joined members</h5>
     <ul>
-      {channelMembers.map(m => {
+      {channelMembers.map((m, i) => {
         if (m.user) {
-          return <li>{m.user.username}</li>;
+          return <li key={i}>{m.user.username}</li>;
         } else if (m.organization) {
-          return <li>{m.organization.name}</li>;
+          return <li key={i}>{m.organization.name} ({m.organization.fullName})</li>;
         } else {
-          return <li>(unknown member {`${m.type}-${m.id}`})</li>
+          return <li key={i}>(unknown member {`${m.type}-${m.id}`})</li>
         }
       })}
     </ul>

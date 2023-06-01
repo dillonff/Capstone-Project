@@ -32,14 +32,17 @@ public class ChannelService {
 
     private UserMapper userMapper;
 
+    private MessageMapper messageMapper;
+
     @Autowired
-    public ChannelService(ChannelMapper channelMapper, ChannelMemberMapper channelMemberMapper, ChannelOrganizationMapper channelOrganizationMapper, OrganizationMemberMapper organizationMemberMapper, OrganizationMapper organizationMapper, UserMapper userMapper) {
+    public ChannelService(ChannelMapper channelMapper, ChannelMemberMapper channelMemberMapper, ChannelOrganizationMapper channelOrganizationMapper, OrganizationMemberMapper organizationMemberMapper, OrganizationMapper organizationMapper, UserMapper userMapper, MessageMapper messageMapper) {
         this.channelMapper = channelMapper;
         this.channelMemberMapper = channelMemberMapper;
         this.channelOrganizationMapper = channelOrganizationMapper;
         this.organizationMemberMapper = organizationMemberMapper;
         this.organizationMapper = organizationMapper;
         this.userMapper = userMapper;
+        this.messageMapper = messageMapper;
     }
 
     public Channel createChannel(long workspaceId, String name, boolean isPublic, boolean autoJoin) {
@@ -134,6 +137,24 @@ public class ChannelService {
 
     public boolean userIsMember(Channel channel, Long userId) {
         return channelMemberMapper.isMember(channel.getId(), 0, userId);
+    }
+
+    public Message getLatestMessage(Long channelId) {
+        var messages = messageMapper.filterMessages(
+                null,
+                channelId,
+                null,
+                null,
+                null,
+                null,
+                true,
+                0,
+                1
+        );
+        if (messages.size() == 1) {
+            return messages.get(0);
+        }
+        return null;
     }
 
 }

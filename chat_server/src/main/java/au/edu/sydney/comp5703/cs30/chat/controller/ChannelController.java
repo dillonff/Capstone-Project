@@ -35,6 +35,9 @@ public class ChannelController {
     private UserMapper userMapper;
 
     @Autowired
+    private MessageMapper messageMapper;
+
+    @Autowired
     private ChannelService channelService;
 
     @RequestMapping(
@@ -272,6 +275,12 @@ public class ChannelController {
         if (channel.isDirectMessage()) {
             channel.setDmPeerMembers(channelService.getDirectMessagePeerMembers(channel, callingUser));
         }
+        var latest = channelService.getLatestMessage(channel.getId());
+        if (latest != null) {
+            channel.setLatestMessageId(latest.getId());
+        }
+        var cm = channelMemberMapper.findByUserAndChannelId(callingUser.getId(), channel.getId());
+        channel.setCallerMember(cm);
     }
 
     private void addChannelUnique(List<Channel> channels, Set<Long> idSet, List<Channel> target) {
