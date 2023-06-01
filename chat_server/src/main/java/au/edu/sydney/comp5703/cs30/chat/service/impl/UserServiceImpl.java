@@ -25,7 +25,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void reg(String username, String password) {
+    public void reg(String username, String password, String phone, String email, String displayName) {
 
         User result = userMapper.findByUsername(username);
         String hashedPass;
@@ -35,7 +35,7 @@ public class UserServiceImpl implements IUserService {
             throw new DuplicateUsernameException("Trying to register username [" + username + "] is already been used");
         }
 
-        User user = new User(username);
+        User user = new User(username, "", phone, email, displayName);
         hashedPass = encoder.encode(password);
         user.setPassword(hashedPass);
 
@@ -70,13 +70,13 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void updateInfoByUid(String username, String phone, String email, Integer id) {
+    public void updateInfoByUid(Long id, String username, String phone, String email, String displayName) {
 
         User result = userMapper.findById(id);
         if (result == null || result.getIsDeleted() == 1) {
             throw new UsernameErrorException("user not exists");
         }else
-            userMapper.updateInfoById(username, phone, email, id);
+            userMapper.updateInfoById(id, username, phone, email, displayName);
 
     }
 }

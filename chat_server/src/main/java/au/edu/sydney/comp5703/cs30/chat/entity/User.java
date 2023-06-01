@@ -15,14 +15,16 @@ public class User {
     private String phone;
     private String email;
 
+    private String displayName;
+
     private int isDeleted;
 
-
-    public User(String username) {
+    public User(String username, String password, String phone, String email, String displayName) {
         this.username = username;
-        this.password = "";
-        this.email = "";
-        this.phone = "";
+        this.password = password;
+        this.phone = phone;
+        this.email = email;
+        this.displayName = displayName;
     }
 
     public long getId() {
@@ -71,5 +73,13 @@ public class User {
 
     public void setIsDeleted(int is_deleted) {
         this.isDeleted = is_deleted;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 }

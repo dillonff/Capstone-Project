@@ -125,9 +125,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
         // workaround for the temporary authentication
         var user = userMapper.findByUsername(ar.getUserName());
         if (user == null) {
-            user = new User(ar.getUserName());
-            userMapper.insertUser(user);
-            wssession.close();
             throw new RuntimeException("user not authenticated");
         }
         // add the user to general channel

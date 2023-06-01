@@ -28,8 +28,7 @@ function Header() {
   //   }, []);
 
     const [anchorEl, setAnchorEl] = useState(null);
-    const [userInfo, setUserInfo] = useState([]);
-    // ...
+    const [userInfo, setUserInfo] = useState({});
     const tabAnchorEl = (el, status) => {
       console.log(el, 'eee');
       setAnchorEl(el)
