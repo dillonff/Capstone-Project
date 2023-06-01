@@ -359,6 +359,10 @@ export const joinOrg = (orgId, userId, userEmail) => {
   return callApiJsonChecked('/organizations/' + orgId + '/members', 'POST', body);
 }
 
+export const setChannelRead = (channelId) => {
+  return callApiJsonChecked('/channels/' + channelId + '/read', 'PUT');
+}
+
 export const getMembersInfo = async (rawMembers) => {
   const members = [];
   for (let m of rawMembers) {

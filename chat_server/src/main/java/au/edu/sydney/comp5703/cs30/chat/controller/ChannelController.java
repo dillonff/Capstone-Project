@@ -221,18 +221,29 @@ public class ChannelController {
         if (member == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not a channel member");
         }
+        var shouldPush = false;
         switch (action) {
             case "pin":
                 channelMemberMapper.setPinned(member.getId(), true);
+                shouldPush = true;
                 break;
             case "unpin":
                 channelMemberMapper.setPinned(member.getId(), false);
+                shouldPush = true;
+                break;
+            case "read":
+                var latest = channelService.getLatestMessage(channel.getId());
+                if (latest != null) {
+                    channelMemberMapper.setLastReadMessageId(latest.getId(), member.getId());
+                }
                 break;
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid action: " + action);
         }
-        var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
-        broadcastMessages(p);
+        if (shouldPush) {
+            var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
+            broadcastMessages(p);
+        }
         return "{}";
     }
 

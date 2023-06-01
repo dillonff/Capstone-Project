@@ -57,6 +57,9 @@ public interface ChannelMemberMapper {
     @Update("update chat_channel_member set last_read_message_id = #{messageId} where id = #{channelMemberId}")
     Long setLastReadMessageId(long messageId, long channelMemberId);
 
+    @Update("update chat_channel_member set is_mentioned = #{mentioned} where id = #{channelMemberId}")
+    Long setMentioned(boolean mentioned, long channelMemberId);
+
     @Select("""
             <script>
             select

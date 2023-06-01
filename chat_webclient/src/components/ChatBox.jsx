@@ -16,7 +16,9 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
 
-import { callApi } from '../api';
+import { callApi, callApiJsonChecked } from '../api';
+import { AddGlobalModalsContext } from '../AppContext';
+import { showError } from '../util';
 
 // if (
 //   typeof customElements !== 'undefined' &&
@@ -33,6 +35,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
   const [text, setText] = React.useState('');
   const [emojiAnchor, setEmojiAnchor] = React.useState(null);
   const [alternateEmailAnchor, setAlternateEmailAnchor] = React.useState(null);
+  const addGlobalModal = React.useContext(AddGlobalModalsContext);
 
     const handleAlternateEmailClick = (event) => {
         setAlternateEmailAnchor(event.currentTarget);
@@ -113,13 +116,10 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
       body.fileIds = fileIds;
     }
     body = JSON.stringify(body);
-    callApi('/messages/send', 'POST', body).then((res) => {
-      if (res.ok) {
-        setText('');
-      } else {
-        console.error(res);
-        alert('Cannot send message');
-      }
+    callApiJsonChecked('/messages/send', 'POST', body).then((res) => {
+      setText('');
+    }).catch(e => {
+      showError(addGlobalModal, e);
     });
   };
 
