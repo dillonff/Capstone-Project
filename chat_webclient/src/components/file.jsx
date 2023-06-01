@@ -11,9 +11,10 @@ import {
   getOrg,
   getOrgs,
   nullOrganization,
-  getFile
+  getFile,
+  getWorkspaceAll
 } from '../api.js';
-import folderData from '../config/folderConfig'
+// import folderData from '../config/folderConfig'
 
 
 
@@ -44,7 +45,7 @@ const App = () => {
   const userID = localStorage.getItem("userID"); 
   const [fileList,setFileList] = useState([]);
   const [fileId,setFileid] = useState(-1);
-
+  const [folderData,setFolderData] =useState([]);
   const userCache = {};
 
 
@@ -71,32 +72,6 @@ async function getUser(id, auth, refresh = false) {
   }
   return user;
 }
-
-  const handleDownload = (documentId) => {
-    fetch(`/download.jsp?documentId=${documentId}`)
-      .then((response) => {
-        if (response.ok) {
-          const link = document.createElement("a");
-          link.href = response.url;
-          link.setAttribute("download", "");
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        } else {
-          console.error("Failed to download document");
-        }
-      })
-      .catch((error) => {
-        console.error("Error downloading document:", error);
-      });
-  };
-
-  const filterRecentFiles = (file) => {
-    const uploadedDate = new Date(file.uploadedAt);
-    const today = new Date();
-    const ninetyDaysAgo = new Date().setDate(today.getDate() - 90);
-    return uploadedDate > ninetyDaysAgo;
-  };
 
   const handleFolderClick = (folder) => {
     console.log(folder.value, 'f');
@@ -136,6 +111,20 @@ async function getUser(id, auth, refresh = false) {
         console.error("Error reading file:", error);
       });
   };
+  useEffect(()=>{
+    getWorkspaceAll().then((e)=>{
+      let workspaceList = [];
+      e.map((item)=>{
+        const obj = {
+          id: item.id,
+          name: item.name,
+          value: item.id,
+        }
+        workspaceList.push(obj);
+      })
+      setFolderData(workspaceList);
+    })
+  },[])
 
   const [sortOptions, setSortOptions] = useState({});
   useEffect(()=>{

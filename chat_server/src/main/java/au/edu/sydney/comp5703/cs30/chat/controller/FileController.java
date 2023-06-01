@@ -61,9 +61,9 @@ public class FileController {
 //        File file = new File();
 //        file.setId(id);
         List<Map<String,Object>> fileList = fileMapper.findByIdList(file);
-        if (fileList.size() == 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found: " + file);
-        }
+//        if (fileList.size() == 0) {
+//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found: " + file);
+//        }
         return fileList;
     }
 
