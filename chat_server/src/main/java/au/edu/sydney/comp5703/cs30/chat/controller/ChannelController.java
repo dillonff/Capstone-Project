@@ -8,6 +8,7 @@ import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import au.edu.sydney.comp5703.cs30.chat.mapper.*;
 import au.edu.sydney.comp5703.cs30.chat.model.*;
 import au.edu.sydney.comp5703.cs30.chat.service.ChannelService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -169,9 +170,9 @@ public class ChannelController {
 
 
     @RequestMapping(
-            value = "/api/v1/channels/{channelId}/{action}", method = RequestMethod.PUT
+            value = "/api/v1/channels/{channelId}/{action}", method = RequestMethod.PUT, produces = "application/json"
     )
-    public void handleChannelAction(@PathVariable Long channelId, @PathVariable String action, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
+    public String handleChannelAction(@PathVariable Long channelId, @PathVariable String action, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
         var user = userMapper.findById(auth);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authenticated");
@@ -194,6 +195,9 @@ public class ChannelController {
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid action: " + action);
         }
+        var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
+        broadcastMessages(p);
+        return "{}";
     }
 
     @RequestMapping(value = "/api/v1/channels/{channelId}/messages/{messageId}/read",

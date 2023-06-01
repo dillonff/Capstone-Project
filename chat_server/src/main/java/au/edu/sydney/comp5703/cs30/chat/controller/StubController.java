@@ -54,9 +54,9 @@ public class StubController {
         // encoder = new Argon2PasswordEncoder(16, 32, 1, 65536, 2);
         var enc  = SCryptPasswordEncoder.defaultsForSpringSecurity_v5_8();
         var start = System.currentTimeMillis();
-        var res = passwordEncoder.encode("123456789");
+        var res = passwordEncoder.encode("test1");
         var mid = System.currentTimeMillis();
-        passwordEncoder.matches("123456789", res);
+        passwordEncoder.matches("test1", res);
         var end = System.currentTimeMillis();
         System.err.println(res);
         System.err.println("" + (mid - start) + " " + (end - mid));

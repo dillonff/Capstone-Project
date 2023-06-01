@@ -24,4 +24,8 @@ public interface UserMapper {
 
     List<User> filter(Long workspaceId, Long channelId, Long organizationId);
 
+    Integer setToken(Long userId, String token);
+
+    User findByToken(String token);
+
 }

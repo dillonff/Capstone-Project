@@ -27,13 +27,10 @@ export const nullOrganization = {
 
 
 export async function login(username, password) {
-  let res = await callApi('/auth', 'POST', JSON.stringify({
-    userName: username
+  let res = await callApiJsonChecked('/auth', 'POST', JSON.stringify({
+    userName: username,
+    password: password
   }));
-  if (!res.ok) {
-    throw new Error('login failed');
-  }
-  res = await res.json();
   auth.user = await getUser(res.userId);
   auth.token = res.userId;
   Event.start();
@@ -133,16 +130,21 @@ export async function callApiJsonChecked(path, method, body) {
   } catch (e) {
     throw new ApiError("Cannot contack chat server.", e);
   }
-  if (!res.ok) {
-    // TODO: pass error messages to UI
-    throw new ApiError("Chat server error.");
-  }
   try {
-    res = await res.json();
+    let data = await res.json();
+    if (!res.ok) {
+      if (data.message) {
+        throw new ApiError(data.message);
+      } else {
+        throw new ApiError("Server returned a invalid response");
+      }
+    }
+    return data;
   } catch (e) {
+    if (e instanceof ApiError)
+      throw e;
     throw new ApiError("Invalid response from chat server.", e);
   }
-  return res;
 }
 
 export const getAllChannels = async (workspaceId) => {
@@ -185,6 +187,15 @@ export const createChannel = (wid, name, publicChannel, peerMemberType, peerMemb
   }
   req = JSON.stringify(req);
   return callApiJsonChecked('/channels', 'POST', req);
+}
+
+export const handleChannelPin = (channel, pin) => {
+  if (pin) {
+    pin = 'pin';
+  } else {
+    pin = 'unpin';
+  }
+  return callApiJsonChecked(`/channels/${channel.id}/${pin}`, 'PUT');
 }
 
 export const createWorkspace = (name) => {

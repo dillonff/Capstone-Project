@@ -82,5 +82,17 @@
         </trim>
     </select>
 
+    <update id="setToken">
+        update chat_user set token = #{token} where id = #{userId} and not is_deleted
+    </update>
+
+    <select id="findByToken" resultMap="UserEntityMap">
+        SELECT
+            *
+        FROM
+            chat_user
+        WHERE
+            token = #{token} and not is_deleted and not token = '' limit 1
+    </select>
 
 </mapper>

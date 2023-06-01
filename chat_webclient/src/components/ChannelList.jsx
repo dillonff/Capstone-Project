@@ -1,6 +1,6 @@
 import React from 'react';
 
-import SimpleBoxItem from './SimpleBoxItem';
+import ChannelListItem from './ChannelListItem';
 import ValeIcon from '../assets/ValeIcon.png';
 import LogoutIcon from '../assets/logout.png';
 import TagIcon from '@mui/icons-material/Tag';
@@ -33,18 +33,19 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
       }
     };
     let elem = (
-      <SimpleBoxItem
+      <ChannelListItem
         classNamePrefix="channel"
         title={channel.name}
         text={members.length + ' people'}
         key={i}
         onClick={clickCb}
         selected={channel.id === selectedChannel.id}
+        channel={channel}
       >
         <IconButton>
           <MoreHorizIcon />
         </IconButton>
-      </SimpleBoxItem>
+      </ChannelListItem>
     );
     channelElems.push(elem);
   }

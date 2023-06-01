@@ -8,7 +8,10 @@ import MenuItem from '@mui/material/MenuItem';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-function SimpleBoxItem(props) {
+import { auth, handleChannelPin } from '../api';
+
+
+function ChannelListItem(props) {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClick = (event) => {
@@ -20,45 +23,67 @@ function SimpleBoxItem(props) {
     setAnchorEl(null);
   };
 
+  let pinned = false;
+  const channel = props.channel;
+  const members = props.channel.members;
+  if (members) {
+    for (const m of members) {
+      if (m.userId === auth.user.id) {
+        pinned = m.pinned;
+      }
+    }
+  }
+
+  const handlePin = () => {
+    handleChannelPin(channel, !pinned);
+    handleClose();
+  }
+
+  const rootClasses = []
+  if (props.selected) {
+    rootClasses.push('workspace__wrapper__selected');
+  } else {
+    rootClasses.push('workspace__wrapper--channel');
+  }
+  rootClasses.push('d-flex justify-content-between');
+
   return (
       <div
-          className={
-            props.selected
-                ? 'workspace__wrapper__selected'
-                : `workspace__wrapper--${props.classNamePrefix}`
-          }
+          className={rootClasses.join(' ')}
           key={props.key}
           onClick={props.onClick}
       >
-        <div style={{width:"110px"}}>
-          <div style={{width:"110px"}}>
+        <div style={{flex: '1 0 0'}}>
+          <div>
             <TagIcon className="sidebar__icon" />
             {props.title}
           </div>
-          <div style={{width:"110px"}}>
+          <div>
             <GroupIcon className="sidebar__icon" />
             {props.text}
           </div>
         </div>
-          <IconButton
-              className="workspace__icon-button workspace__wrapper__selected"
-              onClick={handleClick}
-              style={{ color: 'grey',marginLeft:'15px',marginBottom:'25px', height:'60px'}}
-          >
-              <PushPinIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-          <div style={{width:"60px"}}>
-              <div style={{width:"60px", color:'grey', marginLeft:'120px', marginBottom:'38px'}}>
-                  <FiberManualRecordIcon sx={{ fontSize: 14 }}/>
-              </div>
-          </div>
         <IconButton
-            className="workspace__icon-button workspace__wrapper__selected"
+            className=""
             onClick={handleClick}
-            style={{ color: 'white', marginLeft:'auto' , height:'60px'}}
+            style={{
+              color: pinned ? 'red' : 'grey'
+            }}
         >
-          <MoreHorizIcon />
+            <PushPinIcon sx={{ fontSize: 18 }} />
         </IconButton>
+        <div className="d-flex flex-column align-items-center">
+          <div>
+            <FiberManualRecordIcon sx={{ fontSize: 14 }}/>
+          </div>
+          <IconButton
+              className=" "
+              onClick={handleClick}
+              style={{ color: 'white'}}
+          >
+            <MoreHorizIcon />
+          </IconButton>
+        </div>
           <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
@@ -72,11 +97,11 @@ function SimpleBoxItem(props) {
                   horizontal: 'left',
               }}
           >
-              <MenuItem onClick={handleClose}><PushPinIcon />Pin</MenuItem>
+              <MenuItem onClick={handlePin}><PushPinIcon />{pinned ? 'Unpin' : 'Pin'}</MenuItem>
               <MenuItem onClick={handleClose}><DeleteForeverIcon/>Delete</MenuItem>
           </Menu>
       </div>
   );
 }
 
-export default SimpleBoxItem;
+export default ChannelListItem;
