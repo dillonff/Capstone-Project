@@ -58,11 +58,11 @@ public class UserServiceImpl implements IUserService {
         }
 
 
-        if (!Objects.equals(oldPassword, result.getPassword())) {
+        if (!encoder.matches(oldPassword, result.getPassword())) {
             throw new PasswordErrorException("Wrong password.");
         }
-//        newHashedPass = encoder.encode(newPassword);
-        Integer rows = userMapper.updatePassById(id, newPassword);
+        newHashedPass = encoder.encode(newPassword);
+        Integer rows = userMapper.updatePassById(id, newHashedPass);
 
         if (rows != 1) {
             throw new UpdateException("Unknown exception for information updating.");

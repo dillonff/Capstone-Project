@@ -49,7 +49,7 @@ export default function Edit() {
       email:user.email,
       phone:user.phone
     }
-    updateUser(job).then((e)=>{console.log("修改成功");})
+    updateUser(job).then((e)=>{alert("Success!");})
   };
   
   return (

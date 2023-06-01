@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.SecureRandom;
+import java.util.Objects;
 
 import static au.edu.sydney.comp5703.cs30.chat.WsUtil.broadcastMessages;
 import static au.edu.sydney.comp5703.cs30.chat.WsUtil.makeServerPush;
@@ -64,8 +65,7 @@ public class AuthController {
         }
 
         try {
-            var match = passwordEncoder.matches(req.getPassword(), user.getPassword());
-            if (!match) {
+            if (!passwordEncoder.matches(req.getPassword(),user.getPassword())) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Incorrect password");
             }
         } catch (IllegalArgumentException e) {
@@ -75,7 +75,7 @@ public class AuthController {
 
         System.err.println(sc.toString());
         var token = getNewToken(user);
-        userMapper.setToken(user.getId(), token);
+//        userMapper.setToken(user.getId(), token);
 
         // construct a result for auth type
         var result = new AuthResponse(user.getId(), "(none)");

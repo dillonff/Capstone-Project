@@ -20,8 +20,6 @@ export default function Edit() {
   const [comments, setComments] = useState([]);
   const [authenticated, setAuthenticated] = useState(localStorage.getItem(localStorage.getItem("authenticated") || false));
   const [inputValue, setInputValue] = useState('');
-  
-
   const setValue = (e)=>{
     let value = e.target.value;
     let name = e.target.name;
@@ -45,11 +43,12 @@ export default function Edit() {
 //    const encryptedPassword=md5(data.get('oldpassword').toString());
     const encryptedPassword=data.get('oldpassword').toString();
 
-    if(useroldpassword !== encryptedPassword){
-        alert("Old password is wrong!")
-        return
-    }
-    else if (newpassword!==newpassword2) {
+    // if(useroldpassword !== encryptedPassword){
+    //     alert("Old password is wrong!")
+    //     return
+    // }
+    // else
+     if (newpassword!==newpassword2) {
         alert("Re-enter password is different from the password!")
         return
       }
@@ -57,14 +56,14 @@ export default function Edit() {
  //       const password=md5(newpassword);
         const password=newpassword;
 
-console.log(password);
         const obj={
 id :userInfo.id,
 username:userInfo.username,
-oldPassword:userInfo.password,
+oldPassword:encryptedPassword,
 newPassword:password
         };
-        updateUser(obj)
+        updateUser(obj);
+        alert("Success!");
         }
     }
 
