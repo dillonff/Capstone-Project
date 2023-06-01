@@ -10,7 +10,7 @@
             <arg column="password" javaType="String" />
             <arg column="phone" javaType="String" />
             <arg column="email" javaType="String" />
-            <arg column="displayName" javaType="String" />
+            <arg column="display_name" javaType="String" />
         </constructor>
         <id column="id" property="id"></id>
         <result column="username" property="username"></result>
