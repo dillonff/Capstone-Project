@@ -192,6 +192,23 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
     </div>
   );
 
+  const mentionListElems = [];
+  for (const m of channel.members || []) {
+    if (m.user) {
+      const elem = <MenuItem
+        key={m.user.id}
+        onClick={() => {
+          handleAlternateEmailClose();
+          addEmoji(`@${m.user.username} `);
+        }}
+      >{m.user.username}</MenuItem>;
+      mentionListElems.push(elem);
+    }
+  }
+  if (mentionListElems.length === 0) {
+    mentionListElems.push(<MenuItem>No one can be mentioned</MenuItem>);
+  }
+
   return (
     <div className="chatbox__container__wrapper">
       {/* message list */}
@@ -316,10 +333,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
                       horizontal: 'left',
                   }}
               >
-                  <MenuItem  onClick={handleAlternateEmailClose}> 111 </MenuItem>
-                  <MenuItem  onClick={handleAlternateEmailClose}> 22222 </MenuItem>
-                  <MenuItem  onClick={handleAlternateEmailClose}> 3333 </MenuItem>
-                  <MenuItem  onClick={handleAlternateEmailClose}> 4 </MenuItem>
+                {mentionListElems}
               </Menu>
 
           </div>

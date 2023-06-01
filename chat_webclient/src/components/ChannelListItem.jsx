@@ -60,10 +60,10 @@ function ChannelListItem(props) {
     cb.onNewMessage = (data) => {
       console.error(data, 'ok00');
       if (data.channelId === channel.id && !props.selected) {
-        console.error(data, 'ok');
+        const mentionStr = `@${auth.user.username}`;
+        console.error(data, mentionStr, 'ok');
         setChannelLocalInfo(i => {
-          const mentionStr = `@${auth.user.username}`;
-          if (data.content.indexOf(mentionStr + ' ') > 0 || data.content.endsWith(mentionStr)) {
+          if (data.content.indexOf(mentionStr + ' ') >= 0 || data.content.endsWith(mentionStr)) {
             return {...i, mentioned: true, unread: true};
           }
           return {...i, unread: true};
