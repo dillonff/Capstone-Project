@@ -106,7 +106,7 @@ export const nullOrganizationMember = {
   autoJoinChannel: false
 }
 
-const API_ENDPOINT = 'http://127.0.0.1:11451/api/v1';
+export const API_ENDPOINT = 'http://127.0.0.1:11451/api/v1';
 export function callApi(path, method, body) {
   const headers = {
     authorization: auth.token
@@ -176,11 +176,12 @@ export const processChannelMembers = async (members) => {
   }
 }
 
-export const createChannel = (wid, name, publicChannel, peerMemberType, peerMemberId) => {
+export const createChannel = (wid, name, publicChannel, autoJoin, peerMemberType, peerMemberId) => {
   let req = {
     name: name,
     workspace: wid,
-    publicChannel: publicChannel
+    publicChannel: publicChannel,
+    autoJoin: autoJoin
   };
   if (peerMemberId) {
     req.peerMemberId = parseInt(peerMemberId);
@@ -297,13 +298,18 @@ export const getMessageById = async (id) => {
 }
 
 
-export const addUserToWorkspace = (wid, uid) => {
+export const addUserToWorkspace = (wid, email) => {
   let req = {
-    userId: parseInt(uid),
-    workspaceId: parseInt(wid)
+    workspaceId: parseInt(wid),
+    type: 0
   };
+  if (!isNaN(parseInt(email))) {
+    req.memberId = parseInt(email);
+  } else {
+    req.email = email;
+  }
   req = JSON.stringify(req);
-  return callApi('/workspaces/join', 'POST', req);
+  return callApiJsonChecked('/workspaces/join', 'POST', req);
 }
 
 const orgCache = {};

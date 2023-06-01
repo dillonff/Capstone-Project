@@ -27,7 +27,10 @@ function ChannelMember({
             displayName: m.user.username,
             otherText: 'Workspace user',
             onAdd: _ => {
-              // TODO:
+              addUserToChannel(channel.id, m.user.id).catch(e => {
+                console.error(e);
+                alert(e);
+              })
             }
           });
         }
@@ -38,7 +41,7 @@ function ChannelMember({
             displayName: m.organization.name, 
             otherText: m.organization.fullName,
             onAdd: _ => {
-              // TODO:
+              
             }
           });
         }

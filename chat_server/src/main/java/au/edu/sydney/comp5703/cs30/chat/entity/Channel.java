@@ -19,6 +19,8 @@ public class Channel {
 
     private Boolean directMessage;
 
+    private Boolean autoJoin;
+
     // members of the direct message (excluding calling user and organization users)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<ChannelMemberMixin> dmPeerMembers;
@@ -31,7 +33,10 @@ public class Channel {
         this.workspaceId = workspaceId;
         this.publicChannel = isPublic;
         this.directMessage = false;
+        this.autoJoin = false;
     }
+
+    public Channel() {}
 
     public long getId() {
         return id;
@@ -111,5 +116,14 @@ public class Channel {
 
     public void setCallerIsMember(Boolean callerIsMember) {
         this.callerIsMember = callerIsMember;
+    }
+
+
+    public Boolean shouldAutoJoin() {
+        return autoJoin;
+    }
+
+    public void setAutoJoin(Boolean autoJoin) {
+        this.autoJoin = autoJoin;
     }
 }

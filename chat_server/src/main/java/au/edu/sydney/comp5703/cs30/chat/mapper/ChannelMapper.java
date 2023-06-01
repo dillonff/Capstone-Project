@@ -21,4 +21,7 @@ public interface ChannelMapper {
     List<Channel> findPrivateByWorkspaceAndMember(long workspaceId, long userId);
 
     List<Channel> findDirectMessageChannels(long workspaceId, int type, long memberId);
+
+    // only some props can be updated, see mapper file
+    Integer updateChannel(Channel channel);
 }

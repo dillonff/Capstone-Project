@@ -12,8 +12,11 @@ import OrganizationListener from './components/OrganizationListener';
 
 import {
   OrganizationIdContext,
-  OrganizationsContext
+  OrganizationsContext,
+  AddGlobalModalsContext,
+  GlobalModalsContext
 } from './AppContext';
+import { GlobalModals } from './components/GlobalModals';
 
 
 
@@ -22,6 +25,22 @@ function App() {
 
   const [organizationId, setOrganizationId] = React.useState(-1);
   const [organizations, setOrganizations] = React.useState([]);
+  const [globalModals, setGlobalModals] = React.useState([]);
+
+  const addGlobalModal = React.useCallback((MFunc, props) => {
+    if (!props) {
+      props = {};
+    }
+    console.warn(MFunc, props);
+    let elem = null;
+    const close = () => {
+      setGlobalModals(ms => {
+        return ms.filter(m => m !== elem);
+      });
+    }
+    elem = <MFunc open={true} onClose={close} key={new Date().getTime()} {...props} />;
+    setGlobalModals(ms => [...ms, elem]);
+  }, [setGlobalModals]);
 
   if (Object.is(currentUser, nullUser)) {
     return <SimpleLogin onLoggedin={_ => {
@@ -32,8 +51,11 @@ function App() {
   // TODO: getting very complex, use react redux instead
   return <OrganizationIdContext.Provider value={[organizationId, setOrganizationId]}>
     <OrganizationsContext.Provider value={[organizations, setOrganizations]}>
-      <OrganizationListener />
-      <WorkspaceContainer />
+      <AddGlobalModalsContext.Provider value={addGlobalModal}>
+        <GlobalModals globalModals={globalModals} />
+        <OrganizationListener />
+        <WorkspaceContainer />
+      </AddGlobalModalsContext.Provider>
     </OrganizationsContext.Provider>
   </OrganizationIdContext.Provider>
   

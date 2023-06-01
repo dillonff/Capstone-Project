@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -51,7 +52,10 @@ public class ChannelController {
         }
         Channel channel;
         if (req.getPeerMemberId() == null) {
-            channel = channelService.createChannel(workspace.getId(), req.getName(), req.isPublicChannel());
+            if (!StringUtils.hasLength(req.getName())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "channel name required");
+            }
+            channel = channelService.createChannel(workspace.getId(), req.getName(), req.isPublicChannel(), req.shouldAutoJoin());
             channelService.addMemberToChannel(channel.getId(), user.getId());
         } else {
             if (req.getPeerMemberType() != 0 && req.getPeerMemberType() != 1) {
@@ -124,6 +128,35 @@ public class ChannelController {
         }
         channelPostProcess(channel, user);
         return  channel;
+    }
+
+    @RequestMapping(value = "/api/v1/channels/{channelId}", produces = "application/json", consumes = "application/json", method = RequestMethod.PUT)
+    public String handleUpdateChannel(@PathVariable long channelId,
+                                      @RequestBody Channel req,
+                                      @CurrentSecurityContext SecurityContext sc,
+                                      @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
+        var user = userMapper.findById(auth);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "user not authenticated");
+        }
+        var infoValid = false;
+        var c = new Channel();
+        if (req.shouldAutoJoin() != null) {
+            infoValid = true;
+            c.setAutoJoin(req.shouldAutoJoin());
+        }
+        if (StringUtils.hasLength(req.getName())) {
+            infoValid = true;
+            c.setName(req.getName());
+        }
+        if (!infoValid) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "no information can be updated");
+        }
+        var res = channelMapper.updateChannel(c);
+        if (res != 1) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "unexpected channel update error");
+        }
+        return "{}";
     }
 
 

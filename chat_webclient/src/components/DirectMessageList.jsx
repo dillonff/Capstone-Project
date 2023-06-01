@@ -31,7 +31,8 @@ export function DirectMessageList({
     }
     dmElems.push(
       <div className={className} onClick={onDmClick}>
-        <UserAvatar key={channel.id} username={name}></UserAvatar>{name}
+        <UserAvatar key={channel.id} username={name}></UserAvatar>
+        <div style={{marginLeft: '10px'}}>{name}</div>
       </div>
     );
   }

@@ -18,7 +18,6 @@ function stringToColor(string) {
     color += `00${value.toString(16)}`.slice(-2);
   }
   /* eslint-enable no-bitwise */
-  console.log('Color', color);
   return color;
 }
 
