@@ -178,7 +178,7 @@ function WorkspaceContainer({}) {
                             type="button"
                             variant="outline-secondary"
                             onClick={(_) => {
-                                getAndUpdateWorkspaces().catch((e) => {
+                                getAndUpdateWorkspaces(_ => true).catch((e) => {
                                     console.error(e);
                                     alert(e);
                                 });
