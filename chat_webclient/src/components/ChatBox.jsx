@@ -142,6 +142,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
       let body = {
       content: msg,
       channelId: channel.id,
+      fileIds: fileIds
     };
     if (organization && organization.id > 0) {
       body.organizationId = organization.id;
