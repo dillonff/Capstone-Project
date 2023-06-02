@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -56,13 +57,17 @@ public class OrganizationController {
 
         var name = req.get("name");
         var fullName = req.get("fullName");
-        if (name == null || fullName == null) {
+        if (!StringUtils.hasLength(name) || !StringUtils.hasLength(fullName)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Org name and full name must be specified");
         }
         var email = req.get("email");
         // TODO: check email existence
-        if (email == null) {
+        if (!StringUtils.hasLength(email)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A unique org email must be specified");
+        }
+        var dupOrg = organizationMapper.findByEmail(email);
+        if (dupOrg != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Organization email was already used");
         }
         var description = req.get("description");
         if (description == null) {
