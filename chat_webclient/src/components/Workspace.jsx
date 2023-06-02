@@ -29,7 +29,8 @@ import {
   getWorkspaceMembers,
   processWorkspaceMembers,
   getChannelMembers,
-  processChannelMembers
+  processChannelMembers,
+  addOrgToWorkspace
 } from '../api.js';
 
 import ChannelList from './ChannelList.jsx';
@@ -53,6 +54,7 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
   let [channels, setChannels] = React.useState([]);
   const [currentChannelId, setCurrentChannelId] = React.useState(-1);
   const [showCreateChannel, setShowCreateChannel] = React.useState(false);
+  const [openInviteOrg, setOpenInviteOrg] = React.useState(false);
   const addGlobalModal = React.useContext(AddGlobalModalsContext);
   const updateChannelCtx = React.useRef({ongoing: false, next: null});
   const workspaceRef = React.useRef(null);
@@ -176,6 +178,9 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
             <Dropdown.Item onClick={onAddUserClick}>
               Invite user
             </Dropdown.Item>
+            <Dropdown.Item onClick={() => setOpenInviteOrg(true)}>
+              Invite organization
+            </Dropdown.Item>
             <Dropdown.Item onClick={onCreateChannelClick}>
               Create channel
             </Dropdown.Item>
@@ -204,6 +209,23 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
           title="Create Channel"
         >
           <CreateChannelForm workspace={workspace} onClose={() => setShowCreateChannel(false)} />
+        </SimpleDetailDialog>
+
+        {/** invite org form */}
+        <SimpleDetailDialog
+          open={openInviteOrg}
+          onClose={() => setOpenInviteOrg(false)}
+          title="Invite Organization to Workspace"
+        >
+          <InviteMemberForm
+            onInvite={(email) => {
+              addOrgToWorkspace(workspace.id, email).then(() => {
+                setOpenInviteOrg(false);
+              }).catch(e => {
+                showError(addGlobalModal, e);
+              })
+            }}
+          />
         </SimpleDetailDialog>
 
         <hr />

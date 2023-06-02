@@ -307,7 +307,21 @@ export const getMessageById = async (id) => {
 export const addUserToWorkspace = (wid, email) => {
   let req = {
     workspaceId: parseInt(wid),
-    type: 0
+    type: 0 // user
+  };
+  if (!isNaN(parseInt(email))) {
+    req.memberId = parseInt(email);
+  } else {
+    req.email = email;
+  }
+  req = JSON.stringify(req);
+  return callApiJsonChecked('/workspaces/join', 'POST', req);
+}
+
+export const addOrgToWorkspace = (wid, email) => {
+  let req = {
+    workspaceId: parseInt(wid),
+    type: 1  // org
   };
   if (!isNaN(parseInt(email))) {
     req.memberId = parseInt(email);
@@ -355,13 +369,14 @@ export const createOrg = (name, fullName, email, description) => {
 }
 
 export const joinOrg = (orgId, userId, userEmail) => {
-  const body = {};
+  let body = {};
   if (userId) {
     body.userId = userId;
   }
   if (userEmail) {
     body.userEmail = userEmail;
   }
+  body = JSON.stringify(body);
   return callApiJsonChecked('/organizations/' + orgId + '/members', 'POST', body);
 }
 

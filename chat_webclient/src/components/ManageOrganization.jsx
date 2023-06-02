@@ -12,7 +12,11 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import OrganizationForm from './OrganizationForm';
 import { Button, Checkbox, FormControl, FormControlLabel, TextField } from '@mui/material';
 import OrganizationMemberList from './OrganizationMemberList';
-import { auth, nullOrganizationMember } from '../api';
+import { auth, joinOrg, nullOrganizationMember } from '../api';
+import { AddGlobalModalsContext } from '../AppContext';
+import { showError } from '../util';
+import SimpleDetailDialog from './SimpleDetailDialog';
+import { InviteMemberForm } from './InviteMemberForm';
 
 
 function TabPanel(props) {
@@ -49,6 +53,7 @@ function a11yProps(index) {
 }
 
 function OrganizationMemberSettings({member}) {
+
   return <form>
     <TextField
       fullWidth
@@ -73,6 +78,16 @@ function OrganizationMemberSettings({member}) {
 export default function ManageOrganization({org}) {
   const [value, setValue] = React.useState(0);
   const formRef = React.useRef();
+  const [openAddMember, setOpenAddMember] = React.useState(false);
+  const addGlobalModal = React.useContext(AddGlobalModalsContext);
+
+  const handleAddMember = (email) => {
+    joinOrg(org.id, null, email).then(() => {
+      setOpenAddMember(false);
+    }).catch(e => {
+      showError(addGlobalModal, e);
+    });
+  }
 
   let member = nullOrganizationMember;
   for (const m of org.members) {
@@ -108,7 +123,16 @@ export default function ManageOrganization({org}) {
         <Button variant="outlined" sx={{marginTop: '1em'}}>Save</Button>
       </TabPanel>
       <TabPanel value={value} index={1} className="flex-scroll">
-        <OrganizationMemberList members={org.members} />
+        <OrganizationMemberList members={org.members} onAddClick={() => setOpenAddMember(true)} />
+        <SimpleDetailDialog
+          open={openAddMember}
+          onClose={() => setOpenAddMember(false)}
+          title="Invite User to this Organization"
+        >
+          <InviteMemberForm
+            onInvite={handleAddMember}
+          />
+        </SimpleDetailDialog>
       </TabPanel>
       <TabPanel value={value} index={2}>
         <OrganizationMemberSettings member={member} />

@@ -3,6 +3,7 @@ package au.edu.sydney.comp5703.cs30.chat.controller;
 import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.entity.Organization;
 import au.edu.sydney.comp5703.cs30.chat.entity.OrganizationMember;
+import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import au.edu.sydney.comp5703.cs30.chat.mapper.*;
 import au.edu.sydney.comp5703.cs30.chat.model.InfoChangedPush;
 import au.edu.sydney.comp5703.cs30.chat.model.JoinOrganizationRequest;
@@ -61,7 +62,6 @@ public class OrganizationController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Org name and full name must be specified");
         }
         var email = req.get("email");
-        // TODO: check email existence
         if (!StringUtils.hasLength(email)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A unique org email must be specified");
         }
@@ -83,7 +83,7 @@ public class OrganizationController {
         member.setAutoJoinChannel(true);
         organizationMapper.addMember(member);
 
-        // tell all the clients that the channel info has changed
+        // tell all the clients that the org info has changed
         var p = makeServerPush("infoChanged", new InfoChangedPush("organization"));
         broadcastMessages(p);
 
@@ -144,15 +144,32 @@ public class OrganizationController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization " + id + " not found");
         }
 
+        user = null;
         var userId = req.getUserId();
         if (userId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "userId to join the org must be specified");
+            var email = req.getUserEmail();
+            if (!StringUtils.hasLength(email)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "userEmail to join the org must be specified");
+            }
+            var users = userMapper.findByEmail(email);
+            if (users.size() == 1) {
+                user = users.get(0);
+            }
+        } else {
+            user = userMapper.findById(userId);
         }
-        user = userMapper.findById(userId);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found");
+        }
         var member = new OrganizationMember(user.getId(), org.getId());
         member.setDisplayName(user.getUsername());
         member.setAutoJoinChannel(true);
         organizationMapper.addMember(member);
+
+        // tell all the clients that the org info has changed
+        var p = makeServerPush("infoChanged", new InfoChangedPush("organization"));
+        broadcastMessages(p);
+
         return "{}";
     }
 }
