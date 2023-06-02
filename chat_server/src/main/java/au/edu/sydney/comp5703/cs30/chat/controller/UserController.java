@@ -69,9 +69,23 @@ public class UserController extends BaseController {
         if (req.getNewPassword() != null) {
             userService.changePassword((int) user.getId(), user.getUsername(), req.getOldPassword(), req.getNewPassword());
         }
-        if (req.getUsername() != null && req.getEmail() != null && req.getPhone() != null &&req.getDisplayName() != null) {
-            userService.updateInfoByUid(user.getId(), req.getUsername(), req.getPhone(), req.getEmail(), req.getDisplayName());
+        var username = user.getUsername();
+        var email = user.getEmail();
+        var phone = user.getPhone();
+        var displayName = user.getDisplayName();
+        if (StringUtils.hasLength(req.getUsername())) {
+            username = req.getUsername();
         }
+        if (StringUtils.hasLength(req.getEmail())) {
+            email = req.getEmail();
+        }
+        if (StringUtils.hasLength(req.getPhone())) {
+            phone = req.getPhone();
+        }
+        if (StringUtils.hasLength(req.getDisplayName())) {
+            displayName = req.getDisplayName();
+        }
+        userService.updateInfoByUid(user.getId(), username, phone, email, displayName);
         return new JsonResult<>(OK);
     }
 
