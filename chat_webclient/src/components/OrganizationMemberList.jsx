@@ -34,12 +34,12 @@ function MemberItem({member}) {
   </ListItem>
 }
 
-export default function OrganizationMemberList({members}) {
+export default function OrganizationMemberList({members, onAddClick}) {
   return (
     <div className="flex-scroll-parent" style={{minHeight: '0'}}>
       <div className="d-flex justify-content-between">
         <div>{members.length} people</div>
-        <Button variant="outlined" >Add member</Button>
+        <Button variant="outlined" onClick={onAddClick} >Add member</Button>
       </div>
       <List className="flex-scroll" sx={{ width: '100%', bgcolor: 'background.paper', minHeight: 0 }}>
         {members.map(m => {

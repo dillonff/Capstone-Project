@@ -225,17 +225,23 @@ export const getAllWorkspaces = async (orgId) => {
 
 export const addUserToChannel = (cid, uid) => {
   let req = {
-    userId: parseInt(uid),
+    memberId: parseInt(uid),
     channelId: parseInt(cid),
+    type: 0  // user
   };
   req = JSON.stringify(req);
-  return callApi('/channels/join', 'POST', req).then(res => {
-    if (!res.ok) {
-      console.error(res);
-      throw Error('Api call failed');
-    }
-  });
+  return callApiJsonChecked('/channels/join', 'POST', req);
 };
+
+export const addOrgToChannel = (cid, oid) => {
+  let req = {
+    memberId: parseInt(oid),
+    channelId: parseInt(cid),
+    type: 1  // org
+  };
+  req = JSON.stringify(req);
+  return callApiJsonChecked('/channels/join', 'POST', req);
+}
 
 export const processServerMessage = async (m) => {
   let user = await getUser(m.senderId);
@@ -301,7 +307,21 @@ export const getMessageById = async (id) => {
 export const addUserToWorkspace = (wid, email) => {
   let req = {
     workspaceId: parseInt(wid),
-    type: 0
+    type: 0 // user
+  };
+  if (!isNaN(parseInt(email))) {
+    req.memberId = parseInt(email);
+  } else {
+    req.email = email;
+  }
+  req = JSON.stringify(req);
+  return callApiJsonChecked('/workspaces/join', 'POST', req);
+}
+
+export const addOrgToWorkspace = (wid, email) => {
+  let req = {
+    workspaceId: parseInt(wid),
+    type: 1  // org
   };
   if (!isNaN(parseInt(email))) {
     req.memberId = parseInt(email);
@@ -349,14 +369,19 @@ export const createOrg = (name, fullName, email, description) => {
 }
 
 export const joinOrg = (orgId, userId, userEmail) => {
-  const body = {};
+  let body = {};
   if (userId) {
     body.userId = userId;
   }
   if (userEmail) {
     body.userEmail = userEmail;
   }
+  body = JSON.stringify(body);
   return callApiJsonChecked('/organizations/' + orgId + '/members', 'POST', body);
+}
+
+export const setChannelRead = (channelId) => {
+  return callApiJsonChecked('/channels/' + channelId + '/read', 'PUT');
 }
 
 export const getMembersInfo = async (rawMembers) => {

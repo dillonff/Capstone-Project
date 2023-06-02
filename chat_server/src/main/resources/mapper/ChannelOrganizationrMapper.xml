@@ -31,5 +31,14 @@
         where channel_id = #{channelId} and not is_deleted
     </select>
 
+    <select id="isMember" resultType="_boolean">
+        select
+            count(*)
+        from
+            chat_channel_organization
+        where
+            channel_id = #{channelId} and organization_id = #{organizationId}
+    </select>
+
 
 </mapper>

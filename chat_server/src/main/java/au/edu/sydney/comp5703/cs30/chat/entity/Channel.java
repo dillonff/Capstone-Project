@@ -21,12 +21,19 @@ public class Channel {
 
     private Boolean autoJoin;
 
+    // derived properties
     // members of the direct message (excluding calling user and organization users)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<ChannelMemberMixin> dmPeerMembers;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean callerIsMember;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long latestMessageId;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private ChannelMember callerMember;
 
     public Channel(String name, long workspaceId, boolean isPublic) {
         this.name = name;
@@ -125,5 +132,21 @@ public class Channel {
 
     public void setAutoJoin(Boolean autoJoin) {
         this.autoJoin = autoJoin;
+    }
+
+    public Long getLatestMessageId() {
+        return latestMessageId;
+    }
+
+    public void setLatestMessageId(Long latestMessageId) {
+        this.latestMessageId = latestMessageId;
+    }
+
+    public ChannelMember getCallerMember() {
+        return callerMember;
+    }
+
+    public void setCallerMember(ChannelMember callerMember) {
+        this.callerMember = callerMember;
     }
 }

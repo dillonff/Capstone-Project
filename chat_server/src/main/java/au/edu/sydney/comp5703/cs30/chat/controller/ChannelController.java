@@ -4,6 +4,7 @@ import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.Util;
 import au.edu.sydney.comp5703.cs30.chat.entity.Channel;
 import au.edu.sydney.comp5703.cs30.chat.entity.ChannelMember;
+import au.edu.sydney.comp5703.cs30.chat.entity.ChannelOrganization;
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import au.edu.sydney.comp5703.cs30.chat.mapper.*;
 import au.edu.sydney.comp5703.cs30.chat.model.*;
@@ -33,6 +34,9 @@ public class ChannelController {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private MessageMapper messageMapper;
 
     @Autowired
     private ChannelService channelService;
@@ -80,14 +84,36 @@ public class ChannelController {
             value = "/api/v1/channels/join", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
     public String handleJoinChannel(@RequestBody JoinChannelRequest req, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
-        // for existing client, first figure out the clientSession that was created in auth
-        var user = userMapper.findById(req.getUserId());
         var channel = channelMapper.findById(req.getChannelId());
-        var member = channelMemberMapper.findByUserAndChannelId(user.getId(), channel.getId());
-        if (member != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already a member");
+        if (channel == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "channel not found");
         }
-        channelService.addMemberToChannel(channel.getId(), user.getId());
+        switch (req.getType()) {
+            case 0:
+                var user = userMapper.findById(req.getMemberId());
+                if (user == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found");
+                }
+                var member = channelMemberMapper.findByUserAndChannelId(user.getId(), channel.getId());
+                if (member != null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already a member");
+                }
+                channelService.addMemberToChannel(channel.getId(), user.getId());
+                break;
+            case 1:
+                var org = organizationMapper.findById(req.getMemberId());
+                if (org == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "organization not found");
+                }
+                if (channelOrganizationMapper.isMember(channel.getId(), org.getId())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already a member");
+                }
+                channelOrganizationMapper.insert(new ChannelOrganization(channel.getId(), org.getId()));
+                break;
+            default:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid member type");
+        }
+
 
         var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
         broadcastMessages(p);
@@ -218,18 +244,29 @@ public class ChannelController {
         if (member == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not a channel member");
         }
+        var shouldPush = false;
         switch (action) {
             case "pin":
                 channelMemberMapper.setPinned(member.getId(), true);
+                shouldPush = true;
                 break;
             case "unpin":
                 channelMemberMapper.setPinned(member.getId(), false);
+                shouldPush = true;
+                break;
+            case "read":
+                var latest = channelService.getLatestMessage(channel.getId());
+                if (latest != null) {
+                    channelMemberMapper.setLastReadMessageId(latest.getId(), member.getId());
+                }
                 break;
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid action: " + action);
         }
-        var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
-        broadcastMessages(p);
+        if (shouldPush) {
+            var p = makeServerPush("infoChanged", new InfoChangedPush("channel"));
+            broadcastMessages(p);
+        }
         return "{}";
     }
 
@@ -272,6 +309,12 @@ public class ChannelController {
         if (channel.isDirectMessage()) {
             channel.setDmPeerMembers(channelService.getDirectMessagePeerMembers(channel, callingUser));
         }
+        var latest = channelService.getLatestMessage(channel.getId());
+        if (latest != null) {
+            channel.setLatestMessageId(latest.getId());
+        }
+        var cm = channelMemberMapper.findByUserAndChannelId(callingUser.getId(), channel.getId());
+        channel.setCallerMember(cm);
     }
 
     private void addChannelUnique(List<Channel> channels, Set<Long> idSet, List<Channel> target) {

@@ -4,19 +4,20 @@ import React from 'react';
 import Button from 'react-bootstrap/Button';
 
 import {
+  addOrgToChannel,
   addUserToChannel,
   getOrg,
   getUser
 } from '../api';
-import { useMountedEffect } from '../util';
+import { AddGlobalModalsContext } from '../AppContext';
+import { showError, useMountedEffect } from '../util';
 
 function ChannelMember({
   channel,
   workspaceMembers,
   channelMembers
 }) {
-  console.log(channel);
-
+  const addGlobalModal = React.useContext(AddGlobalModalsContext);
   let membersNotJoinned = [];
   let userMembersIdSet = new Set(channelMembers.map(m => m.userId));
   for (let m of workspaceMembers) {
@@ -28,9 +29,8 @@ function ChannelMember({
             otherText: 'Workspace user',
             onAdd: _ => {
               addUserToChannel(channel.id, m.user.id).catch(e => {
-                console.error(e);
-                alert(e);
-              })
+                showError(addGlobalModal, e);
+              });
             }
           });
         }
@@ -41,7 +41,9 @@ function ChannelMember({
             displayName: m.organization.name, 
             otherText: m.organization.fullName,
             onAdd: _ => {
-              
+              addOrgToChannel(channel.id, m.organization.id).catch(e => {
+                showError(addGlobalModal, e);
+              });
             }
           });
         }
@@ -55,13 +57,13 @@ function ChannelMember({
   return <div>
     <h5>Joined members</h5>
     <ul>
-      {channelMembers.map(m => {
+      {channelMembers.map((m, i) => {
         if (m.user) {
-          return <li>{m.user.username}</li>;
+          return <li key={i}>{m.user.username}</li>;
         } else if (m.organization) {
-          return <li>{m.organization.name}</li>;
+          return <li key={i}>{m.organization.name} ({m.organization.fullName})</li>;
         } else {
-          return <li>(unknown member {`${m.type}-${m.id}`})</li>
+          return <li key={i}>(unknown member {`${m.type}-${m.id}`})</li>
         }
       })}
     </ul>

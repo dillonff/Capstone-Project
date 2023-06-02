@@ -17,6 +17,7 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
   const organization = findById(organizationId, organizations, nullOrganization);
 
   let channelElems = [];
+  let channelElemsPinned = [];
   for (let i = 0; i < channels.length; i++) {
     const channel = channels[i];
     const members = channel.members || [];
@@ -24,7 +25,7 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
     if (channel.directMessage) {
       continue;
     }
-    if (organization.id > 0 && !orgIsChannelMember(organization, members)) {
+    if (!channel.publicChannel && organization.id > 0 && !orgIsChannelMember(organization, members)) {
       continue;
     }
     const clickCb = () => {
@@ -47,7 +48,11 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
         </IconButton>
       </ChannelListItem>
     );
-    channelElems.push(elem);
+    if (channel.callerMember?.pinned) {
+      channelElemsPinned.push(elem);
+    } else {
+      channelElems.push(elem);
+    }
   }
   if (channelElems.length === 0) {
     channelElems.push(<div key="-1">No channel</div>);
@@ -58,7 +63,10 @@ const ChannelList = ({ channels, selectedChannel, onChannelClick }) => {
       {/* <SideBar /> */}
       <div className="channel-list__list__wrapper">
         {/* <CompanyHeader /> */}
-        <div>{channelElems}</div>
+        <div>
+          {channelElemsPinned}
+          {channelElems}
+        </div>
       </div>
     </>
   );

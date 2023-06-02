@@ -16,7 +16,13 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
 
-import { callApi } from '../api';
+import { addOrgToChannel, addUserToChannel, auth, callApi, callApiJsonChecked, nullOrganization, nullOrganizationMember } from '../api';
+import {
+  AddGlobalModalsContext,
+  OrganizationIdContext,
+  OrganizationsContext
+} from '../AppContext';
+import { showError } from '../util';
 
 // if (
 //   typeof customElements !== 'undefined' &&
@@ -33,6 +39,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
   const [text, setText] = React.useState('');
   const [emojiAnchor, setEmojiAnchor] = React.useState(null);
   const [alternateEmailAnchor, setAlternateEmailAnchor] = React.useState(null);
+  const addGlobalModal = React.useContext(AddGlobalModalsContext);
 
     const handleAlternateEmailClick = (event) => {
         setAlternateEmailAnchor(event.currentTarget);
@@ -41,6 +48,36 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
     const handleAlternateEmailClose = () => {
         setAlternateEmailAnchor(null);
     };
+    const checkOrgIsMember = () => {
+      for (const m of (channel.members || [])) {
+        if (m.type === 1 && m.memberId === organization.id) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    const isMember = () => {
+      let userIsMember = channel.callerIsMember;
+      let orgIsMember = true;
+      if (organization.id > 0 && !channel.directMessage) {
+        orgIsMember = checkOrgIsMember();
+      }
+      return userIsMember && orgIsMember;
+    }
+
+    const handleJoin = () => {
+      if (!channel.callerIsMember) {
+        addUserToChannel(channel.id, auth.user.id).catch(e => {
+          showError(addGlobalModal, e);
+        });
+      }
+      if (organization.id > 0 && !checkOrgIsMember()) {
+        addOrgToChannel(channel.id, organization.id).catch(e => {
+          showError(addGlobalModal, e);
+        });
+      }
+    }
 
 
     const checkScroll = (_) => {
@@ -113,13 +150,10 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
       body.fileIds = fileIds;
     }
     body = JSON.stringify(body);
-    callApi('/messages/send', 'POST', body).then((res) => {
-      if (res.ok) {
-        setText('');
-      } else {
-        console.error(res);
-        alert('Cannot send message');
-      }
+    callApiJsonChecked('/messages/send', 'POST', body).then((res) => {
+      setText('');
+    }).catch(e => {
+      showError(addGlobalModal, e);
     });
   };
 
@@ -158,6 +192,23 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
     </div>
   );
 
+  const mentionListElems = [];
+  for (const m of channel.members || []) {
+    if (m.user) {
+      const elem = <MenuItem
+        key={m.user.id}
+        onClick={() => {
+          handleAlternateEmailClose();
+          addEmoji(`@${m.user.username} `);
+        }}
+      >{m.user.username}</MenuItem>;
+      mentionListElems.push(elem);
+    }
+  }
+  if (mentionListElems.length === 0) {
+    mentionListElems.push(<MenuItem>No one can be mentioned</MenuItem>);
+  }
+
   return (
     <div className="chatbox__container__wrapper">
       {/* message list */}
@@ -187,6 +238,16 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
         />
       </div>
 
+      <div className="d-flex justify-content-center align-items-center" style={{width: '100%', padding: '5px 0 0 0'}}>
+        {!isMember() && <>
+          <span style={{marginRight: '10px'}}>You're not a member of this channel.</span>
+          <Button
+            variant="outlined"
+            onClick={handleJoin}
+          >Join this channel</Button>
+        </>}
+      </div>
+
       {/** message input box */}
       <div className="chatbox__container__input">
         <div className="chatbox__container__input__box">
@@ -212,15 +273,6 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
             />
           </div>
 
-          {/*<input*/}
-          {/*    type="button"*/}
-          {/*    value="Send"*/}
-          {/*    onClick={_ => sendMessage(text)}*/}
-          {/*    style={{*/}
-          {/*      marginLeft: 'auto', */}
-          {/*      width: '100px', */}
-          {/*    }}*/}
-          {/*/>*/}
           <div style={{ display: 'flex', width: '100%' }}>
             <IconButton
               color="neutral"
@@ -281,10 +333,7 @@ function ChatBox({ channel, messages, scrollTo, organization }) {
                       horizontal: 'left',
                   }}
               >
-                  <MenuItem  onClick={handleAlternateEmailClose}> 111 </MenuItem>
-                  <MenuItem  onClick={handleAlternateEmailClose}> 22222 </MenuItem>
-                  <MenuItem  onClick={handleAlternateEmailClose}> 3333 </MenuItem>
-                  <MenuItem  onClick={handleAlternateEmailClose}> 4 </MenuItem>
+                {mentionListElems}
               </Menu>
 
           </div>

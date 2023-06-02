@@ -1,14 +1,19 @@
 package au.edu.sydney.comp5703.cs30.chat.model;
 
 public class JoinChannelRequest {
-    public long channelId;
-    private long userId;
+    private long channelId;
+    private int type;
+    private long memberId;
 
     public long getChannelId() {
         return channelId;
     }
 
-    public long getUserId() {
-        return userId;
+    public int getType() {
+        return type;
+    }
+
+    public long getMemberId() {
+        return memberId;
     }
 }

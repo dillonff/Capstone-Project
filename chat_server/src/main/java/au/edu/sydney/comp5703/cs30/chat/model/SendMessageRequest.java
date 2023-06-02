@@ -10,6 +10,8 @@ public class SendMessageRequest {
 
     private List<Long> fileIds;
 
+    private List<Long> mentionedUserIds;
+
     public String getContent() {
         return content;
     }
@@ -24,5 +26,9 @@ public class SendMessageRequest {
 
     public List<Long> getFileIds() {
         return fileIds;
+    }
+
+    public List<Long> getMentionedUserIds() {
+        return mentionedUserIds;
     }
 }

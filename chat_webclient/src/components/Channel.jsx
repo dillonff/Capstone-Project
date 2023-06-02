@@ -10,6 +10,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ChannelMember from './ChannelMember';
 
 import {
+  AddGlobalModalsContext,
   OrganizationIdContext,
   OrganizationsContext
 } from '../AppContext';
@@ -23,11 +24,12 @@ import {
   nullOrganization,
   getOrg,
   getChannelMembers,
-  processChannelMembers
+  processChannelMembers,
+  setChannelRead
 } from '../api.js';
 import Event from '../event.js';
 import {
-  findById, getDmName, useMountedEffect
+  findById, getDmName, showError, useMountedEffect
 } from '../util';
 import UserAvatar from './UserAvatar';
 
@@ -37,6 +39,7 @@ function Channel({
 }) {
   const [messages, setMessages] = React.useState([]);
   const addUserIdRef = React.useRef();
+  const addGlobalModal = React.useContext(AddGlobalModalsContext);
   
   const [show, setShow] = React.useState(false);
   const [organizationId] = React.useContext(OrganizationIdContext);
@@ -53,7 +56,7 @@ function Channel({
     if (channel.id === -1)
       return;
     getMessages(channel.id).then(res => {
-      getMounted && setMessages(res);
+      getMounted() && setMessages(res);
     }).catch(e => {
       console.error(e);
       alert(e);
@@ -66,8 +69,8 @@ function Channel({
       if (data.channelId !== channel.id) {
         return;
       }
-      console.log('new message arrived');
-      console.log(data);
+      // console.log('new message arrived');
+      // console.log(data);
       setMessages(messages => [...messages, data]);
     }
     Event.addListener(cb);
@@ -77,6 +80,12 @@ function Channel({
   }, [channel]);
 
   const updateMembers = async getMounted => {
+    if (channel.members) {
+      setMembers(channel.members);
+      return;
+    }
+    // old code to retrieve channel members,
+    // but they are now temporarily retrieved by Workspace
     membersVersion.current++;
     const expectedVersion = membersVersion.current;
     let res = await getChannelMembers(channel.id);
@@ -91,7 +100,28 @@ function Channel({
     if (channel.id === -1)
       return;
     updateMembers(getMounted);
-  }, [channel])
+  }, [channel]);
+
+  React.useEffect(() => {
+    if (messages.length > 0) {
+      const m = messages[messages.length - 1];
+      const member = channel.callerMember;
+      let unread = false;
+      if (member && member.lastReadMessageId < channel.latestMessageId) {
+        unread = true;
+      }
+      console.error(m);
+      console.error(channel, unread);
+      if (m.senderId !== auth.user.id && unread) {
+        setChannelRead(m.channelId).then(_ => {
+          member.lastReadMessageId = m.id;
+          channel.latestMessageId = m.id;
+        }).catch(e => {
+          showError(addGlobalModal, e);
+        });
+      }
+    }
+  }, [messages, channel]);
 
   let name = channel.name;
   if (channel.directMessage) {

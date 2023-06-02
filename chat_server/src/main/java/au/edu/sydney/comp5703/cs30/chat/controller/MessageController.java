@@ -1,6 +1,7 @@
 package au.edu.sydney.comp5703.cs30.chat.controller;
 
 import au.edu.sydney.comp5703.cs30.chat.Repo;
+import au.edu.sydney.comp5703.cs30.chat.entity.ChannelMember;
 import au.edu.sydney.comp5703.cs30.chat.entity.Message;
 import au.edu.sydney.comp5703.cs30.chat.mapper.*;
 import au.edu.sydney.comp5703.cs30.chat.model.*;
@@ -36,6 +37,9 @@ public class MessageController {
 
     @Autowired
     private WorkspaceMapper workspaceMapper;
+
+    @Autowired
+    private ChannelMemberMapper channelMemberMapper;
 
     private static final ObjectMapper om = new ObjectMapper();
     @RequestMapping(
@@ -76,7 +80,24 @@ public class MessageController {
             }
         }
 
+        // set mentioned
+        if (req.getMentionedUserIds() != null) {
+            for (var id : req.getMentionedUserIds()) {
+                if (id != null) {
+                    var m = channelMemberMapper.findByUserAndChannelId(id, channel.getId());
+                    if (m != null) {
+                        channelMemberMapper.setMentioned(true, m.getId());
+                    }
+                }
+            }
+        }
 
+        // update self lastReadMessageId
+        var member = channelMemberMapper.findByUserAndChannelId(user.getId(), channel.getId());
+        if (member != null) {
+            channelMemberMapper.setLastReadMessageId(message.getId(), member.getId());
+            channelMemberMapper.setMentioned(false, member.getId());
+        }
 
         // send a new message push to all members in the channel
         // var msg = new NewMessagePush(message.getId(), message.getContent(), message.getSenderId(), message.getChannelId());
