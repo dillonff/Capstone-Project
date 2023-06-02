@@ -190,15 +190,7 @@ async function getUser(id, auth, refresh = false) {
             <div>Please select a folder</div>
           )}
         </div>
-        <div className="search-bar">
-          <input
-           type="text"
-           placeholder="Search..."
-           value={searchTerm}
-           onChange={handleSearchTermChange}
-            />
-             <button onClick={handleSearch}>Search</button>
-              </div>
+       
               <div className="files">
               <table>
   <thead>
@@ -263,7 +255,7 @@ async function getUser(id, auth, refresh = false) {
         onMouseEnter={(e) => e.target.classList.add("highlight")}
         onMouseLeave={(e) => e.target.classList.remove("highlight")}
       >
-       <td className="file-name" onClick={() => handleFileClick(file.id)}>
+       <td className="file-name">
   {file.filename}
 </td>
 
