@@ -34,6 +34,8 @@ public class ClientSession {
 
     public static void remove(String wsid) {
         var session = sessionMap.remove(wsid);
+        if (session == null)
+            return;
         var uid = session.getUser().getId();
         var sessions = userMap.get(uid);
         sessions.removeIf(s -> s.getWssession().equals(session.getWssession()));

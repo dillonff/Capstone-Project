@@ -28,14 +28,31 @@ export const nullOrganization = {
 
 export async function login(username, password) {
   let res = await callApiJsonChecked('/auth', 'POST', JSON.stringify({
-    userName: username,
+    username: username,
     password: password
   }));
+  auth.token = res.token;
   auth.user = await getUser(res.userId);
-  auth.token = res.userId;
   Event.start();
   console.error(auth);
+  localStorage.setItem('chat.token', res.token);
   return auth.user
+}
+
+export async function loginToken() {
+  let token = localStorage.getItem("chat.token");
+  if (!token) {
+    throw new Error("no token");
+  }
+  auth.token = token;
+  let res = await getUser('current', true);
+  auth.user = res;
+  Event.start();
+}
+
+export function logout() {
+  localStorage.removeItem("chat.token");
+  window.location.reload();
 }
 
 export async function signup(username, password, confirmPassword, phone, email, displayName) {
@@ -72,7 +89,7 @@ export async function getUser(id, refresh = false) {
 }
 
 export const updateUser = (date) => {
-  return callApi('/userUpdate', 'POST',JSON.stringify(date));
+  return callApiJsonChecked('/userUpdate', 'POST',JSON.stringify(date));
 }
 
 
@@ -129,7 +146,7 @@ export async function callApiJsonChecked(path, method, body) {
   try {
     res = await callApi(path, method, body);
   } catch (e) {
-    throw new ApiError("Cannot contack chat server.", e);
+    throw new ApiError("Cannot contact chat server.", e);
   }
   try {
     let data = await res.json();
@@ -411,16 +428,11 @@ export const getFile = async (id, workspace,sortOptions) => {
     workspace:workspace,
     sortOptions:sortOptions
   }
-  let res = await callApi(`/files/list`, 'POST',JSON.stringify(date));
-  if (res.ok) {
-    res = await res.json();
-    return res;
-  }
-  throw new Error('Cannot get File');
+  return await callApiJsonChecked(`/files/list`, 'POST',JSON.stringify(date));
 }
 
 export const getWorkspaceAll = async () => {
-  let res = await callApi(`/workspaces/-1`, 'GET');
+  let res = await callApi(`/workspaces`, 'GET');
   if (res.ok) {
     res = await res.json();
     return res;

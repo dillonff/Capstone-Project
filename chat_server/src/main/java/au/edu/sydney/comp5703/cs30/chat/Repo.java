@@ -13,6 +13,9 @@ import org.apache.ibatis.binding.MapperProxy;
 
 @Component
 public class Repo {
+
+    // these are really workaround for injecting beans to static fields
+    // the code here should be put into corresponding service classes
     public static WorkspaceMapper workspaceMapper;
 
     public static ChannelMemberMapper channelMemberMapper;
@@ -88,18 +91,20 @@ public class Repo {
 
 
     public static void addMemberToWorkspace(long workspaceId, int type, long memberId) {
-        //TODO: join all public channels
         workspaceMemberMapper.insert(new WorkspaceMember(workspaceId, type, memberId));
-        var general = Util.getChannelForName(workspaceId, "general");
-        switch (type) {
-            case 0:
-                //addMemberToChannel(general.getId(), memberId);
-                break;
-            case 1:
-                channelOrganizationMapper.insert(new ChannelOrganization(general.getId(), memberId));
-                break;
-            default:
-                throw new RuntimeException("Invalid type: " + type);
+        for (var c : channelMapper.findPublicByWorkspaceId(workspaceId)) {
+            if (!c.shouldAutoJoin())
+                continue;
+            switch (type) {
+                case 0:
+                    channelMemberMapper.insertChannelMember(new ChannelMember(c.getId(), memberId));
+                    break;
+                case 1:
+                    channelOrganizationMapper.insert(new ChannelOrganization(c.getId(), memberId));
+                    break;
+                default:
+                    throw new RuntimeException("Invalid type: " + type);
+            }
         }
     }
 

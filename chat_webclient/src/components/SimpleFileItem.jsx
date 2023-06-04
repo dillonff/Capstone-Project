@@ -1,8 +1,8 @@
 import React from 'react';
-import { API_ENDPOINT } from '../api';
+import { API_ENDPOINT, auth } from '../api';
 
 function getFileLink(file) {
-  return API_ENDPOINT + "/files/" + file.id + "/" + encodeURIComponent(file.filename);
+  return `${API_ENDPOINT}/files/${file.id}/${encodeURIComponent(file.filename)}?token=${auth.token}`;
 }
 
 function isImage(file) {

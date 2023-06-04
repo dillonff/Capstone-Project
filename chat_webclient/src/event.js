@@ -28,7 +28,7 @@ function onWsOpen() {
   socket.send(JSON.stringify({
     'type': 'auth',
     'args': {
-      'userName': auth.user?.username
+      'token': auth.token
     }
   }));
 }
@@ -113,11 +113,17 @@ function start() {
   socket.onmessage = onMessage;
 }
 
+let reconnectWait = false;
+
 function reconnectDelay(timeout) {
+  if (reconnectWait)
+    return;
   if (!timeout) {
     timeout = 5000;
   }
+  reconnectWait = true;
   setTimeout(() => {
+    reconnectWait = false;
     start();
   }, timeout);
 }

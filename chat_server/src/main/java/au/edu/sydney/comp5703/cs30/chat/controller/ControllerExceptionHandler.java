@@ -1,6 +1,7 @@
 package au.edu.sydney.comp5703.cs30.chat.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,10 +15,10 @@ import java.util.Map;
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ResponseStatusException.class)
-    public @ResponseBody ErrorBody eHandler(jakarta.servlet.http.HttpServletRequest req, ResponseStatusException e) throws Exception {
+    public @ResponseBody ErrorBody eHandler(jakarta.servlet.http.HttpServletRequest req, HttpServletResponse response, ResponseStatusException e) throws Exception {
         e.printStackTrace();
+        response.setStatus(e.getStatusCode().value());
         return buildErrorBody(e.getReason());
     }
 

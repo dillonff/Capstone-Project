@@ -22,6 +22,7 @@ import java.util.Map;
 
 import static au.edu.sydney.comp5703.cs30.chat.WsUtil.broadcastMessages;
 import static au.edu.sydney.comp5703.cs30.chat.WsUtil.makeServerPush;
+import static au.edu.sydney.comp5703.cs30.chat.controller.ControllerHelper.getCurrentUser;
 
 @RestController
 public class OrganizationController {
@@ -50,11 +51,8 @@ public class OrganizationController {
 
     // controller for manual testing only
     @RequestMapping(value = "/api/v1/organizations", consumes = "application/json", produces = "application/json", method = RequestMethod.POST)
-    public Organization handleCreateOrg(@RequestBody Map<String, String> req, @RequestHeader("Authorization") Long auth) throws Exception {
-        var user = userMapper.findById(auth);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized");
-        }
+    public Organization handleCreateOrg(@RequestBody Map<String, String> req) throws Exception {
+        var user = getCurrentUser();
 
         var name = req.get("name");
         var fullName = req.get("fullName");
@@ -92,11 +90,8 @@ public class OrganizationController {
 
 
     @RequestMapping(value = "/api/v1/organizations", produces = "application/json", method = RequestMethod.GET)
-    public Map<String, Object> handleGetOrg(@RequestHeader("Authorization") Long auth) throws Exception {
-        var user = userMapper.findById(auth);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized");
-        }
+    public Map<String, Object> handleGetOrg() throws Exception {
+        var user = getCurrentUser();
 
         var orgs = organizationMapper.findByUserId(user.getId());
         var result = new HashMap<String, Object>();
@@ -105,22 +100,16 @@ public class OrganizationController {
     }
 
     @RequestMapping(value = "/api/v1/organizations/{id}", produces = "application/json", method = RequestMethod.GET)
-    public Organization handleGetInfo(@PathVariable Long id, @RequestHeader("Authorization") Long auth) throws Exception {
-        var user = userMapper.findById(auth);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized");
-        }
+    public Organization handleGetInfo(@PathVariable Long id) throws Exception {
+        var user = getCurrentUser();
 
         var org = organizationMapper.findById(id);
         return org;
     }
 
     @RequestMapping(value = "/api/v1/organizations/{id}/members", produces = "application/json", method = RequestMethod.GET)
-    public Map<String, Object> handleGetMembers(@PathVariable Long id, @RequestHeader("Authorization") Long auth) throws Exception {
-        var user = userMapper.findById(auth);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized");
-        }
+    public Map<String, Object> handleGetMembers(@PathVariable Long id) throws Exception {
+        var user = getCurrentUser();
 
         var org = organizationMapper.findById(id);
         if (org == null) {
@@ -133,11 +122,8 @@ public class OrganizationController {
     }
 
     @RequestMapping(value = "/api/v1/organizations/{id}/members", consumes = "application/json", produces = "application/json", method = RequestMethod.POST)
-    public String handleAddMembers(@RequestBody JoinOrganizationRequest req, @PathVariable Long id, @RequestHeader("Authorization") Long auth) throws Exception {
-        var user = userMapper.findById(auth);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized");
-        }
+    public String handleAddMembers(@RequestBody JoinOrganizationRequest req, @PathVariable Long id) throws Exception {
+        var user = getCurrentUser();
 
         var org = organizationMapper.findById(id);
         if (org == null) {

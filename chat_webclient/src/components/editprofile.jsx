@@ -8,7 +8,7 @@ import CardContent from '@mui/material/CardContent';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-import {updateUser,getUser} from "../api" 
+import {updateUser,getUser, loginToken, auth} from "../api" 
 
 export default function Edit() {
 
@@ -22,12 +22,15 @@ export default function Edit() {
   });
 
   useEffect(() => {
-    const userID = localStorage.getItem("userID"); 
-     getUser(userID).then((e)=>{
-        console.log(e);
-        setUser(e)
-     })
-  }, [])
+    loginToken().then(() => {
+      const u = auth.user;
+      console.log(u);
+      setUser(u);
+    }).catch(e => {
+      console.error(e);
+      alert(e);
+    });
+  }, []);
   const setValue = (e, key)=>{
     let newState = {...user}
     newState[key] = e.target.value

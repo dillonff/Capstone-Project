@@ -1,9 +1,11 @@
 -- // file usage table
 -- Migration SQL that makes the change goes here.
+-- The usage_type comment was wrong, which can be fixed by another migration script if the wrong comment was previously applied
 
 create table chat_file_usage (
                                  id bigint unsigned not null auto_increment comment 'entry id',
-                                 usage_type tinyint unsigned not null comment 'file usage type: 1-message, 2-channel, 3-workspace',
+                                 -- usage_type tinyint unsigned not null comment 'file usage type: 1-message, 2-channel, 3-workspace',  -- This is wrong
+                                 usage_type tinyint unsigned not null comment 'file usage type: 1-workspace, 2-channel, 3-message',
                                  usage_id bigint unsigned not null comment 'usage id based on usage type',
                                  file_id bigint unsigned not null comment 'file id referring to chat_file',
                                  is_deleted tinyint(1) unsigned not null default 0 comment '0-not deleted, 1-deleted',
