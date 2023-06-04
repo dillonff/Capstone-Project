@@ -10,14 +10,11 @@ Only push messages
 ```
 
 #### New Message
-```json
+```json5
 {
   "type": "newMessage",
   "data": {
-    "messageId": "message-id",
-    "preview": "preview text",
-    "senderId": "numeric sender id",
-    "channelId": "numeric channel id"
+    // just the Message entity
   }
 }
 ```
