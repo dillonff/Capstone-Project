@@ -38,12 +38,13 @@ import Channel from './Channel';
 import CreateOrganization from './CreateOrganization';
 import Event from '../event';
 import UserAvatar from './UserAvatar';
-import { showError, showInfo, useMountedEffect } from '../util.js';
+import { findById, showError, showInfo, useMountedEffect } from '../util.js';
 import { DirectMessageList } from './DirectMessageList.jsx';
-import { AddGlobalModalsContext } from '../AppContext.js';
+import { AddGlobalModalsContext, OrganizationIdContext, OrganizationsContext } from '../AppContext.js';
 import SimpleDetailDialog from './SimpleDetailDialog.jsx';
 import { InviteMemberForm } from './InviteMemberForm.jsx';
 import { CreateChannelForm } from './CreateChannelForm.jsx';
+import OrganizationForm from './OrganizationForm.jsx';
 
 const WorkspaceDropdown = ({ workspace }) => {
   return;
@@ -58,6 +59,9 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
   const addGlobalModal = React.useContext(AddGlobalModalsContext);
   const updateChannelCtx = React.useRef({ongoing: false, next: null});
   const workspaceRef = React.useRef(null);
+  const [organizationId] = React.useContext(OrganizationIdContext);
+  const [organizations] = React.useContext(OrganizationsContext);
+  const organization = findById(organizationId, organizations, nullOrganization);
 
   let currentChannel = nullChannel;
   if (currentChannelId !== -1) {
@@ -200,6 +204,8 @@ const Workspace = ({ initialWorkspace, setSelectedWorkspace }) => {
             </Dropdown.Item>
           </DropdownButton>
         </div>
+
+        <div>Logged in as {auth.user.username}{organization.id > 0 && ` (@${organization.name})`}</div>
 
         {/** create channel form */}
         <SimpleDetailDialog

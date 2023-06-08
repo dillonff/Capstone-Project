@@ -4,8 +4,12 @@ import au.edu.sydney.comp5703.cs30.chat.Repo;
 import au.edu.sydney.comp5703.cs30.chat.entity.File;
 import au.edu.sydney.comp5703.cs30.chat.entity.User;
 import au.edu.sydney.comp5703.cs30.chat.mapper.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -18,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.time.Instant;
 
 @RestController
 public class StubController {
@@ -37,10 +43,15 @@ public class StubController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private static final ObjectMapper om;
+    static {
+        om = Jackson2ObjectMapperBuilder.json().featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS).build();
+    }
+
 
     // controller for manual testing only
     @RequestMapping(value = "/stub1", method = RequestMethod.GET)
-    public void handleStub() {
+    public void handleStub() throws JsonProcessingException {
 //        var user = new User("test" + System.currentTimeMillis());
 //        var res = userMapper.insertUser(user);
 //
@@ -63,5 +74,6 @@ public class StubController {
 
         // fileMapper.insertFile(new File("name", "path", 12345L, 0L));
         fileMapper.findById(1);
+        System.err.println(om.writeValueAsString(Instant.now()));
     }
 }

@@ -13,7 +13,7 @@ import { Button } from "@mui/material";
 import BadgeIcon from '@mui/icons-material/Badge';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import { Link } from "react-router-dom";
-import {getUser} from "../api" 
+import {auth, getUser, logout} from "../api" 
 
 
 function Header() {
@@ -38,9 +38,9 @@ function Header() {
       setAnchorEl(el)
     }
     useEffect(() => {
-      const userInfo = localStorage.getItem("userInfo"); 
+      const userInfo = auth.user;
       if (userInfo) {
-        setUserInfo(JSON.parse(userInfo))
+        setUserInfo(userInfo);
       }
     }, [])
 
@@ -87,7 +87,7 @@ function Header() {
               horizontal: 'right',
             }}
           >
-            <div className="popover-content">
+            <div className="popover-content" style={{padding: '10px'}}>
               <Grid>
                     <BadgeIcon sx={{ size: 100 }}/>
 
@@ -103,14 +103,18 @@ function Header() {
               </Grid>
               {
                   // userId.toString() === profileUserId ? 
-                  <Button 
-                      // component={Link} to={ '/editprofile'}
-                    //  href='/editprofile'
-                    onClick={handleprofile}
-                      >
-    
-                      Edit Profile
-                  </Button>//: ''
+                  <>
+                    <Button 
+                        // component={Link} to={ '/editprofile'}
+                      //  href='/editprofile'
+                      onClick={handleprofile}
+                        >
+      
+                        Edit Profile
+                    </Button>
+                    <br />
+                    <Button onClick={logout}>Log out</Button>
+                  </>
                 }
               <Box width="100%" /> {/* basically adds a new row */}
 

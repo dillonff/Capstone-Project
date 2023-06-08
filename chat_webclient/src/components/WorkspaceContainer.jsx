@@ -14,7 +14,8 @@ import {
   auth,
   nullOrganization,
   getWorkspaceMembers,
-  processWorkspaceMembers
+  processWorkspaceMembers,
+  logout
 } from '../api';
 
 import {
@@ -176,14 +177,22 @@ function WorkspaceContainer({}) {
                         >Create workspace</Button>
                         <Button
                             type="button"
+                            className="me-2"
                             variant="outline-secondary"
                             onClick={(_) => {
-                                getAndUpdateWorkspaces().catch((e) => {
+                                getAndUpdateWorkspaces(_ => true).catch((e) => {
                                     console.error(e);
                                     alert(e);
                                 });
                             }}
                         >Refresh workspace</Button>
+                        <Button
+                            type="button"
+                            variant="outline-danger"
+                            onClick={(_) => {
+                                logout();
+                            }}
+                        >Log out</Button>
                     </div>
                 </h2>
 

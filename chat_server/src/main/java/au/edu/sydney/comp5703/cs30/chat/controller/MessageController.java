@@ -20,6 +20,7 @@ import java.time.format.DateTimeParseException;
 
 import static au.edu.sydney.comp5703.cs30.chat.WsUtil.broadcastMessagesToChannel;
 import static au.edu.sydney.comp5703.cs30.chat.WsUtil.makeServerPush;
+import static au.edu.sydney.comp5703.cs30.chat.controller.ControllerHelper.getCurrentUser;
 
 @RestController
 public class MessageController {
@@ -45,9 +46,9 @@ public class MessageController {
     @RequestMapping(
             value = "/api/v1/messages/send", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
-    public SendMessageResponse handleSendMessage(@RequestBody SendMessageRequest req, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
+    public SendMessageResponse handleSendMessage(@RequestBody SendMessageRequest req) throws Exception {
         // for existing client, first figure out the clientSession that was created in auth
-        var user = userMapper.findById(auth);
+        var user = getCurrentUser();
         // then figure out the channel by id
         var channelId = req.getChannelId();
         var channel = channelMapper.findById(channelId);
@@ -101,6 +102,7 @@ public class MessageController {
 
         // send a new message push to all members in the channel
         // var msg = new NewMessagePush(message.getId(), message.getContent(), message.getSenderId(), message.getChannelId());
+        message = messageMapper.findById(message.getId());
         var bcastPayload = makeServerPush("newMessage", message);
         broadcastMessagesToChannel(bcastPayload, channel);
 

@@ -5,7 +5,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import {updateUser} from '../api'
+import {auth, loginToken, updateUser} from '../api'
 
 export default function Edit() {
 
@@ -19,6 +19,16 @@ export default function Edit() {
         })
 
   };
+
+  React.useEffect(() => {
+    loginToken().then(() => {
+      setUser(auth.user);
+    }).catch(e => {
+      console.error(e);
+      alert(e);
+    })
+  }, []);
+
   const prohibitRefresh = (e) => {
     e.preventDefault() || (e.returnValue = false);  
 };
@@ -29,7 +39,6 @@ export default function Edit() {
 
     const newpassword = data.get('newpassword').toString();
     const newpassword2 = data.get('newpassword2').toString();
-    const userInfo = JSON.parse(localStorage.getItem("userInfo")); 
    
     const encryptedPassword=data.get('oldpassword').toString();
 
@@ -41,8 +50,8 @@ export default function Edit() {
         const password=newpassword;
 
         const obj={
-id :userInfo.id,
-username:userInfo.username,
+id :user.id,
+username:user.username,
 oldPassword:encryptedPassword,
 newPassword:password
         };

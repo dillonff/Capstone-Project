@@ -63,7 +63,6 @@ body {
 
 
 
-/* 设置主体部分样式 */
 .main {
   margin-left: 350px;
   padding: 20px;
@@ -85,6 +84,8 @@ body {
   padding: 10px;
   text-align: left;
   border: 1px solid #ddd;
+  max-width: 300px;
+  overflow-wrap: break-word;
 }
 
 .files th {

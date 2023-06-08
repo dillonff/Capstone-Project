@@ -12,11 +12,15 @@ import {
   getOrgs,
   nullOrganization,
   getFile,
-  getWorkspaceAll
+  getWorkspaceAll,
+  loginToken,
+  API_ENDPOINT
 } from '../api.js';
 // import folderData from '../config/folderConfig'
 
-
+function getFileLink(file) {
+  return `${API_ENDPOINT}/files/${file.id}/${encodeURIComponent(file.filename)}?token=${auth.token}`;
+}
 
 const getMembersInfo = async (memberIds) => {
   const members = [];
@@ -37,8 +41,7 @@ const getMembersInfo = async (memberIds) => {
 
 
 const App = () => {
-  // const [selectedFolder, setSelectedFolder] = useState('1');
-  let selectedFolder = '1'
+  const [selectedFolder, setSelectedFolder] = useState('1');
   const [User, setUser] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredFiles, setFilteredFiles] = useState([]);
@@ -47,6 +50,17 @@ const App = () => {
   const [fileId,setFileid] = useState(-1);
   const [folderData,setFolderData] =useState([]);
   const userCache = {};
+
+  useEffect(() => {
+    loginToken().then(() => {
+      const u = auth.user;
+      console.log(u);
+      setUser(u);
+    }).catch(e => {
+      console.error(e);
+      alert(e);
+    });
+  }, []);
 
 
   function getFileList() {
@@ -74,13 +88,12 @@ async function getUser(id, auth, refresh = false) {
 }
 
   const handleFolderClick = (folder) => {
-    console.log(folder.value, 'f');
-    // setSelectedFolder(folder.value);
-    selectedFolder = folder.value
+    console.log(folder, 'f');
+    setSelectedFolder(folder.value);
     console.log(selectedFolder, 'select');
     // setFilteredFiles(folder.files);
     //.filter(filterRecentFiles));
-    getFileList()
+    // getFileList()
   };
 
   const handleSearchTermChange = (event) => {
@@ -129,7 +142,7 @@ async function getUser(id, auth, refresh = false) {
   const [sortOptions, setSortOptions] = useState({});
   useEffect(()=>{
     getFileList()
-  },[sortOptions])
+  },[sortOptions, selectedFolder])
 
   const handleSort = (field) => {
 
@@ -185,7 +198,7 @@ async function getUser(id, auth, refresh = false) {
       <div className="main">
         <div className="header">
           {selectedFolder ? (
-            <div>{selectedFolder.name}</div>
+            <div>{folderData.find(f => f.value === selectedFolder)?.name || `Workspace id ${selectedFolder}`}</div>
           ) : (
             <div>Please select a folder</div>
           )}
@@ -264,7 +277,7 @@ async function getUser(id, auth, refresh = false) {
         <td>
         {new Date(file.timeCreated).getTime()+(90*24*60*60*1000) > new Date().getTime()?
        // <button  href={"http://127.0.0.1:11451/api/v1/files/" + file.id + "/" + encodeURIComponent(file.filename)}>Download</button>
-       <a target="_blank" href={"http://127.0.0.1:11451/api/v1/files/" + file.id + "/" + encodeURIComponent(file.filename)}>Download</a>:
+       <a target="_blank" href={getFileLink(file)}>Download</a>:
         <span></span>}
         </td>
       </tr>

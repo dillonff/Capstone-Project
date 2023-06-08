@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static au.edu.sydney.comp5703.cs30.chat.WsUtil.*;
+import static au.edu.sydney.comp5703.cs30.chat.controller.ControllerHelper.getCurrentUser;
 
 @RestController
 public class WorkspaceController {
@@ -49,11 +50,8 @@ public class WorkspaceController {
     @RequestMapping(
             value = "/api/v1/workspaces", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
-    public Workspace createWorkspace(@RequestBody CreateWorkspaceRequest req, @RequestHeader(HttpHeaders.AUTHORIZATION) long auth) throws Exception {
-        var user = userMapper.findById(auth);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "user not authorized");
-        }
+    public Workspace createWorkspace(@RequestBody CreateWorkspaceRequest req) throws Exception {
+        var user = getCurrentUser();
         if (req.getName() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no workspace name provided");
         }
@@ -123,17 +121,6 @@ public class WorkspaceController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already a member");
         }
         Repo.addMemberToWorkspace(workspace.getId(), req.getType(), memberId);
-        var channels = channelMapper.findPublicByWorkspaceId(workspace.getId());
-        for (var c : channels) {
-            if (c.shouldAutoJoin()) {
-                if (req.getType() == 0) {
-                    channelService.addMemberToChannel(c.getId(), memberId);
-                } else {
-                    channelOrganizationMapper.insert(new ChannelOrganization(c.getId(), memberId));
-                }
-
-            }
-        }
         var p = makeServerPush("infoChanged", new InfoChangedPush("workspace"));
         broadcastMessages(p);
         return "{}";
@@ -142,7 +129,8 @@ public class WorkspaceController {
     @RequestMapping(
             value = "/api/v1/workspaces", produces = "application/json", method = RequestMethod.GET
     )
-    public List<Workspace> getWorkspaces(@RequestParam(required = false) Long organizationId, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
+    public List<Workspace> getWorkspaces(@RequestParam(required = false) Long organizationId) {
+        var user = getCurrentUser();
         var ids = new LinkedList<Long>();
         var type = 0;
         var memberId = 0L;
@@ -150,7 +138,7 @@ public class WorkspaceController {
             type = 1;
             memberId = organizationId;
         } else {
-            memberId = auth;
+            memberId = user.getId();
         }
         var workspaces = workspaceMapper.findByMemberId(type, memberId);
         return workspaces;

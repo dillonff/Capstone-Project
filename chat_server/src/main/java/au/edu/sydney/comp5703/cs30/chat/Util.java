@@ -38,6 +38,7 @@ public class Util {
         var workspace = new Workspace(name);
         workspaceMapper.insertWorkspace(workspace);
         var general = new Channel("general", workspace.getId(), true);
+        general.setAutoJoin(true);
         channelMapper.insertChannel(general);
         return workspace;
     }

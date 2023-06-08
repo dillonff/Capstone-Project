@@ -24,6 +24,7 @@ import java.util.*;
 import static au.edu.sydney.comp5703.cs30.chat.Repo.*;
 import static au.edu.sydney.comp5703.cs30.chat.WsUtil.broadcastMessages;
 import static au.edu.sydney.comp5703.cs30.chat.WsUtil.makeServerPush;
+import static au.edu.sydney.comp5703.cs30.chat.controller.ControllerHelper.getCurrentUser;
 
 @RestController
 public class ChannelController {
@@ -44,12 +45,9 @@ public class ChannelController {
     @RequestMapping(
             value = "/api/v1/channels", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
-    public Channel handleCreateChannel(@RequestBody CreateChannelRequest req, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
+    public Channel handleCreateChannel(@RequestBody CreateChannelRequest req, @CurrentSecurityContext SecurityContext sc) throws Exception {
         // this is a simple workaround to know the calling user
-        var user = userMapper.findById(auth);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found");
-        }
+        var user = getCurrentUser();
         var workspace = workspaceMapper.findById(req.getWorkspace());
         if (workspace == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "workspace not found");
@@ -83,7 +81,7 @@ public class ChannelController {
     @RequestMapping(
             value = "/api/v1/channels/join", consumes = "application/json", produces = "application/json", method = RequestMethod.POST
     )
-    public String handleJoinChannel(@RequestBody JoinChannelRequest req, @CurrentSecurityContext SecurityContext sc, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
+    public String handleJoinChannel(@RequestBody JoinChannelRequest req, @CurrentSecurityContext SecurityContext sc) throws Exception {
         var channel = channelMapper.findById(req.getChannelId());
         if (channel == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "channel not found");
@@ -109,6 +107,7 @@ public class ChannelController {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already a member");
                 }
                 channelOrganizationMapper.insert(new ChannelOrganization(channel.getId(), org.getId()));
+                // TODO: add org members which has autoJoinChannel set to true
                 break;
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid member type");
@@ -124,8 +123,8 @@ public class ChannelController {
     @RequestMapping(
             value = "/api/v1/channels", produces = "application/json", method = RequestMethod.GET
     )
-    public List<Channel> handleGetChannels(@RequestParam Long workspaceId, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
-        var user = userMapper.findById(auth);
+    public List<Channel> handleGetChannels(@RequestParam Long workspaceId) {
+        var user = getCurrentUser();
         var privateChannels = channelMapper.findPrivateByWorkspaceAndMember(workspaceId, user.getId());
         var publicChannels = channelMapper.findPublicByWorkspaceId(workspaceId);
         // TODO: include channels that the user's org is a member of
@@ -144,9 +143,8 @@ public class ChannelController {
 
     )
         public Channel handleGetChannelInfo(@PathVariable long channelId,
-                                        @CurrentSecurityContext SecurityContext sc,
-                                        @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
-        var user = userMapper.findById(auth);
+                                        @CurrentSecurityContext SecurityContext sc) {
+        var user = getCurrentUser();
         System.out.println(user.getUsername());
         var channel = channelMapper.findById(channelId);
         if (channel == null) {
@@ -159,12 +157,8 @@ public class ChannelController {
     @RequestMapping(value = "/api/v1/channels/{channelId}", produces = "application/json", consumes = "application/json", method = RequestMethod.PUT)
     public String handleUpdateChannel(@PathVariable long channelId,
                                       @RequestBody Channel req,
-                                      @CurrentSecurityContext SecurityContext sc,
-                                      @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
-        var user = userMapper.findById(auth);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "user not authenticated");
-        }
+                                      @CurrentSecurityContext SecurityContext sc) {
+        var user = getCurrentUser();
         var infoValid = false;
         var c = new Channel();
         if (req.shouldAutoJoin() != null) {
@@ -191,12 +185,8 @@ public class ChannelController {
 
     )
     public ChannelMember handleGetChannelMember(@PathVariable long channelId,
-                                                @CurrentSecurityContext SecurityContext sc,
-                                                @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
-        var user = userMapper.findById(auth);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "user not authenticated");
-        }
+                                                @CurrentSecurityContext SecurityContext sc) {
+        var user = getCurrentUser();
         var channelMember = channelMemberMapper.findByUserAndChannelId(user.getId(), channelId);
         if (channelMember == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "channel member not found");
@@ -208,13 +198,8 @@ public class ChannelController {
     @RequestMapping(
             value = "/api/v1/channels/{channelId}/members", produces = "application/json", method = RequestMethod.GET
     )
-    public List<Object> handleGetChannelMembers(@PathVariable long channelId,
-                                                       @CurrentSecurityContext SecurityContext sc,
-                                                       @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
-        var user = userMapper.findById(auth);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "user not authenticated");
-        }
+    public List<Object> handleGetChannelMembers(@PathVariable long channelId) {
+        var user = getCurrentUser();
         var channel = channelMapper.findById(channelId);
         if (channel == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "channel not found");
@@ -231,11 +216,8 @@ public class ChannelController {
     @RequestMapping(
             value = "/api/v1/channels/{channelId}/{action}", method = RequestMethod.PUT, produces = "application/json"
     )
-    public String handleChannelAction(@PathVariable Long channelId, @PathVariable String action, @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) throws Exception {
-        var user = userMapper.findById(auth);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authenticated");
-        }
+    public String handleChannelAction(@PathVariable Long channelId, @PathVariable String action) throws Exception {
+        var user = getCurrentUser();
         var channel = channelMapper.findById(channelId);
         if (channel == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found");
@@ -272,12 +254,8 @@ public class ChannelController {
 
     @RequestMapping(value = "/api/v1/channels/{channelId}/messages/{messageId}/read",
             method = RequestMethod.PUT)
-    public void markMessageAsRead(@PathVariable Long channelId, @PathVariable Long messageId,
-                                  @RequestHeader(HttpHeaders.AUTHORIZATION) Long auth) {
-        var user = userMapper.findById(auth);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authenticated");
-        }
+    public void markMessageAsRead(@PathVariable Long channelId, @PathVariable Long messageId) {
+        var user = getCurrentUser();
         var channel = channelMapper.findById(channelId);
         if (channel == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found");

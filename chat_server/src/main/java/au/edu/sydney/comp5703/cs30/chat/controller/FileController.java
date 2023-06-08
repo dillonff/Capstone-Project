@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static au.edu.sydney.comp5703.cs30.chat.controller.ControllerHelper.getCurrentUser;
+
 
 @RestController
 public class FileController {
@@ -42,8 +44,8 @@ public class FileController {
     private UserMapper userMapper;
 
     @PostMapping(value = "/api/v1/files", produces = "application/json")
-    public File uploadFile(@RequestParam("file") MultipartFile mf, @RequestHeader("authorization") Long auth) {
-        var user = userMapper.findById(auth);
+    public File uploadFile(@RequestParam("file") MultipartFile mf) {
+        var user = getCurrentUser();
         var file = fileStorageService.storeFile(mf, user.getId());
         return file;
     }

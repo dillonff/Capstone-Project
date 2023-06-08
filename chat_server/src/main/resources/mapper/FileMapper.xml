@@ -43,14 +43,14 @@
         cf.gmt_create as timeCreated,
         cu.username as uploaderName
             from chat_file cf
-            left join chat_user cu on cu.id = cf.uploader_id
+            join chat_user cu on cu.id = cf.uploader_id
+            <if test="workspace != null and workspace != ''">
+                join chat_file_usage cfu on (cfu.usage_type = 1 and cfu.usage_id = #{workspace} and cfu.file_id = cf.id and not cfu.is_deleted)
+            </if>
             <where>
                 1=1
                 <if test="id != null and id != -1">
                     and cf.id = #{id}
-                </if>
-                <if test="workspace != null and workspace!= ''">
-                    and cf.workspace = #{workspace}
                 </if>
                 and not cf.is_deleted
             </where>

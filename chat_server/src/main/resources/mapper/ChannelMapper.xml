@@ -22,9 +22,9 @@
 
     <insert id="insertChannel" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         insert into chat_channel(
-            name, workspace_id, is_public, is_direct_message
+            name, workspace_id, is_public, is_direct_message, is_auto_join
         ) values (
-            #{name}, #{workspaceId}, #{publicChannel}, #{directMessage}
+            #{name}, #{workspaceId}, #{publicChannel}, #{directMessage}, #{autoJoin}
         )
     </insert>
 

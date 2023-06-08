@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -32,7 +33,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private static ObjectMapper om = new ObjectMapper();
     @Override
     protected void handleTextMessage(WebSocketSession wssession, TextMessage message) throws Exception {
-        System.out.println("new ws message");
+        System.out.println("new ws message " + message.getPayload());
         var payload = message.getPayload();
         // construct a json tree of the request payload
         var treeNode = om.readTree(payload);
@@ -57,6 +58,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
         ClientSession.remove(session.getId());
+    }
+
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        System.err.println("ws uri: " + session.getUri());
     }
 
     private ObjectNode makeSuccessfulServerResponseCommon(String request) throws JsonProcessingException {
@@ -122,8 +128,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
 
     private void handleAuthRequest(WebSocketSession wssession, AuthRequest ar) throws Exception {
-        // workaround for the temporary authentication
-        var user = userMapper.findByUsername(ar.getUserName());
+        var token = ar.getToken();
+        if (!StringUtils.hasLength(token)) {
+            throw new RuntimeException("token not provided");
+        }
+        var user = userMapper.findByToken(token);
         if (user == null) {
             throw new RuntimeException("user not authenticated");
         }

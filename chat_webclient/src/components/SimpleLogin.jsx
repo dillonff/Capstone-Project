@@ -1,5 +1,5 @@
 import React from 'react';
-import { login, signup } from '../api';
+import { login, loginToken, signup } from '../api';
 
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -13,19 +13,25 @@ function SimpleLogin({ defaultUsername, onLoggedin }) {
   const formRef = React.useRef();
   const [username, setUsername] = React.useState(defaultUsername);
   const [isSignup, setSignup] = React.useState(false);
+  const [useToken, setUseToken] = React.useState(true);
 
   React.useEffect(_ => {
     console.log(formRef.current);
     console.log(new FormData(formRef.current));
+    loginToken().then(() => {
+      if (onLoggedin) {
+        onLoggedin();
+      }
+    }).catch(e => {
+      setUseToken(false);
+      console.error(e);
+    });
   }, []);
 
   const doLogin = (event) => {
     event.preventDefault();
     login(usernameInputRef.current.value, passwordInputRef.current.value)
       .then((_) => {
-        localStorage.setItem("userID", _.id);
-        localStorage.setItem("userInfo", JSON.stringify(_));
-        console.log(localStorage.getItem("userID"));
         if (onLoggedin) {
           onLoggedin();
         }
@@ -72,6 +78,7 @@ function SimpleLogin({ defaultUsername, onLoggedin }) {
       <h2 style={{ textAlign: 'center' }}>
         {isSignup ? 'Create an account' : 'Login to Vale'}
       </h2>
+      {useToken && <div style={{color: 'red'}}>Trying to validate your login session...</div>}
       <Form ref={formRef}>
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label>Username</Form.Label>

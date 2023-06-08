@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static au.edu.sydney.comp5703.cs30.chat.controller.ControllerHelper.getCurrentUser;
+
 @RestController
 public class UserController extends BaseController {
 
@@ -27,8 +29,16 @@ public class UserController extends BaseController {
     private IUserService userService;
 
     @RequestMapping(value = "/api/v1/users/{userId}", produces = "application/json", method = RequestMethod.GET)
-    public User handleGetUser(@PathVariable long userId) {
-        User user = userMapper.findById(userId);
+    public User handleGetUser(@PathVariable String userId) {
+        if ("current".equals(userId))
+            return getCurrentUser();
+        Long uid;
+        try {
+            uid = Long.parseLong(userId);
+        } catch (NumberFormatException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad user id");
+        }
+        User user = userMapper.findById(uid);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.");
         }
@@ -69,9 +79,23 @@ public class UserController extends BaseController {
         if (req.getNewPassword() != null) {
             userService.changePassword((int) user.getId(), user.getUsername(), req.getOldPassword(), req.getNewPassword());
         }
-        if (req.getUsername() != null && req.getEmail() != null && req.getPhone() != null &&req.getDisplayName() != null) {
-            userService.updateInfoByUid(user.getId(), req.getUsername(), req.getPhone(), req.getEmail(), req.getDisplayName());
+        var username = user.getUsername();
+        var email = user.getEmail();
+        var phone = user.getPhone();
+        var displayName = user.getDisplayName();
+        if (StringUtils.hasLength(req.getUsername())) {
+            username = req.getUsername();
         }
+        if (StringUtils.hasLength(req.getEmail())) {
+            email = req.getEmail();
+        }
+        if (StringUtils.hasLength(req.getPhone())) {
+            phone = req.getPhone();
+        }
+        if (StringUtils.hasLength(req.getDisplayName())) {
+            displayName = req.getDisplayName();
+        }
+        userService.updateInfoByUid(user.getId(), username, phone, email, displayName);
         return new JsonResult<>(OK);
     }
 
