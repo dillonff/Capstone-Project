@@ -15,16 +15,16 @@
     * After setting up the database you need to run the database migration command. This will create desired tables. See 'Mybatis migration' section for details.
     * `cd chat_server`
     * `./migrate up`
-4. Use Intellij IDEA to open `chat_server` directory and load maven changes to install dependencies, then it can be started.
-    * If you want to run this project without Intellij, you can use this maven command:
+4. Use Intellij IDEA to open `chat_server` directory and load maven changes to install dependencies, then it can be started. The server should be running on port 11451.
+    * If you want to run this project without Intellij, you can use this maven command (works on Windows and Linux):
     * `cd chat_server`
     * `./mvnw spring-boot:run`
 5. Open a terminal, cd to `chat_webclient` directory and run `npm install`
-6. run `npm start` to start the frontend
+6. run `npm start` to start the frontend, it should be running on port 3000.
 
 ### Database
-* mysql database is required for this application
-* the username and password are comp5703 and comp5703, which has been written into configuration files. You should use a strong password in the production environment.
+* Mysql database is required for this application. Make sure the database server listens on port 3306
+* the username and password are comp5703 and comp5703, which has been written into configuration files (application.properties and Mybatis migration config). You should use a strong password in the production environment.
 * comp5703 user must be created in the database, either use the db management tool to create the user or use the following sql:
 * `create user 'comp5703'@'%' identified by 'comp5703';`
 * `grant all privileges on *.* to 'comp5703'@'%';`
